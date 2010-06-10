@@ -1,0 +1,803 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!-- saved from url=(0073)http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.h -->
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<TITLE>The C Standard Library</TITLE>
+</HEAD><BODY>
+<H1>C Standard Library</H1> 
+<P>[Last modified : 2006-11-30]</P>
+<H2><A name="Contents">Contents</A></H2>
+<UL>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#assert.h"><CODE>&lt;assert.h&gt;</CODE> : Diagnostics</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ctype.h"><CODE>&lt;ctype.h&gt;</CODE> : Character Class Tests</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno.h"><CODE>&lt;errno.h&gt;</CODE> : Error Codes Reported by (Some) Library Functions</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#float.h"><CODE>&lt;float.h&gt;</CODE> : Implementation-defined Floating-Point Limits</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#limits.h"><CODE>&lt;limits.h&gt;</CODE> : Implementation-defined Limits</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#locale.h"><CODE>&lt;locale.h&gt;</CODE> : Locale-specific Information</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#math.h"><CODE>&lt;math.h&gt;</CODE> : Mathematical Functions</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setjmp.h"><CODE>&lt;setjmp.h&gt;</CODE> : Non-local Jumps</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#signal.h"><CODE>&lt;signal.h&gt;</CODE> : Signals</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdarg.h"><CODE>&lt;stdarg.h&gt;</CODE> : Variable Argument Lists</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stddef.h"><CODE>&lt;stddef.h&gt;</CODE> : Definitions of General Use</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.h"><CODE>&lt;stdio.h&gt;</CODE> : Input and Output</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.h"><CODE>&lt;stdlib.h&gt;</CODE> : Utility functions</A></LI>
+<LI><A href="./The C Standard Library_files/The C Standard Library.htm"><CODE>&lt;string.h&gt;</CODE> : String functions</A></LI>
+<LI><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time.h"><CODE>&lt;time.h&gt;</CODE> : Time and Date functions</A></LI>
+</UL> 
+<H2><A name="assert.h">&lt;assert.h&gt;</A></H2>
+<DL>
+<DT><CODE>void assert(int <VAR>expression</VAR>);</CODE></DT>
+<DD><EM>Macro</EM> used for internal error detection.
+(Ignored if <CODE>NDEBUG</CODE> is defined where <CODE>&lt;assert.h&gt;</CODE>
+is included.)  If <VAR>expression</VAR> equals zero, message printed on
+<CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stderr">stderr</A></CODE> and <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#abort">abort</A>
+called to terminate execution. Source filename and line number in message are
+from preprocessor macros <CODE>__FILE__</CODE> and <CODE>__LINE__</CODE>.</DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="ctype.h">&lt;ctype.h&gt;</A></H2>
+<DL>
+<DT><CODE>int isalnum(int <VAR>c</VAR>);</CODE></DT>
+<DD><CODE>isalpha(<VAR>c</VAR>)</CODE> or <CODE>isdigit(<VAR>c</VAR>)</CODE></DD>
+<DT><CODE>int isalpha(int <VAR>c</VAR>);</CODE></DT>
+<DD><CODE>isupper(<VAR>c</VAR>)</CODE> or <CODE>islower(<VAR>c</VAR>)</CODE></DD>
+<DT><CODE>int iscntrl(int <VAR>c</VAR>);</CODE></DT>
+<DD>is control character.  In ASCII, control characters are <CODE>0x00</CODE> (<CODE>NUL</CODE>) to <CODE>0x1F</CODE> (<CODE>US</CODE>), and <CODE>0x7F</CODE> (<CODE>DEL</CODE>)</DD>
+<DT><CODE>int isdigit(int <VAR>c</VAR>);</CODE></DT>
+<DD>is decimal digit</DD>
+<DT><CODE>int isgraph(int <VAR>c</VAR>);</CODE></DT>
+<DD>is printing character other than space</DD>
+<DT><CODE>int islower(int <VAR>c</VAR>);</CODE></DT>
+<DD>is lower-case letter</DD>
+<DT><CODE>int isprint(int <VAR>c</VAR>);</CODE></DT>
+<DD>is printing character (including space).  In ASCII, printing characters are <CODE>0x20</CODE> (<CODE>' '</CODE>) to <CODE>0x7E</CODE> (<CODE>'~'</CODE>)</DD>
+<DT><CODE>int ispunct(int <VAR>c</VAR>);</CODE></DT>
+<DD>is printing character other than space, letter, digit</DD>
+<DT><CODE>int isspace(int <VAR>c</VAR>);</CODE></DT>
+<DD>is space, formfeed, newline, carriage return, tab, vertical tab</DD>
+<DT><CODE>int isupper(int <VAR>c</VAR>);</CODE></DT>
+<DD>is upper-case letter</DD>
+<DT><CODE>int isxdigit(int <VAR>c</VAR>);</CODE></DT>
+<DD>is hexadecimal digit</DD>
+<DT><CODE>int tolower(int <VAR>c</VAR>);</CODE></DT>
+<DD>return lower-case equivalent</DD>
+<DT><CODE>int toupper(int <VAR>c</VAR>);</CODE></DT>
+<DD>return upper-case equivalent</DD>
+</DL>
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="errno.h">&lt;errno.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="errno">errno</A></CODE></DT>
+<DD>object to which <STRONG>certain</STRONG> library functions assign specific positive values on error</DD>
+<DT><CODE><A name="EDOM">EDOM</A></CODE></DT>
+<DD>code used for domain errors</DD>
+<DT><CODE><A name="ERANGE">ERANGE</A></CODE></DT>
+<DD>code used for range errors</DD>
+</DL>
+<P>Notes:</P>
+<UL>
+<LI>other implementation-defined error values are permitted</LI>
+<LI>to determine the value (if any) assigned to <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A> by a library function, a program should assign zero to <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A> immediately prior to the function call</LI>
+</UL>
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="float.h">&lt;float.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="FLT_RADIX">FLT_RADIX</A></CODE></DT>
+<DD>radix of floating-point representations</DD>
+<DT><CODE>FLT_ROUNDS</CODE></DT>
+<DD>floating-point rounding mode</DD>
+</DL>
+<P>Where the prefix "<CODE>FLT</CODE>" pertains to type <CODE>float</CODE>, "<CODE>DBL</CODE>" to type <CODE>double</CODE>, and "<CODE>LDBL</CODE>" to type <CODE>long double</CODE>:</P>
+<DL>
+<DT><CODE>FLT_DIG</CODE></DT>
+<DT><CODE>DBL_DIG</CODE></DT>
+<DT><CODE>LDBL_DIG</CODE></DT>
+<DD>precision (in decimal digits)</DD>
+<DT><CODE>FLT_EPSILON</CODE></DT>
+<DT><CODE>DBL_EPSILON</CODE></DT>
+<DT><CODE>LDBL_EPSILON</CODE></DT>
+<DD>smallest number <VAR>x</VAR> such that <CODE>1.0 + <VAR>x</VAR> != 1.0</CODE></DD>
+<DT><CODE>FLT_MANT_DIG</CODE></DT>
+<DT><CODE>DBL_MANT_DIG</CODE></DT>
+<DT><CODE>LDBL_MANT_DIG</CODE></DT>
+<DD>number of digits, base <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FLT_RADIX">FLT_RADIX</A></CODE>, in mantissa</DD>
+<DT><CODE>FLT_MAX</CODE></DT>
+<DT><CODE>DBL_MAX</CODE></DT>
+<DT><CODE>LDBL_MAX</CODE></DT>
+<DD>maximum number</DD>
+<DT><CODE>FLT_MAX_EXP</CODE></DT>
+<DT><CODE>DBL_MAX_EXP</CODE></DT>
+<DT><CODE>LDBL_MAX_EXP</CODE></DT>
+<DD>largest positive integer exponent to which <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FLT_RADIX">FLT_RADIX</A></CODE> can be raised and remain representable</DD>
+<DT><CODE>FLT_MIN</CODE></DT>
+<DT><CODE>DBL_MIN</CODE></DT>
+<DT><CODE>LDBL_MIN</CODE></DT>
+<DD>minimum normalised number</DD>
+<DT><CODE>FLT_MIN_EXP</CODE></DT>
+<DT><CODE>DBL_MIN_EXP</CODE></DT>
+<DT><CODE>LDBL_MIN_EXP</CODE></DT>
+<DD>smallest negative integer exponent to which <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FLT_RADIX">FLT_RADIX</A></CODE> can be raised and remain representable</DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="limits.h">&lt;limits.h&gt;</A></H2>
+<DL>
+<DT><CODE>CHAR_BIT</CODE></DT>
+<DD>number of bits in a <CODE>char</CODE></DD>
+<DT><CODE>CHAR_MAX</CODE></DT>
+<DD>maximum value of type <CODE>char</CODE></DD>
+<DT><CODE>CHAR_MIN</CODE></DT>
+<DD>minimum value of type <CODE>char</CODE></DD>
+<DT><CODE>SCHAR_MAX</CODE></DT>
+<DD>maximum value of type <CODE>signed char</CODE></DD>
+<DT><CODE>SCHAR_MIN</CODE></DT>
+<DD>minimum value of type <CODE>signed char</CODE></DD>
+<DT><CODE>UCHAR_MAX</CODE></DT>
+<DD>maximum value of type <CODE>unsigned char</CODE></DD>
+<DT><CODE>SHRT_MAX</CODE></DT>
+<DD>maximum value of type <CODE>short</CODE></DD>
+<DT><CODE>SHRT_MIN</CODE></DT>
+<DD>minimum value of type <CODE>short</CODE></DD>
+<DT><CODE>USHRT_MAX</CODE></DT>
+<DD>maximum value of type <CODE>unsigned short</CODE></DD>
+<DT><CODE>INT_MAX</CODE></DT>
+<DD>maximum value of type <CODE>int</CODE></DD>
+<DT><CODE>INT_MIN</CODE></DT>
+<DD>minimum value of type <CODE>int</CODE></DD>
+<DT><CODE>UINT_MAX</CODE></DT>
+<DD>maximum value of type <CODE>unsigned int</CODE></DD>
+<DT><CODE><A name="LONG_MAX">LONG_MAX</A></CODE></DT>
+<DD>maximum value of type <CODE>long</CODE></DD>
+<DT><CODE><A name="LONG_MIN">LONG_MIN</A></CODE></DT>
+<DD>minimum value of type <CODE>long</CODE></DD>
+<DT><CODE><A name="ULONG_MAX">ULONG_MAX</A></CODE></DT>
+<DD>maximum value of type <CODE>unsigned long</CODE></DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="locale.h">&lt;locale.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="lconv">struct lconv</A></CODE></DT>
+<DD>Describes formatting of monetary and other numeric values:<DL>
+<DT><CODE>char* <A name="decimal_point">decimal_point</A>;</CODE></DT>
+<DD>decimal point for non-monetary values</DD>
+<DT><CODE>char* grouping;</CODE></DT>
+<DD>sizes of digit groups for non-monetary values</DD>
+<DT><CODE>char* thousands_sep;</CODE></DT>
+<DD>separator for digit groups for non-monetary values (left of "decimal point")</DD>
+<DT><CODE>char* currency_symbol;</CODE></DT>
+<DD>currency symbol</DD>
+<DT><CODE>char* int_curr_symbol;</CODE></DT>
+<DD>international currency symbol</DD>
+<DT><CODE>char* mon_decimal_point;</CODE></DT>
+<DD>decimal point for monetary values</DD>
+<DT><CODE>char* mon_grouping;</CODE></DT>
+<DD>sizes of digit groups for monetary values</DD>
+<DT><CODE>char* mon_thousands_sep;</CODE></DT>
+<DD>separator for digit groups for monetary values (left of "decimal point")</DD>
+<DT><CODE>char* negative_sign;</CODE></DT>
+<DD>negative sign for monetary values</DD>
+<DT><CODE>char* positive_sign;</CODE></DT>
+<DD>positive sign for monetary values</DD>
+<DT><CODE>char frac_digits;</CODE></DT>
+<DD>number of digits to be displayed to right of "decimal point" for monetary values</DD>
+<DT><CODE>char int_frac_digits;</CODE></DT>
+<DD>number of digits to be displayed to right of "decimal point" for international monetary values</DD>
+<DT><CODE>char n_cs_precedes;</CODE></DT>
+<DD>whether currency symbol precedes (<CODE>1</CODE>) or follows (<CODE>0</CODE>) negative monetary values</DD>
+<DT><CODE>char n_sep_by_space;</CODE></DT>
+<DD>whether currency symbol is (<CODE>1</CODE>) or is not (<CODE>0</CODE>) separated by space from negative monetary values</DD>
+<DT><CODE><A name="n_sign_posn">char n_sign_posn</A>;</CODE></DT>
+<DD>format for negative monetary values:<DL>
+<DT><CODE>0</CODE></DT>
+<DD>parentheses surround quantity and currency symbol</DD>
+<DT><CODE>1</CODE></DT>
+<DD>sign precedes quantity and currency symbol</DD>
+<DT><CODE>2</CODE></DT>
+<DD>sign follows quantity and currency symbol</DD>
+<DT><CODE>3</CODE></DT>
+<DD>sign immediately precedes currency symbol</DD>
+<DT><CODE>4</CODE></DT>
+<DD>sign immediately follows currency symbol</DD>
+</DL></DD>
+<DT><CODE>char p_cs_precedes;</CODE></DT>
+<DD>whether currency symbol precedes (<CODE>1</CODE>) or follows (<CODE>0</CODE>) positive monetary values</DD>
+<DT><CODE>char p_sep_by_space;</CODE></DT>
+<DD>whether currency symbol is (<CODE>1</CODE>) or is not (<CODE>0</CODE>) separated by space from non-negative monetary values</DD>
+<DT><CODE>char p_sign_posn;</CODE></DT>
+<DD>format for non-negative monetary values, with values as for <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#n_sign_posn">n_sign_posn</A></CODE></DD>
+</DL>Implementations may change field order and include additional fields.  <EM>Standard C Library</EM> functions use only <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#decimal_point">decimal_point</A></CODE>.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#lconv">struct lconv</A>* localeconv(void);</CODE></DT>
+<DD>returns pointer to formatting information for current locale</DD>
+<DT><CODE>char* setlocale(int <VAR><A name="category">category</A></VAR>, const char* locale);</CODE></DT>
+<DD>Sets components of locale according to specified <CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> and <CODE><VAR>locale</VAR></CODE>.  Returns string describing new locale or null on error.  (Implementations are permitted to define values of <CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> additional to those describe here.)</DD>
+<DT><CODE>LC_ALL</CODE></DT>
+<DD><CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> argument for all categories</DD>
+<DT><CODE>LC_NUMERIC</CODE></DT>
+<DD><CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> for numeric formatting information</DD>
+<DT><CODE>LC_MONETARY</CODE></DT>
+<DD><CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> for monetary formatting information</DD>
+<DT><CODE>LC_COLLATE</CODE></DT>
+<DD><CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> for information affecting collating functions</DD>
+<DT><CODE>LC_CTYPE</CODE></DT>
+<DD><CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> for information affecting <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ctype.h">character class tests</A> functions</DD>
+<DT><CODE>LC_TIME</CODE></DT>
+<DD><CODE><VAR><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#category">category</A></VAR></CODE> for information affecting time conversions functions</DD>
+<DT><CODE>NULL</CODE></DT>
+<DD>null pointer constant</DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="math.h">&lt;math.h&gt;</A></H2>
+<P>On domain error, implementation-defined value returned and <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> set to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EDOM">EDOM</A></CODE>.  On range error, <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> set to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ERANGE">ERANGE</A></CODE> and return value is <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#HUGE_VAL">HUGE_VAL</A></CODE> with correct sign for overflow, or zero for underflow.  Angles are in radians.</P>
+<DL>
+<DT><CODE><A name="HUGE_VAL">HUGE_VAL</A></CODE></DT>
+<DD>magnitude returned (with correct sign) on overflow error</DD>
+<DT><CODE>double exp(double <VAR>x</VAR>);</CODE></DT>
+<DD>exponential of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double log(double <VAR>x</VAR>);</CODE></DT>
+<DD>natural logarithm of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double log10(double <VAR>x</VAR>);</CODE></DT>
+<DD>base-10 logarithm of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double pow(double <VAR>x</VAR>, double <VAR>y</VAR>);</CODE></DT>
+<DD><CODE><VAR>x</VAR></CODE> raised to power <CODE><VAR>y</VAR></CODE></DD>
+<DT><CODE>double sqrt(double <VAR>x</VAR>);</CODE></DT>
+<DD>square root of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double ceil(double <VAR>x</VAR>);</CODE></DT>
+<DD>smallest integer not less than <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double floor(double <VAR>x</VAR>);</CODE></DT>
+<DD>largest integer not greater than <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double fabs(double <VAR>x</VAR>);</CODE></DT>
+<DD>absolute value of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double ldexp(double <VAR>x</VAR>, int <VAR>n</VAR>);</CODE></DT>
+<DD><CODE><VAR>x</VAR></CODE> times 2 to the power <CODE><VAR>n</VAR></CODE></DD>
+<DT><CODE>double frexp(double <VAR>x</VAR>, int* <VAR>exp</VAR>);</CODE></DT>
+<DD>if <CODE><VAR>x</VAR></CODE> non-zero, returns value, with absolute value in interval [1/2, 1), and assigns to <CODE>*<VAR>exp</VAR></CODE> integer such that product of return value and 2 raised to the power <CODE>*<VAR>exp</VAR></CODE> equals <CODE><VAR>x</VAR></CODE>; if <CODE><VAR>x</VAR></CODE> zero, both return value and <CODE>*<VAR>exp</VAR></CODE> are zero</DD>
+<DT><CODE>double modf(double <VAR>x</VAR>, double* <VAR>ip</VAR>);</CODE></DT>
+<DD>returns fractional part and assigns to <CODE>*<VAR>ip</VAR></CODE> integral part of <CODE><VAR>x</VAR></CODE>, both with same sign as <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double fmod(double <VAR>x</VAR>, double <VAR>y</VAR>);</CODE></DT>
+<DD>if <CODE><VAR>y</VAR></CODE> non-zero, floating-point remainder of <CODE><VAR>x</VAR>/<VAR>y</VAR></CODE>, with same sign as <CODE><VAR>x</VAR></CODE>; if <CODE><VAR>y</VAR></CODE> zero, result is implementation-defined</DD>
+<DT><CODE>double sin(double <VAR>x</VAR>);</CODE></DT>
+<DD>sine of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double cos(double <VAR>x</VAR>);</CODE></DT>
+<DD>cosine of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double tan(double <VAR>x</VAR>);</CODE></DT>
+<DD>tangent of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double asin(double <VAR>x</VAR>);</CODE></DT>
+<DD>arc-sine of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double acos(double <VAR>x</VAR>);</CODE></DT>
+<DD>arc-cosine of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double atan(double <VAR>x</VAR>);</CODE></DT>
+<DD>arc-tangent of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double atan2(double <VAR>y</VAR>, double <VAR>x</VAR>);</CODE></DT>
+<DD>arc-tangent of <CODE><VAR>y</VAR>/<VAR>x</VAR></CODE></DD>
+<DT><CODE>double sinh(double <VAR>x</VAR>);</CODE></DT>
+<DD>hyperbolic sine of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double cosh(double <VAR>x</VAR>);</CODE></DT>
+<DD>hyperbolic cosine of <CODE><VAR>x</VAR></CODE></DD>
+<DT><CODE>double tanh(double <VAR>x</VAR>);</CODE></DT>
+<DD>hyperbolic tangent of <CODE><VAR>x</VAR></CODE></DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="setjmp.h">&lt;setjmp.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="jmp_buf">jmp_buf</A></CODE></DT>
+<DD>type of object holding context information</DD>
+<DT><CODE>int setjmp(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#jmp_buf">jmp_buf</A> <VAR>env</VAR>);</CODE></DT>
+<DD>Saves context information in <CODE><VAR>env</VAR></CODE> and returns zero.  Subsequent call to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#longjmp">longjmp</A></CODE> with same <VAR>env</VAR> returns non-zero.</DD>
+<DT><CODE>void longjmp(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#jmp_buf">jmp_buf</A> <VAR>env</VAR>, int <VAR>val</VAR>);</CODE></DT>
+<DD>Restores context saved by most recent call to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setjmp">setjmp</A></CODE> with specified <CODE><VAR>env</VAR></CODE>.  Execution resumes as a second return from <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setjmp">setjmp</A></CODE>, with returned value <CODE><VAR>val</VAR></CODE> if specified value non-zero, or 1 otherwise.</DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="signal.h">&lt;signal.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="sigabrt">SIGABRT</A></CODE></DT>
+<DD>abnormal termination</DD>
+<DT><CODE>SIGFPE</CODE></DT>
+<DD>arithmetic error</DD>
+<DT><CODE>SIGILL</CODE></DT>
+<DD>invalid execution</DD>
+<DT><CODE>SIGINT</CODE></DT>
+<DD>(asynchronous) interactive attention</DD>
+<DT><CODE>SIGSEGV</CODE></DT>
+<DD>illegal storage access</DD>
+<DT><CODE>SIGTERM</CODE></DT>
+<DD>(asynchronous) termination request</DD>
+<DT><CODE><A name="SIG_DFL">SIG_DFL</A></CODE></DT>
+<DD>specifies default signal handling</DD>
+<DT><CODE><A name="SIG_ERR">SIG_ERR</A></CODE></DT>
+<DD><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#signal">signal</A></CODE> return value indicating error</DD>
+<DT><CODE><A name="SIG_IGN">SIG_IGN</A></CODE></DT>
+<DD>specifies that signal should be ignored</DD>
+<DT><CODE>void (*<A name="signal">signal</A>(int <VAR>sig</VAR>, void (*<VAR>handler</VAR>)(int)))(int);</CODE></DT>
+<DD>Install handler for subsequent signal <VAR>sig</VAR>.  If <CODE><VAR>handler</VAR></CODE> is <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#SIG_DFL">SIG_DFL</A></CODE>, implementation-defined default behaviour will be used; if <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#SIG_IGN">SIG_IGN</A></CODE>, signal will be ignored; otherwise function pointed to by <CODE><VAR>handler</VAR></CODE> will be invoked with argument <VAR>sig</VAR>.  In the last case, handling is <STRONG>restored to default behaviour</STRONG> before <CODE><VAR>handler</VAR></CODE> is called.  If <CODE><VAR>handler</VAR></CODE> returns, execution resumes where signal occurred.  <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#signal">signal</A></CODE> returns the previous handler or <CODE>SIG_ERR</CODE> on error.  Initial state is implementation-defined.  Implementations may may define signals additional to those listed here.</DD>
+<DT><CODE><A name="raise">int raise(int <VAR>sig</VAR>);</A></CODE></DT>
+<DD>Sends signal <CODE><VAR>sig</VAR></CODE>.  Returns zero on success.</DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="stdarg.h">&lt;stdarg.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="va_list">va_list</A></CODE></DT>
+<DD>type of object holding context information</DD>
+<DT><CODE>void <A name="va_start">va_start</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_list">va_list</A> <VAR>ap</VAR>, <VAR>lastarg</VAR>);</CODE></DT>
+<DD>Initialisation macro which must be called once before any unnamed argument is accessed.  Stores context information in <CODE><VAR>ap</VAR></CODE>.  <CODE><VAR>lastarg</VAR></CODE> is the last named parameter of the function.</DD>
+<DT><CODE><VAR>type</VAR> <A name="vaarg">va_arg</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_list">va_list</A> <VAR>ap</VAR>, <VAR>type</VAR>);</CODE></DT>
+<DD>Yields value of the type (<CODE><VAR>type</VAR></CODE>) and value of the next unnamed argument.</DD>
+<DT><CODE>void <A name="va_end">va_end</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_list">va_list</A> <VAR>ap</VAR>);</CODE></DT>
+<DD>Termination macro which must be called once after argument processing and before exit from function.</DD>
+</DL>  
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="stddef.h">&lt;stddef.h&gt;</A></H2>
+<DL>
+<DT><CODE>NULL</CODE></DT>
+<DD>Null pointer constant.</DD>
+<DT><CODE>offsetof(<VAR>stype</VAR>, <VAR>m</VAR>)</CODE></DT>
+<DD>Offset (in bytes) of member <CODE><VAR>m</VAR></CODE> from start of structure type <CODE><VAR>stype</VAR></CODE>.</DD>
+<DT><CODE>ptrdiff_t</CODE></DT>
+<DD>Type for objects declared to store result of subtracting pointers.</DD>
+<DT><CODE>size_t</CODE></DT>
+<DD>Type for objects declared to store result of <CODE>sizeof</CODE> operator.</DD>
+</DL>
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="stdio.h">&lt;stdio.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="BUFSIZ">BUFSIZ</A></CODE></DT>
+<DD>Size of buffer used by <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setbuf">setbuf</A></CODE>.</DD>
+<DT><CODE><A name="EOF">EOF</A></CODE></DT>
+<DD>Value used to indicate end-of-stream or to report an error.</DD>
+<DT><CODE>FILENAME_MAX</CODE></DT>
+<DD>Maximum length required for array of characters to hold a filename.</DD>
+<DT><CODE>FOPEN_MAX</CODE></DT>
+<DD>Maximum number of files which may be open simultaneously.</DD>
+<DT><CODE><A name="L_tmpnam">L_tmpnam</A></CODE></DT>
+<DD>Number of characters required for temporary filename generated by <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#tmpnam">tmpnam</A></CODE>.</DD>
+<DT><CODE><A name="stdio.NULL">NULL</A></CODE></DT>
+<DD>Null pointer constant.</DD>
+<DT><CODE><A name="SEEK_CUR">SEEK_CUR</A></CODE></DT>
+<DD>Value for <CODE><VAR>origin</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fseek">fseek</A></CODE> specifying current file position.</DD>
+<DT><CODE><A name="SEEK_END">SEEK_END</A></CODE></DT>
+<DD>Value for <CODE><VAR>origin</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fseek">fseek</A></CODE> specifying end of file.</DD>
+<DT><CODE><A name="SEEK_SET">SEEK_SET</A></CODE></DT>
+<DD>Value for <CODE><VAR>origin</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fseek">fseek</A></CODE> specifying beginning of file.</DD>
+<DT><CODE><A name="TMP_MAX">TMP_MAX</A></CODE></DT>
+<DD>Minimum number of unique filenames generated by calls to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#tmpnam">tmpnam</A></CODE>.</DD>
+<DT><CODE><A name="_IOFBF">_IOFBF</A></CODE></DT>
+<DD>Value for <CODE><VAR>mode</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setvbuf">setvbuf</A></CODE> specifying full buffering.</DD>
+<DT><CODE><A name="_IOLBF">_IOLBF</A></CODE></DT>
+<DD>Value for <CODE><VAR>mode</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setvbuf">setvbuf</A></CODE> specifying line buffering.</DD>
+<DT><CODE><A name="_IONBF">_IONBF</A></CODE></DT>
+<DD>Value for <CODE><VAR>mode</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setvbuf">setvbuf</A></CODE> specifying no buffering.</DD>
+<DT><CODE><A name="stdin">stdin</A></CODE></DT>
+<DD>File pointer for standard input stream.  Automatically opened when program execution begins.</DD>
+<DT><CODE><A name="stdout">stdout</A></CODE></DT>
+<DD>File pointer for standard output stream.  Automatically opened when program execution begins.</DD>
+<DT><CODE><A name="stderr">stderr</A></CODE></DT>
+<DD>File pointer for standard error stream.  Automatically opened when program execution begins.</DD>
+<DT><CODE><A name="FILE">FILE</A></CODE></DT>
+<DD>Type of object holding information necessary to control a stream.</DD>
+<DT><CODE><A name="fpos_t">fpos_t</A></CODE></DT>
+<DD>Type for objects declared to store file position information.</DD>
+<DT><CODE><A name="stdio.size_t">size_t</A></CODE></DT>
+<DD>Type for objects declared to store result of <CODE>sizeof</CODE> operator.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <A name="fopen">fopen</A>(const char* <VAR>filename</VAR>, const char* <VAR>mode</VAR>);</CODE></DT>
+<DD>Opens file named <CODE><VAR>filename</VAR></CODE> and returns a stream, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.NULL">NULL</A></CODE> on failure.  <CODE><VAR>mode</VAR></CODE> may be one of the following for text files:<DL>
+<DT><CODE>"r"</CODE></DT>
+<DD>text reading</DD>
+<DT><CODE>"w"</CODE></DT>
+<DD>text writing</DD>
+<DT><CODE>"a"</CODE></DT>
+<DD>text append</DD>
+<DT><CODE>"r+"</CODE></DT>
+<DD>text update (reading and writing)</DD>
+<DT><CODE>"w+"</CODE></DT>
+<DD>text update, discarding previous content (if any)</DD>
+<DT><CODE>"a+"</CODE></DT>
+<DD>text append, reading, and writing at end</DD>
+</DL> or one of those strings with <CODE>b</CODE> included (after the first character), for binary files.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* freopen(const char* <VAR>filename</VAR>, const char* <VAR>mode</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Closes file associated with <CODE><VAR>stream</VAR></CODE>, then opens file <CODE><VAR>filename</VAR></CODE> with specified mode and associates it with <CODE><VAR>stream</VAR></CODE>.  Returns <CODE><VAR>stream</VAR></CODE> or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.NULL">NULL</A></CODE> on error.</DD>
+<DT><CODE>int <A name="fflush">fflush</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Flushes stream <CODE><VAR>stream</VAR></CODE> and returns zero on success or <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A> on error.  Effect undefined for input stream.  <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fflush">fflush</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.NULL">NULL</A>)</CODE> flushes all output streams.</DD>
+<DT><CODE>int <A name="fclose">fclose</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Closes stream <VAR>stream</VAR> (after flushing, if output stream).  Returns <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE> on error, zero otherwise.</DD>
+<DT><CODE>int <A name="remove">remove</A>(const char* <VAR>filename</VAR>);</CODE></DT>
+<DD>Removes specified file. Returns non-zero on failure.</DD>
+<DT><CODE>int <A name="rename">rename</A>(const char* <VAR>oldname</VAR>, const char* <VAR>newname</VAR>);</CODE></DT>
+<DD>Changes name of file <CODE><VAR>oldname</VAR></CODE> to <CODE><VAR>newname</VAR></CODE>. Returns non-zero on failure.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <A name="tmpfile">tmpfile</A>();</CODE></DT>
+<DD>Creates temporary file (mode <CODE>"wb+"</CODE>) which will be removed when closed or on normal program termination.  Returns stream or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.NULL">NULL</A></CODE> on failure.</DD>
+<DT><CODE>char* <A name="tmpnam">tmpnam</A>(char <VAR>s</VAR>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#L_tmpnam">L_tmpnam</A>]);</CODE></DT>
+<DD>Assigns to <CODE><VAR>s</VAR></CODE> (if <CODE><VAR>s</VAR></CODE> non-null) and returns unique name for a temporary file.  Unique name is returned for each of the first <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#TMP_MAX">TMP_MAX</A></CODE> invocations.</DD>
+<DT><CODE>int <A name="setvbuf">setvbuf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, char* <VAR>buf</VAR>, int <VAR>mode</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>size</VAR>);</CODE></DT>
+<DD>Controls buffering for stream <CODE><VAR>stream</VAR></CODE>.  <CODE><VAR>mode</VAR></CODE> is <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#_IOFBF">_IOFBF</A></CODE> for full buffering, <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#_IOLBF">_IOLBF</A></CODE> for line buffering, <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#_IONBF">_IONBF</A></CODE> for no buffering.  Non-null <CODE><VAR>buf</VAR></CODE> specifies buffer of size <CODE><VAR>size</VAR></CODE> to be used; otherwise, a buffer is allocated.  Returns non-zero on error.  Call must be before any other operation on stream.</DD>
+<DT><CODE>void <A name="setbuf">setbuf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, char* <VAR>buf</VAR>);</CODE></DT>
+<DD>Controls buffering for stream <VAR>stream</VAR>.  For null <CODE><VAR>buf</VAR></CODE>, turns off buffering, otherwise equivalent to <CODE>(void)<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#setvbuf">setvbuf</A>(<VAR>stream</VAR>,&nbsp;<VAR>buf</VAR>,&nbsp;<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#_IOFBF">_IOFBF</A>,&nbsp;<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#BUFSIZ">BUFSIZ</A>)</CODE>.</DD>
+<DT><CODE>int <A name="fprintf">fprintf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, const char* <VAR>format</VAR>, ...);</CODE></DT>
+<DD>Converts (according to format <CODE><VAR>format</VAR></CODE>) and writes output to stream <CODE><VAR>stream</VAR></CODE>.  Number of characters written, or negative value on error, is returned.  Conversion specifications consist of:<UL>
+<LI><CODE>%</CODE></LI>
+<LI>(optional) flag:<DL>
+<DT><CODE>-</CODE></DT>
+<DD>left adjust</DD>
+<DT><CODE>+</CODE></DT>
+<DD>always sign</DD>
+<DT><EM>space</EM></DT>
+<DD>space if no sign</DD>
+<DT><CODE>0</CODE></DT>
+<DD>zero pad</DD>
+<DT><CODE>#</CODE></DT>
+<DD>Alternate form: for conversion character <CODE>o</CODE>, first digit will be zero, for [<CODE>xX</CODE>], prefix <CODE>0x</CODE> or <CODE>0X</CODE> to non-zero value, for [<CODE>eEfgG</CODE>], always decimal point, for [<CODE>gG</CODE>]
+trailing zeros not removed.</DD>
+</DL></LI>
+<LI>(optional) minimum width: if specified as <CODE>*</CODE>, value taken from next argument (which must be <CODE>int</CODE>).</LI>
+<LI>(optional) <CODE>.</CODE> (separating width from precision):</LI>
+<LI>(optional) precision: for conversion character <CODE>s</CODE>, maximum characters to be printed from the string, for [<CODE>eEf</CODE>], digits after decimal point, for [<CODE>gG</CODE>], significant digits, for an integer, minimum number of digits to be printed.  If specified as <CODE>*</CODE>, value taken from next argument (which must be <CODE>int</CODE>).</LI>
+<LI>(optional) length modifier:<DL>
+<DT><CODE>h</CODE></DT>
+<DD><CODE>short</CODE> or <CODE>unsigned short</CODE></DD>
+<DT><CODE>l</CODE></DT>
+<DD><CODE>long</CODE> or <CODE>unsigned long</CODE></DD>
+<DT><CODE>L</CODE></DT>
+<DD><CODE>long double</CODE></DD>
+</DL></LI>
+<LI>conversion character:<DL>
+<DT><CODE>d,i</CODE></DT>
+<DD><CODE>int</CODE> argument, printed in signed decimal notation</DD>
+<DT><CODE>o</CODE></DT>
+<DD><CODE>int</CODE> argument, printed in unsigned octal notation</DD>
+<DT><CODE>x,X</CODE></DT>
+<DD><CODE>int</CODE> argument, printed in unsigned hexadecimal notation</DD>
+<DT><CODE>u</CODE></DT>
+<DD><CODE>int</CODE> argument, printed in unsigned decimal notation</DD>
+<DT><CODE>c</CODE></DT>
+<DD><CODE>int</CODE> argument, printed as single character</DD>
+<DT><CODE>s</CODE></DT>
+<DD><CODE>char*</CODE> argument</DD>
+<DT><CODE>f</CODE></DT>
+<DD><CODE>double</CODE> argument, printed with format [<CODE>-</CODE>]<VAR>mmm</VAR><CODE>.</CODE><VAR>ddd</VAR></DD>
+<DT><CODE>e,E</CODE></DT>
+<DD><CODE>double</CODE> argument, printed with format [<CODE>-</CODE>]<VAR>m</VAR><CODE>.</CODE><VAR>dddddd</VAR>(<CODE>e</CODE>|<CODE>E</CODE>)(<CODE>+</CODE>|<CODE>-</CODE>)<VAR>xx</VAR></DD>
+<DT><CODE>g,G</CODE></DT>
+<DD><CODE>double</CODE> argument</DD>
+<DT><CODE>p</CODE></DT>
+<DD><CODE>void*</CODE> argument, printed as pointer</DD>
+<DT><CODE>n</CODE></DT>
+<DD><CODE>int*</CODE> argument : the  number of characters written to this point is written <EM>into</EM> argument</DD>
+<DT><CODE>%</CODE></DT>
+<DD>no argument; prints %</DD>
+</DL></LI>
+</UL></DD>
+<DT><CODE>int <A name="printf">printf</A>(const char* <VAR>format</VAR>, ...);</CODE></DT>
+<DD><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#printf">printf</A>(f, ...)</CODE> is equivalent to
+<CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fprintf">fprintf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdout">stdout</A>, f, ...)</CODE></DD>
+<DT><CODE>int <A name="sprintf">sprintf</A>(char* <VAR>s</VAR>, const char* <VAR>format</VAR>, ...);</CODE></DT>
+<DD>Like <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fprintf">fprintf</A>, but output written into string <CODE><VAR>s</VAR></CODE>, which <STRONG>must be large enough to hold the output</STRONG>, rather than to a stream.  Output is <CODE>NUL</CODE>-terminated.  Returns length (excluding the terminating <CODE>NUL</CODE>).</DD>
+<DT><CODE>int <A name="vfprintf">vfprintf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, const char* <VAR>format</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_list">va_list</A> <VAR>arg</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fprintf">fprintf</A></CODE> with variable argument list replaced by <CODE><VAR>arg</VAR></CODE>, which must have been initialised by the <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_start">va_start</A></CODE> macro (and may have been used in calls to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_arg">va_arg</A></CODE>).</DD>
+<DT><CODE>int <A name="vprintf">vprintf</A>(const char* <VAR>format</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_list">va_list</A> <VAR>arg</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#printf">printf</A></CODE> with variable argument list replaced by <CODE><VAR>arg</VAR></CODE>, which must have been initialised by the <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_start">va_start</A></CODE> macro (and may have been used in calls to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_arg">va_arg</A></CODE>).</DD>
+<DT><CODE>int vsprintf(char* <VAR>s</VAR>, const char* <VAR>format</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_list">va_list</A> <VAR>arg</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#sprintf">sprintf</A></CODE> with variable argument list replaced by <CODE><VAR>arg</VAR></CODE>, which must have been initialised by the <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_start">va_start</A></CODE> macro (and may have been used in calls to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#va_arg">va_arg</A></CODE>).</DD>
+<DT><CODE>int <A name="fscanf">fscanf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, const char* <VAR>format</VAR>, ...);</CODE></DT>
+<DD>Performs formatted input conversion, reading from stream <CODE><VAR>stream</VAR></CODE> according to format <CODE><VAR>format</VAR></CODE>.  The function returns when <CODE><VAR>format</VAR></CODE> is fully processed.  Returns number of items converted and assigned, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE> if end-of-file or error occurs before any conversion.  Each of the arguments following <CODE><VAR>format</VAR></CODE> <STRONG>must be a pointer</STRONG>.  Format string may contain:<UL>
+<LI>blanks and tabs, which are ignored</LI>
+<LI>ordinary characters, which are expected to match next non-white-space of input</LI>
+<LI>conversion specifications, consisting of:<UL>
+<LI><CODE>%</CODE></LI>
+<LI>(optional) assignment suppression character "<CODE>*</CODE>"</LI>
+<LI>(optional) maximum field width</LI>
+<LI>(optional) target width indicator:<DL>
+<DT><CODE>h</CODE></DT>
+<DD>argument is pointer to <CODE>short</CODE> rather than <CODE>int</CODE></DD>
+<DT><CODE>l</CODE></DT>
+<DD>argument is pointer to <CODE>long</CODE> rather than <CODE>int</CODE>, or <CODE>double</CODE> rather than <CODE>float</CODE></DD>
+<DT><CODE>L</CODE></DT>
+<DD>argument is pointer to <CODE>long double</CODE> rather than <CODE>float</CODE></DD>
+</DL></LI>
+<LI>conversion character:
+<DL>
+<DT><CODE>d</CODE></DT>
+<DD>decimal integer; <CODE>int*</CODE> parameter required</DD>
+<DT><CODE>i</CODE></DT>
+<DD>integer; <CODE>int*</CODE> parameter required; decimal, octal or hex</DD>
+<DT><CODE>o</CODE></DT>
+<DD>octal integer; <CODE>int*</CODE> parameter required</DD>
+<DT><CODE>u</CODE></DT>
+<DD>unsigned decimal integer; <CODE>unsigned int*</CODE> parameter required</DD>
+<DT><CODE>x</CODE></DT>
+<DD>hexadecimal integer; <CODE>int*</CODE> parameter required</DD>
+<DT><CODE>c</CODE></DT>
+<DD>characters; <CODE>char*</CODE> parameter required; white-space is not skipped, and <CODE>NUL</CODE>-termination is not performed</DD>
+<DT><CODE>s</CODE></DT>
+<DD>string of non-white-space; <CODE>char*</CODE> parameter required; string is <CODE>NUL</CODE>-terminated</DD>
+<DT><CODE>e,f,g</CODE></DT>
+<DD>floating-point number; <CODE>float*</CODE> parameter required</DD>
+<DT><CODE>p</CODE></DT>
+<DD>pointer value; <CODE>void*</CODE> parameter required</DD>
+<DT><CODE>n</CODE></DT>
+<DD>chars read so far; <CODE>int*</CODE> parameter required</DD>
+<DT><CODE>[<VAR>...</VAR>]</CODE></DT>
+<DD>longest non-empty string from specified set; <CODE>char*</CODE> parameter required; string is <CODE>NUL</CODE>-terminated</DD>
+<DT><CODE>[^<VAR>...</VAR>]</CODE></DT>
+<DD>longest non-empty string not from specified set; <CODE>char*</CODE> parameter required; string is <CODE>NUL</CODE>-terminated</DD>
+<DT><CODE>%</CODE></DT>
+<DD>literal <CODE>%</CODE>; no assignment</DD>
+</DL></LI></UL></LI></UL></DD>
+<DT><CODE>int <A name="scanf">scanf</A>(const char* <VAR>format</VAR>, ...);</CODE></DT>
+<DD><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#scanf">scanf</A>(f, ...)</CODE> is equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fscanf">fscanf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdin">stdin</A>, f, ...)</CODE></DD>
+<DT><CODE>int sscanf(char* <VAR>s</VAR>, const char* <VAR>format</VAR>, ...);</CODE></DT>
+<DD>Like <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fscanf">fscanf</A></CODE>, but input read from string <CODE><VAR>s</VAR></CODE>.</DD>
+<DT><CODE>int <A name="fgetc">fgetc</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Returns next character from (input) stream <CODE><VAR>stream</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE> on end-of-file or error.</DD>
+<DT><CODE>char* <A name="fgets">fgets</A>(char* <VAR>s</VAR>, int <VAR>n</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Copies characters from (input) stream <CODE><VAR>stream</VAR></CODE> to <CODE><VAR>s</VAR></CODE>, stopping when <CODE><VAR>n</VAR></CODE>-1 characters copied, newline copied, end-of-file reached or error occurs.  If no error, <CODE><VAR>s</VAR></CODE> is <CODE>NUL</CODE>-terminated.  Returns <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.NULL">NULL</A></CODE> on end-of-file or error, <CODE><VAR>s</VAR></CODE> otherwise.</DD>
+<DT>int <CODE><A name="fputc">fputc</A>(int <VAR>c</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Writes <CODE><VAR>c</VAR></CODE>, to stream <CODE><VAR>stream</VAR></CODE>. Returns <CODE><VAR>c</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE> on error.</DD>
+<DT><CODE>char* <A name="fputs">fputs</A>(const char* <VAR>s</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Writes <CODE><VAR>s</VAR></CODE>, to (output) stream stream. Returns non-negative on success or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE> on error.</DD>
+<DT><CODE>int <A name="getc">getc</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fgetc">fgetc</A></CODE> except that it may be a macro.</DD>
+<DT><CODE>int <A name="getchar">getchar</A>(void);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#getc">getc</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdin">stdin</A>)</CODE>.</DD>
+<DT><CODE>char* <A name="gets">gets</A>(char* <VAR>s</VAR>);</CODE></DT>
+<DD>Copies characters from <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdin">stdin</A></CODE> into <CODE><VAR>s</VAR></CODE> until newline encountered, end-of-file reached, or error occurs.  Does not copy newline.  <CODE>NUL</CODE>-terminates <CODE><VAR>s</VAR></CODE>.  Returns <CODE><VAR>s</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.NULL">NULL</A></CODE> on end-of-file or error.  <STRONG>Should not be used because of the potential for buffer overflow.</STRONG></DD>
+<DT><CODE>int <A name="putc">putc</A>(int <VAR>c</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fputc">fputc</A></CODE> except that it may be a macro.</DD>
+<DT><CODE>int <A name="putchar">putchar</A>(int <VAR>c</VAR>);</CODE></DT>
+<DD><CODE>putchar(<VAR>c</VAR>)</CODE> is equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#putc">putc</A>(<VAR>c</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdout">stdout</A>)</CODE>.</DD>
+<DT><CODE>int <A name="puts">puts</A>(const char* <VAR>s</VAR>);</CODE></DT>
+<DD>Writes <CODE><VAR>s</VAR></CODE> (excluding terminating <CODE>NUL</CODE>) and a newline to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdout">stdout</A></CODE>. Returns non-negative on success, <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE> on error.</DD>
+<DT><CODE>int <A name="ungetc">ungetc</A>(int <VAR>c</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Pushes <CODE><VAR>c</VAR></CODE> (which must not be <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE>), onto (input) stream <CODE><VAR>stream</VAR></CODE> such that it will be returned by the next read.  Only one character of pushback is guaranteed (for each stream).  Returns <CODE><VAR>c</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EOF">EOF</A></CODE> on error.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <A name="fread">fread</A>(void* <VAR>ptr</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>size</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>nobj</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Reads (at most) <CODE><VAR>nobj</VAR></CODE> objects of size <CODE><VAR>size</VAR></CODE> from stream <CODE><VAR>stream</VAR></CODE> into <CODE><VAR>ptr</VAR></CODE> and returns number of objects read.  (<CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#feof">feof</A></CODE> and <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ferror">ferror</A></CODE> can be used to check status.)</DD>
+<DT><CODE>size_t <A name="fwrite">fwrite</A>(const void* <VAR>ptr</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>size</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>nobj</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Writes to stream <CODE><VAR>stream</VAR></CODE>, <CODE><VAR>nobj</VAR></CODE> objects of size <CODE><VAR>size</VAR></CODE> from array <CODE><VAR>ptr</VAR></CODE>.  Returns number of objects written.</DD>
+<DT><CODE>int <A name="fseek">fseek</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, long <VAR>offset</VAR>, int <VAR>origin</VAR>);</CODE></DT>
+<DD>Sets file position for stream <CODE><VAR>stream</VAR></CODE> and clears end-of-file indicator.  For a binary stream, file position is set to <CODE><VAR>offset</VAR></CODE> bytes from the position indicated by <CODE><VAR>origin</VAR></CODE>: beginning of file for <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#SEEK_SET">SEEK_SET</A></CODE>, current position for <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#SEEK_CUR">SEEK_CUR</A></CODE>, or end of file for <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#SEEK_END">SEEK_END</A></CODE>.  Behaviour is similar for a text stream, but <CODE><VAR>offset</VAR></CODE> must be zero or, for <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#SEEK_SET">SEEK_SET</A></CODE> only, a value returned by <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ftell">ftell</A></CODE>.  Returns non-zero on error.</DD>
+<DT><CODE>long <A name="ftell">ftell</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Returns current file position for stream <CODE><VAR>stream</VAR></CODE>, or <CODE>-1</CODE> on error.</DD>
+<DT><CODE>void <A name="rewind">rewind</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fseek">fseek</A>(<VAR>stream</VAR>, 0L, SEEK_SET); <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#clearerr">clearerr</A>(<VAR>stream</VAR>)</CODE>.</DD>
+<DT><CODE>int <A name="fgetpos">fgetpos</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fpos_t">fpos_t</A>* <VAR>ptr</VAR>);</CODE></DT>
+<DD>Stores current file position for stream <CODE><VAR>stream</VAR></CODE> in <CODE>*<VAR>ptr</VAR></CODE>.  Returns non-zero on error.</DD>
+<DT><CODE>int <A name="fsetpos">fsetpos</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>, const <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fpos_t">fpos_t</A>* <VAR>ptr</VAR>);</CODE></DT>
+<DD>Sets current position of stream <VAR>stream</VAR> to <CODE>*<VAR>ptr</VAR></CODE>.  Returns non-zero on error.</DD>
+<DT><CODE>void <A name="clearerr">clearerr</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Clears end-of-file and error indicators for stream <CODE><VAR>stream</VAR></CODE>.</DD>
+<DT><CODE>int <A name="feof">feof</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Returns non-zero if end-of-file indicator is set for stream <CODE><VAR>stream</VAR></CODE>.</DD>
+<DT><CODE>int <A name="ferror">ferror</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#FILE">FILE</A>* <VAR>stream</VAR>);</CODE></DT>
+<DD>Returns non-zero if error indicator is set for stream <CODE><VAR>stream</VAR></CODE>.</DD>
+<DT><CODE>void <A name="perror">perror</A>(const char* <VAR>s</VAR>);</CODE></DT>
+<DD>Prints <CODE><VAR>s</VAR></CODE> (if non-null) and <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#strerror">strerror</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A>)</CODE> to standard error as would:<PRE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#fprintf">fprintf</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stderr">stderr</A>, "%s: %s\n", (<VAR>s</VAR> != <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.NULL">NULL</A> ? <VAR>s</VAR> : ""), <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#strerror">strerror</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A>))</PRE></DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="stdlib.h">&lt;stdlib.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="EXIT_FAILURE">EXIT_FAILURE</A></CODE></DT>
+<DD>Value for <CODE><VAR>status</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#exit">exit</A></CODE> indicating failure.</DD>
+<DT><CODE><A name="EXIT_SUCCESS">EXIT_SUCCESS</A></CODE></DT>
+<DD>Value for <CODE><VAR>status</VAR></CODE> argument to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#exit">exit</A></CODE> indicating success.</DD>
+<DT><CODE><A name="RAND_MAX">RAND_MAX</A></CODE></DT>
+<DD>Maximum value returned by <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#rand">rand</A>()</CODE>.</DD>
+<DT><CODE><A name="stdlib.NULL">NULL</A></CODE></DT>
+<DD>Null pointer constant.</DD>
+<DT><CODE><A name="div_t">div_t</A></CODE></DT>
+<DD>Return type of <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#div">div</A>()</CODE>.  Structure having members:<DL>
+<DT><CODE>int quot;</CODE>
+</DT><DD>quotient</DD>
+<DT><CODE>int rem;</CODE>
+</DT><DD>remainder</DD>
+</DL></DD>
+<DT><CODE><A name="ldiv_t">ldiv_t</A></CODE></DT>
+<DD>Return type of <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ldiv">ldiv</A>()</CODE>.  Structure having members:<DL>
+<DT><CODE>long quot;</CODE>
+</DT><DD>quotient</DD>
+<DT><CODE>long rem;</CODE>
+</DT><DD>remainder</DD>
+</DL></DD>
+<DT><CODE><A name="stdlib.size_t">size_t</A></CODE></DT>
+<DD>Type for objects declared to store result of <CODE>sizeof</CODE> operator.</DD>
+<DT><CODE>int abs(int <VAR>n</VAR>);</CODE></DT>
+<DT><CODE>long labs(long <VAR>n</VAR>);</CODE></DT>
+<DD>Returns absolute value of <CODE><VAR>n</VAR></CODE>.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#div_t">div_t</A> <A name="div">div</A>(int <VAR>num</VAR>, int <VAR>denom</VAR>);</CODE></DT>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ldiv_t">ldiv_t</A> <A name="ldiv">ldiv</A>(long <VAR>num</VAR>, long <VAR>denom</VAR>);</CODE></DT>
+<DD>Returns quotient and remainder of <CODE><VAR>num</VAR>/<VAR>denom</VAR></CODE>.</DD>
+<DT><CODE>double atof(const char* <VAR>s</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#strtod">strtod</A>(<VAR>s</VAR>, (char**)<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A>)</CODE> except that <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> is not necessarily set on conversion error.</DD>
+<DT><CODE>int atoi(const char* <VAR>s</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE>(int)<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#strtol">strtol</A>(<VAR>s</VAR>, (char**)<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A>, 10)</CODE> except that <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> is not necessarily set on conversion error.</DD>
+<DT><CODE>long atol(const char* <VAR>s</VAR>);</CODE></DT>
+<DD>Equivalent to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#strtol">strtol</A>(<VAR>s</VAR>, (char**)<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A>, 10)</CODE> except that <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> is not necessarily set on conversion error.</DD>
+<DT><CODE>double <A name="strtod">strtod</A>(const char* <VAR>s</VAR>, char** <VAR>endp</VAR>);</CODE></DT>
+<DD>Converts initial characters (ignoring leading white space) of <CODE><VAR>s</VAR></CODE> to type <CODE>double</CODE>.  If <CODE><VAR>endp</VAR></CODE> non-null, stores pointer to unconverted suffix in <CODE>*<VAR>endp</VAR></CODE>.  On overflow, sets <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ERANGE">ERANGE</A></CODE> and returns <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#HUGE_VAL">HUGE_VAL</A></CODE> with the appropriate sign; on underflow, sets <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ERANGE">ERANGE</A></CODE> and returns zero; otherwise returns converted value.</DD>
+<DT><CODE>long <A name="strtol">strtol</A>(const char* <VAR>s</VAR>, char** <VAR>endp</VAR>, int <VAR>base</VAR>);</CODE></DT>
+<DD>Converts initial characters (ignoring leading white space) of <CODE><VAR>s</VAR></CODE> to type <CODE>long</CODE>.  If <CODE><VAR>endp</VAR></CODE> non-nu
+ll, stores pointer to unconverted suffix in <CODE>*<VAR>endp</VAR></CODE>.  If <CODE><VAR>base</VAR></CODE> between 2 and 36, that base used for conversion; if zero, leading (after any sign) <CODE>0X</CODE> or <CODE>0x</CODE> implies hexadecimal, leading <CODE>0</CODE> (after any sign) implies octal, otherwise decimal assumed.  Leading <CODE>0X</CODE> or <CODE>0x</CODE> permitted for base hexadecimal. On overflow, sets <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#errno">errno</A></CODE> to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ERANGE">ERANGE</A></CODE> and returns <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#LONG_MAX">LONG_MAX</A></CODE> or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#LONG_MIN">LONG_MIN</A></CODE> (as appropriate for sign); otherwise returns converted value.</DD>
+<DT><CODE>unsigned long <A name="strtoul">strtoul</A>(const char* <VAR>s</VAR>, char** <VAR>endp</VAR>, int <VAR>base</VAR>);</CODE></DT>
+<DD>As for <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#strtol">strtol</A></CODE> except result is <CODE>unsigned long</CODE> and value on overflow is <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#ULONG_MAX">ULONG_MAX</A></CODE>.</DD>
+<DT><CODE>void* calloc(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.size_t">size_t</A> <VAR>nobj</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.size_t">size_t</A> <VAR>size</VAR>);</CODE></DT>
+<DD>Returns pointer to <EM>zero-initialised</EM> newly-allocated space for an array of <CODE><VAR>nobj</VAR></CODE> objects each of size <CODE><VAR>size</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A></CODE> on error.</DD>
+<DT><CODE>void* malloc(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.size_t">size_t</A> <VAR>size</VAR>);</CODE></DT>
+<DD>Returns pointer to <EM>uninitialised</EM> newly-allocated space for an object of size <VAR>size</VAR>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A></CODE> on error.</DD>
+<DT><CODE>void* realloc(void* <VAR>p</VAR>, size_t <VAR>size</VAR>);</CODE></DT>
+<DD>Returns pointer to newly-allocated space for an object of size <CODE><VAR>size</VAR></CODE>, initialised, to minimum of old and new sizes, to existing contents of <CODE><VAR>p</VAR></CODE> (if non-null), or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A></CODE> on error.  On success, old object deallocated, otherwise unchanged.</DD>
+<DT><CODE>void free(void* <VAR>p</VAR>);</CODE></DT>
+<DD>If <CODE><VAR>p</VAR></CODE> non-null, deallocates space to which it points.</DD>
+<DT><CODE>void <A name="abort">abort</A>();</CODE></DT>
+<DD>Terminates program abnormally, by calling <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#raise">raise</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#sigabrt">SIGABRT</A>)</CODE>.</DD>
+<DT><CODE>void <A name="exit">exit</A>(int <VAR>status</VAR>);</CODE></DT>
+<DD>Terminates program normally.  Functions installed using <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#atexit">atexit</A></CODE> are called (in reverse order to that in which installed), open files are flushed, open streams are closed and control is returned to environment.  <CODE><VAR>status</VAR></CODE> is returned to environment in implementation-dependent manner. Zero or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EXIT_SUCCESS">EXIT_SUCCESS</A></CODE> indicates successful termination and <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#EXIT_FAILURE">EXIT_FAILURE</A></CODE> indicates unsuccessful termination.  Implementations may define other values.</DD>
+<DT><CODE>int <A name="atexit">atexit</A>(void (*<VAR>fcm</VAR>)(void));</CODE></DT>
+<DD>Registers <CODE><VAR>fcn</VAR></CODE> to be called when program terminates normally (or when <CODE>main</CODE> returns).  Returns non-zero on failure.</DD>
+<DT><CODE>int system(const char* <VAR>s</VAR>);</CODE></DT>
+<DD>If <CODE><VAR>s</VAR></CODE> is not <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A></CODE>, passes <CODE><VAR>s</VAR></CODE> to environment for execution, and returns status reported by command processor; if <CODE><VAR>s</VAR></CODE> is <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A></CODE>, non-zero returned if environment has a command processor.</DD>
+<DT><CODE>char* getenv(const char* <VAR>name</VAR>);</CODE></DT>
+<DD>Returns string associated with name <CODE><VAR>name</VAR></CODE> from implementation's environment, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A></CODE> if no such string exists.</DD>
+<DT><CODE>void* bsearch(const void* <VAR>key</VAR>, const void* <VAR>base</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>n</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>size</VAR>, int (*<VAR>cmp</VAR>)(const void* keyval, const void* datum));</CODE></DT>
+<DD>Searches ordered array <CODE><VAR>base</VAR></CODE> (of <CODE><VAR>n</VAR></CODE> objects each of size <CODE><VAR>size</VAR></CODE>) for item matching <CODE><VAR>key</VAR></CODE> according to comparison function <CODE><VAR>cmp</VAR></CODE>.  <CODE><VAR>cmp</VAR></CODE> must return negative value if first argument is less than second, zero if equal and positive if greater.  Items of <CODE><VAR>base</VAR></CODE> are assumed to be in ascending order (according to <CODE><VAR>cmp</VAR></CODE>).  Returns a pointer to an item matching <CODE><VAR>key</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdlib.NULL">NULL</A></CODE> if none found.</DD>
+<DT><CODE>void qsort(void* <VAR>base</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>n</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#stdio.size_t">size_t</A> <VAR>size</VAR>, int (*<VAR>cmp</VAR>)(const void*, const void*));</CODE></DT>
+<DD>Arranges into ascending order array <CODE><VAR>base</VAR></CODE> (of <CODE><VAR>n</VAR></CODE> objects each of size <CODE><VAR>size</VAR></CODE>) according to comparison function <CODE><VAR>cmp</VAR></CODE>.  <CODE><VAR>cmp</VAR></CODE> must return negative value if first argument is less than second, zero if equal and positive if greater.</DD>
+<DT><CODE>int <A name="rand">rand</A>(void);</CODE></DT>
+<DD>Returns pseudo-random number in range <CODE>0</CODE> to <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#RAND_MAX">RAND_MAX</A></CODE>.</DD>
+<DT><CODE>void srand(unsigned int <VAR>seed</VAR>);</CODE></DT>
+<DD>Uses <CODE><VAR>seed</VAR></CODE> as seed for new sequence of pseudo-random numbers.  Initial seed is <CODE>1</CODE>.</DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="string.h">&lt;string.h&gt;</A></H2>
+<DL>
+<DT><CODE><A name="string.NULL">NULL</A></CODE></DT>
+<DD>Null pointer constant.</DD>
+<DT><CODE><A name="string.size_t">size_t</A></CODE></DT>
+<DD>Type for objects declared to store result of <CODE>sizeof</CODE> operator.</DD>
+<DT><CODE>char* strcpy(char* <VAR>s</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Copies <CODE><VAR>ct</VAR></CODE> to <CODE><VAR>s</VAR></CODE> including terminating <CODE>NUL</CODE> and returns <CODE><VAR>s</VAR></CODE>.</DD>
+<DT><CODE>char* strncpy(char* <VAR>s</VAR>, const char* <VAR>ct</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Copies at most <CODE><VAR>n</VAR></CODE> characters of <CODE><VAR>ct</VAR></CODE> to <CODE><VAR>s</VAR></CODE>.  Pads with <CODE>NUL</CODE> characters if <CODE><VAR>ct</VAR></CODE> is of length less than <CODE><VAR>n</VAR></CODE>.  <STRONG>Note that this may leave <CODE><VAR>s</VAR></CODE> without <CODE>NUL</CODE>-termination.</STRONG>  Return <CODE><VAR>s</VAR></CODE>.</DD>
+<DT><CODE>char* strcat(char* <VAR>s</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Concatenate <CODE><VAR>ct</VAR></CODE> to <CODE><VAR>s</VAR></CODE> and return <CODE><VAR>s</VAR></CODE>.</DD>
+<DT><CODE>char* strncat(char* <VAR>s</VAR>, const char* <VAR>ct</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Concatenate at most <CODE><VAR>n</VAR></CODE> characters of <CODE><VAR>ct</VAR></CODE> to <CODE><VAR>s</VAR></CODE>.  <CODE>NUL</CODE>-terminates <CODE><VAR>s</VAR></CODE> and return it.</DD>
+<DT><CODE>int strcmp(const char* <VAR>cs</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Compares <CODE><VAR>cs</VAR></CODE> with <CODE><VAR>ct</VAR></CODE>, returning negative value if <CODE><VAR>cs</VAR>&lt;<VAR>ct</VAR></CODE>, zero if <CODE><VAR>cs</VAR>==<VAR>ct</VAR></CODE>, positive value if <CODE><VAR>cs</VAR>&gt;<VAR>ct</VAR></CODE>.</DD>
+<DT><CODE>int strncmp(const char* <VAR>cs</VAR>, const char* <VAR>ct</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Compares at most (the first) <CODE><VAR>n</VAR></CODE> characters of <CODE><VAR>cs</VAR></CODE> and <CODE><VAR>ct</VAR></CODE>, returning negative value if <CODE><VAR>cs</VAR>&lt;<VAR>ct</VAR></CODE>, zero if <CODE><VAR>cs</VAR>==<VAR>ct</VAR></CODE>, positive value if <CODE><VAR>cs</VAR>&gt;<VAR>ct</VAR></CODE>.</DD>
+<DT><CODE>int strcoll(const char* <VAR>cs</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Compares <CODE><VAR>cs</VAR></CODE> with <CODE><VAR>ct</VAR></CODE> according to locale, returning negative value if <CODE><VAR>cs</VAR>&lt;<VAR>ct</VAR></CODE>, zero if <CODE><VAR>cs</VAR>==<VAR>ct</VAR></CODE>, positive value if <CODE><VAR>cs</VAR>&gt;<VAR>ct</VAR></CODE>.</DD>
+<DT><CODE>char* strchr(const char* <VAR>cs</VAR>, int <VAR>c</VAR>);</CODE></DT>
+<DD>Returns pointer to first occurrence of <CODE><VAR>c</VAR></CODE> in <CODE><VAR>cs</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.NULL">NULL</A></CODE> if not found.</DD>
+<DT><CODE>char* strrchr(const char* <VAR>cs</VAR>, int <VAR>c</VAR>);</CODE></DT>
+<DD>Returns pointer to last occurrence of <CODE><VAR>c</VAR></CODE> in <CODE><VAR>cs</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.NULL">NULL</A></CODE> if not found.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> strspn(const char* <VAR>cs</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Returns length of prefix of <CODE><VAR>cs</VAR></CODE> which consists of characters which are in <CODE><VAR>ct</VAR></CODE>.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> strcspn(const char* <VAR>cs</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Returns length of prefix of <CODE><VAR>cs</VAR></CODE> which consists of characters which are <EM>not</EM> in <CODE><VAR>ct</VAR></CODE>.</DD>
+<DT><CODE>char* strpbrk(const char* <VAR>cs</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Returns pointer to first occurrence in <CODE><VAR>cs</VAR></CODE> of any character of <CODE><VAR>ct</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.NULL">NULL</A></CODE> if none is found.</DD>
+<DT><CODE>char* strstr(const char* <VAR>cs</VAR>, const char* <VAR>ct</VAR>);</CODE></DT>
+<DD>Returns pointer to first occurrence of <CODE><VAR>ct</VAR></CODE> within <CODE><VAR>cs</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.NULL">NULL</A></CODE> if none is found.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> strlen(const char* <VAR>cs</VAR>);</CODE></DT>
+<DD>Returns length of <CODE><VAR>cs</VAR></CODE>.</DD>
+<DT><CODE><A name="strerror">char* strerror(int <VAR>n</VAR>);</A></CODE></DT>
+<DD>Returns pointer to implementation-defined message string corresponding with error <CODE><VAR>n</VAR></CODE>.</DD>
+<DT><CODE>char* strtok(char* <VAR>s</VAR>, const char* <VAR>t</VAR>);</CODE></DT>
+<DD>Searches <CODE><VAR>s</VAR></CODE> for next token delimited by any character from <CODE><VAR>ct</VAR></CODE>.  Non-<CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.NULL">NULL</A></CODE> <CODE><VAR>s</VAR></CODE> indicates the first call of a sequence.  If a token is found, it is <CODE>NUL</CODE>-terminated and returned, otherwise <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.NULL">NULL</A></CODE> is returned.  <CODE><VAR>ct</VAR></CODE> need not be identical for each call in a sequence.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> strxfrm(char* <VAR>s</VAR>, const char* <VAR>ct</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Stores in <CODE><VAR>s</VAR></CODE> no more than <CODE><VAR>n</VAR></CODE> characters (including terminating <CODE>NUL</CODE>) of a string produced from <CODE><VAR>ct</VAR></CODE> according to a locale-specific transformation.  Returns length of <EM>entire</EM> transformed string.</DD>
+<DT><CODE>void* <A name="memcpy">memcpy</A>(void* <VAR>s</VAR>, const void* <VAR>ct</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Copies <CODE><VAR>n</VAR></CODE> characters from <CODE><VAR>ct</VAR></CODE> to <CODE><VAR>s</VAR></CODE> and returns <CODE><VAR>s</VAR></CODE>.  <STRONG><CODE><VAR>s</VAR></CODE> may be corrupted if objects overlap.</STRONG></DD>
+<DT><CODE>void* memmove(void* <VAR>s</VAR>, const void* <VAR>ct</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Copies <CODE><VAR>n</VAR></CODE> characters from <CODE><VAR>ct</VAR></CODE> to <CODE><VAR>s</VAR></CODE> and returns <CODE><VAR>s</VAR></CODE>.  <STRONG><CODE><VAR>s</VAR></CODE> will not be corrupted if objects overlap.</STRONG></DD>
+<DT><CODE>int memcmp(const void* <VAR>cs</VAR>, const void* <VAR>ct</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Compares at most (the first) <CODE><VAR>n</VAR></CODE> characters of <CODE><VAR>cs</VAR></CODE> and <CODE><VAR>ct</VAR></CODE>, returning negative value if <CODE><VAR>cs</VAR>&lt;<VAR>ct</VAR></CODE>, zero if <CODE><VAR>cs</VAR>==<VAR>ct</VAR></CODE>, positive value if <CODE><VAR>cs</VAR>&gt;<VAR>ct</VAR></CODE>.</DD>
+<DT><CODE>void* memchr(const void* <VAR>cs</VAR>, int <VAR>c</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Returns pointer to first occurrence of <CODE><VAR>c</VAR></CODE> in first <CODE><VAR>n</VAR></CODE> characters of <CODE><VAR>cs</VAR></CODE>, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.NULL">NULL</A></CODE> if not found.</DD>
+<DT><CODE>void* memset(void* <VAR>s</VAR>, int <VAR>c</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#string.size_t">size_t</A> <VAR>n</VAR>);</CODE></DT>
+<DD>Replaces each of the first <CODE><VAR>n</VAR></CODE> characters of <CODE><VAR>s</VAR></CODE> by <CODE><VAR>c</VAR></CODE> and returns <CODE><VAR>s</VAR></CODE>.</DD>
+</DL> 
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<H2><A name="time.h">&lt;time.h&gt;</A></H2>
+<DL>
+<DT><CODE>CLOCKS_PER_SEC</CODE></DT>
+<DD>The number of <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#clock_t">clock_t</A></CODE> units per second.</DD>
+<DT><CODE><A name="time.NULL">NULL</A></CODE></DT>
+<DD>Null pointer constant.</DD>
+<DT><CODE><A name="clock_t">clock_t</A></CODE></DT>
+<DD>An arithmetic type elapsed processor representing time.</DD>
+<DT><CODE><A name="time_t">time_t</A></CODE></DT>
+<DD>An arithmetic type representing calendar time.</DD>
+<DT><CODE><A name="tm">struct tm</A></CODE></DT>
+<DD>Represents the components of calendar time:
+<DL>
+<DT><CODE>int tm_sec;</CODE></DT>
+<DD>seconds after the minute</DD>
+<DT><CODE>int tm_min;</CODE></DT>
+<DD>minutes after the hour</DD>
+<DT><CODE>int tm_hour;</CODE></DT>
+<DD>hours since midnight</DD>
+<DT><CODE>int tm_mday;</CODE></DT>
+<DD>day of the month</DD>
+<DT><CODE>int tm_mon;</CODE></DT>
+<DD>months <STRONG>since</STRONG> January</DD>
+<DT><CODE>int tm_year;</CODE></DT>
+<DD>years since 1900</DD>
+<DT><CODE>int tm_wday;</CODE></DT>
+<DD>days since Sunday</DD>
+<DT><CODE>int tm_yday;</CODE></DT>
+<DD>days since January 1</DD>
+<DT><CODE>int tm_isdst;</CODE></DT>
+<DD>Daylight Saving Time flag : is positive if DST is in effect, zero if not in
+effect, negative if information not known.</DD>
+</DL>Implementations may change field order and include additional fields.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#clock_t">clock_t</A> clock(void);</CODE></DT>
+<DD>Returns elapsed processor time used by program or <CODE>-1</CODE> if not available.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A> time(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A>* <VAR>tp</VAR>);</CODE></DT>
+<DD>Returns current calendar time or <CODE>-1</CODE> if not available.  If <CODE><VAR>tp</VAR></CODE> is non-<CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time.NULL">NULL</A></CODE>, return value is also assigned to <CODE>*<VAR>tp</VAR></CODE>.</DD>
+<DT><CODE>double difftime(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A> <VAR>time2</VAR>, <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A> <VAR>time1</VAR>);</CODE></DT>
+<DD>Returns the difference in seconds between <CODE><VAR>time2</VAR></CODE> and <CODE><VAR>time1</VAR></CODE>.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A> mktime(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#tm">struct tm</A>* <VAR>tp</VAR>);</CODE></DT>
+<DD>If necessary, adjusts fields of <CODE>*<VAR>tp</VAR></CODE> to fall withing normal ranges.  Returns the corresponding calendar time, or <CODE>-1</CODE> if it cannot be represented.</DD>
+<DT><CODE>char* <A name="asctime">asctime</A>(const <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#tm">struct tm</A>* <VAR>tp</VAR>);</CODE></DT>
+<DD>Returns the given time as a string of the form:<BR>
+<CODE>Sun Jan   3 13:08:42 1988\n\0</CODE></DD>
+<DT><CODE>char* ctime(const <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A>* <VAR>tp</VAR>);</CODE></DT>
+<DD>Returns string equivalent to calendar time <CODE><VAR>tp</VAR></CODE> converted to local time.  Equivalent to:<BR>
+<CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#asctime">asctime</A>(<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#localtime">localtime</A>(tp))</CODE></DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#tm">struct tm</A>* gmtime(const <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A>* <VAR>tp</VAR>);</CODE></DT>
+<DD>Returns calendar time <CODE>*<VAR>tp</VAR></CODE> converted to Coordinated Universal Time, or <CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time.NULL">NULL</A></CODE> if not available.</DD>
+<DT><CODE><A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#tm">struct tm</A>* <A name="localtime">localtime</A>(const <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#time_t">time_t</A>* <VAR>tp</VAR>);</CODE></DT>
+<DD>Returns calendar time <CODE>*<VAR>tp</VAR></CODE> converted into local
+time.</DD>
+<DT><CODE>size_t strftime(char* <VAR>s</VAR>, size_t <VAR>smax</VAR>, const char* <VAR>fmt</VAR>, const <A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#tm">struct tm</A>* <VAR>tp</VAR>);</CODE></DT>
+<DD>Formats <CODE>*<VAR>tp</VAR></CODE> into <CODE><VAR>s</VAR></CODE> according to <CODE><VAR>fmt</VAR></CODE>.  Places no more than <CODE><VAR>smax</VAR></CODE> characters into <CODE><VAR>s</VAR></CODE>, and returns number of characters produced (excluding terminating <CODE>NUL</CODE>), or <CODE>0</CODE> if greater than <CODE><VAR>smax</VAR></CODE>.  Formatting conversions (<CODE>%<VAR>c</VAR></CODE>) are:<DL>
+<DT><CODE>A</CODE></DT>
+<DD>name of weekday</DD>
+<DT><CODE>a</CODE></DT>
+<DD>abbreviated name of weekday</DD>
+<DT><CODE>B</CODE></DT>
+<DD>name of month</DD>
+<DT><CODE>b</CODE></DT>
+<DD>abbreviated name of month</DD>
+<DT><CODE>c</CODE></DT>
+<DD>local date and time representation</DD>
+<DT><CODE>d</CODE></DT>
+<DD>day of month [<CODE>01</CODE>-<CODE>31</CODE>]</DD>
+<DT><CODE>H</CODE></DT>
+<DD>hour (24-hour clock) [<CODE>00</CODE>-<CODE>23</CODE>]</DD>
+<DT><CODE>I</CODE></DT>
+<DD>hour (12-hour clock) [<CODE>01</CODE>-<CODE>12</CODE>]</DD>
+<DT><CODE>j</CODE></DT>
+<DD>day of year [<CODE>001</CODE>-<CODE>366</CODE>]</DD>
+<DT><CODE>M</CODE></DT>
+<DD>minute [<CODE>00</CODE>-<CODE>59</CODE>]</DD>
+<DT><CODE>m</CODE></DT>
+<DD>month [<CODE>01</CODE>-<CODE>12</CODE>]</DD>
+<DT><CODE>p</CODE></DT>
+<DD>local equivalent of "<CODE>AM</CODE>" or "<CODE>PM</CODE>"</DD>
+<DT><CODE>S</CODE></DT>
+<DD>second [<CODE>00</CODE>-<CODE>61</CODE>]</DD>
+<DT><CODE>U</CODE></DT>
+<DD>week number of year (Sunday as 1st day of week) [<CODE>00</CODE>-<CODE>53</CODE>]</DD>
+<DT><CODE>W</CODE></DT>
+<DD>week number of year (Monday as 1st day of week) [<CODE>00</CODE>-<CODE>53</CODE>]</DD>
+<DT><CODE>w</CODE></DT>
+<DD>weekday (Sunday as <CODE>0</CODE>) [<CODE>0</CODE>-<CODE>6</CODE>]</DD>
+<DT><CODE>X</CODE></DT>
+<DD>local time representation</DD>
+<DT><CODE>x</CODE></DT>
+<DD>local date representation</DD>
+<DT><CODE>Y</CODE></DT>
+<DD>year with century</DD>
+<DT><CODE>y</CODE></DT>
+<DD>year without century [<CODE>00</CODE>-<CODE>99</CODE>]</DD>
+<DT><CODE>Z</CODE></DT>
+<DD>name (if any) of time zone</DD>
+<DT><CODE>%</CODE></DT>
+<DD><CODE>%</CODE></DD>
+</DL></DD>
+</DL>
+<P><EM>Local</EM> time may differ from <EM>calendar</EM> time because of time zone.</P>
+<P>[<A href="http://www.utas.edu.au/infosys/info/documentation/C/CStdLib.html#Contents">Contents</A>]</P>
+<HR>
+<ADDRESS><A href="mailto:Ross.Richardson@utas.edu.au">RLR</A></ADDRESS>
+
+
+</BODY></HTML>
