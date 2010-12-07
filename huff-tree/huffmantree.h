@@ -1,6 +1,6 @@
-//¹ş·òÂü±àÂë½âÂëÖ®STLÊµÏÖ 
-//×÷Õß:Jerry
-//ÈÕÆÚ:15-06-06 01:10
+//å“ˆå¤«æ›¼ç¼–ç è§£ç ä¹‹STLå®ç° 
+//ä½œè€…:Jerry
+//æ—¥æœŸ:15-06-06 01:10
 
 #ifndef HUFFMANTREE_H
 #define HUFFMANTREE_H
@@ -9,19 +9,19 @@
 #include <string>
 #include <map>
 
-//ÃüÃû¿Õ¼ä¶¨Òå 
+//å‘½åç©ºé—´å®šä¹‰ 
 namespace huffman
 {
 
 using namespace std;                
 
-//¹ş·òÂüÊ÷Àà 
+//å“ˆå¤«æ›¼æ ‘ç±» 
 template<typename T>
 class HuffmanTree
 {
     public:
         
-        //°ÑÕâ¸öÀàĞèÒªµÄ¸÷ÖÖÀàĞÍtypedefÏÂ,´úÂëºÃ¿´(STL,·ºĞÍ,Âè°¡.....:-) 
+        //æŠŠè¿™ä¸ªç±»éœ€è¦çš„å„ç§ç±»å‹typedefä¸‹,ä»£ç å¥½çœ‹(STL,æ³›å‹,å¦ˆå•Š.....:-) 
         typedef map<T,string> CODEMAP;
 		typedef HuffmanNode<T> NODE,*PNODE;
 		typedef priority_queue<PNODE,vector<PNODE>,typename NODE::Smaller> PQUEUE;
@@ -30,21 +30,21 @@ class HuffmanTree
 		
     private:
         
-        //¹ş·òÂüÊ÷¸ù 
+        //å“ˆå¤«æ›¼æ ‘æ ¹ 
         PNODE root;
-        //¹¹Ôì¹ş·òÂüÊ÷µÄÓÅÏÈ¶ÓÁĞ 
+        //æ„é€ å“ˆå¤«æ›¼æ ‘çš„ä¼˜å…ˆé˜Ÿåˆ— 
         PQUEUE pqNodes;
-        //´æ·Å¹ş·òÂü±àÂëµÄMAP 
+        //å­˜æ”¾å“ˆå¤«æ›¼ç¼–ç çš„MAP 
         CODEMAP huffmanCodes;
-        //±êÖ¾±äÁ¿,±íÊ¾Ê÷ÊÇ·ñ½¨Á¢ºÃ 
+        //æ ‡å¿—å˜é‡,è¡¨ç¤ºæ ‘æ˜¯å¦å»ºç«‹å¥½ 
      	bool treeBuilt;    
      	bool codeCalced;
      	vector<char> code; 
-     	//¼ÆËã¹ş·òÂü±àÂë 
+     	//è®¡ç®—å“ˆå¤«æ›¼ç¼–ç  
      	void CalcHuffmanCode(PNODE node);
-     	//É¾³ıÊ÷ÖĞËùÓĞ½Úµã 
+     	//åˆ é™¤æ ‘ä¸­æ‰€æœ‰èŠ‚ç‚¹ 
         void DeleteNodes(PNODE start);
-     	//Ç°Ğò,ÖĞĞò,ºóĞò±éÀú,Ö÷ÒªÓÃÓÚµ÷ÊÔ 
+     	//å‰åº,ä¸­åº,ååºéå†,ä¸»è¦ç”¨äºè°ƒè¯• 
         void PreTraverse(std::ostream& out,NODE *r); 
         void MidTraverse(std::ostream& out,NODE *r); 
         void PostTraverse(std::ostream& out,NODE *r);      
@@ -53,28 +53,28 @@ class HuffmanTree
 		
 	    HuffmanTree();
 	    ~HuffmanTree();
-	    //´òÓ¡ËùÓĞ½Úµã(°üÀ¨Ç°Ğò,ÖĞĞò,ºóĞò±éÀúĞòÁĞ) 
+	    //æ‰“å°æ‰€æœ‰èŠ‚ç‚¹(åŒ…æ‹¬å‰åº,ä¸­åº,ååºéå†åºåˆ—) 
 	    void PrintAllNodes(std::ostream& out);
-	    //ÊäÈëÊı¾İ,°üÀ¨Êı¾İºÍ¶ÔÓ¦È¨Öµ 
+	    //è¾“å…¥æ•°æ®,åŒ…æ‹¬æ•°æ®å’Œå¯¹åº”æƒå€¼ 
 	    void PushData(T data,long weight)
 	    {
 	        if(!treeBuilt)
 	        	pqNodes.push(NODE::CreateNode(data,weight));
 	    }   
-	    //½¨Á¢¹ş·òÂüÊ÷,½¨Á¢ºÃÁË¾Í²»ÄÜÔÙÏò¶ÓÁĞÖĞÊäÈëÊı¾İÁË 
+	    //å»ºç«‹å“ˆå¤«æ›¼æ ‘,å»ºç«‹å¥½äº†å°±ä¸èƒ½å†å‘é˜Ÿåˆ—ä¸­è¾“å…¥æ•°æ®äº† 
  		void BuildHuffmanTree();
    		
-   		//·µ»Ø¹ş·òÂü±àÂëµÄMAP 
+   		//è¿”å›å“ˆå¤«æ›¼ç¼–ç çš„MAP 
      	CODEMAP& GetCodeMap()
       	{
       	    if(!codeCalced)
       	    	CalcHuffmanCode(root);
            	return huffmanCodes;
         }  
-        //½âÂëº¯Êı,¸ù¾İscr½âÂë³ö¶ÔÓ¦µÄÊı¾İ,´æ·ÅÔÚÊı×édÖĞ,Êı×é´óĞ¡ÓÉsize¾ö¶¨
-        //·µ»ØÖµ:0,½âÂëÊ§°Ü(±ÈÈçÊ÷Ã»ÓĞ½¨Á¢ºÃ);Èô³É¹¦,·µ»ØÓĞĞ§Êı¾İÔªËØ¸öÊı 
+        //è§£ç å‡½æ•°,æ ¹æ®scrè§£ç å‡ºå¯¹åº”çš„æ•°æ®,å­˜æ”¾åœ¨æ•°ç»„dä¸­,æ•°ç»„å¤§å°ç”±sizeå†³å®š
+        //è¿”å›å€¼:0,è§£ç å¤±è´¥(æ¯”å¦‚æ ‘æ²¡æœ‰å»ºç«‹å¥½);è‹¥æˆåŠŸ,è¿”å›æœ‰æ•ˆæ•°æ®å…ƒç´ ä¸ªæ•° 
         int Decode(const char* scr,T* d,const int size);
-        //É¾³ı½Úµã,Ê¹Ê÷»Ö¸´µ½³õÊ¼×´Ì¬(Ã»ÓĞÊı¾İ,Ã»ÓĞ±àÂë) 
+        //åˆ é™¤èŠ‚ç‚¹,ä½¿æ ‘æ¢å¤åˆ°åˆå§‹çŠ¶æ€(æ²¡æœ‰æ•°æ®,æ²¡æœ‰ç¼–ç ) 
         void Destroy()
         {
             DeleteNodes(root);
@@ -87,7 +87,7 @@ class HuffmanTree
 };
 
 
-//¹¹Ôìº¯Êı 
+//æ„é€ å‡½æ•° 
 template <typename T>
 HuffmanTree<T>::HuffmanTree()
 :root(NULL),
@@ -103,7 +103,7 @@ HuffmanTree<T>::~HuffmanTree()
 }
 
 template <typename T>
-//´òÓ¡³öÊ÷ÖĞËùÓĞ½Úµã,ÓÃÓÚµ÷ÊÔ 
+//æ‰“å°å‡ºæ ‘ä¸­æ‰€æœ‰èŠ‚ç‚¹,ç”¨äºè°ƒè¯• 
 #ifdef _DEBUG
 void HuffmanTree<T>::PrintAllNodes(std::ostream& out)
 {
@@ -120,25 +120,25 @@ void HuffmanTree<T>::PrintAllNodes(std::ostream& out)
 void HuffmanTree<T>::PrintAllNodes(std::ostream& out){}
 #endif
 
-//½¨Á¢¹ş·òÂüÊ÷ 
+//å»ºç«‹å“ˆå¤«æ›¼æ ‘ 
 template <typename T>
 void HuffmanTree<T>::BuildHuffmanTree()
 {
     if(pqNodes.empty())
-    	return;//Èç¹û¶ÓÁĞÎª¿Õ¾ÍÖ±½ÓÍË³ö 
+    	return;//å¦‚æœé˜Ÿåˆ—ä¸ºç©ºå°±ç›´æ¥é€€å‡º 
     while(pqNodes.size()!=1)
     {
-    	//´ÓÓÅÏÈ¶ÓÁĞÖĞµ¯³öÈ¨Öµ×îĞ¡µÄÁ½¸ö½Úµã,·ÅÔÚleftºÍrightÖĞ 
+    	//ä»ä¼˜å…ˆé˜Ÿåˆ—ä¸­å¼¹å‡ºæƒå€¼æœ€å°çš„ä¸¤ä¸ªèŠ‚ç‚¹,æ”¾åœ¨leftå’Œrightä¸­ 
      	PNODE left = pqNodes.top();
     	pqNodes.pop();
     	PNODE right = pqNodes.top();
     	pqNodes.pop();
-    	//°ÑËüÃÇµÄÈ¨ÖµÏà¼Ó,¹¹ÔìÒ»¸öĞÂ½Úµã 
+    	//æŠŠå®ƒä»¬çš„æƒå€¼ç›¸åŠ ,æ„é€ ä¸€ä¸ªæ–°èŠ‚ç‚¹ 
     	PNODE newNode = NODE::CreateNode(0,(left->Weight() + right->Weight()),left,right);
-    	//¸Õ¸Õµ¯³öµÄÁ½¸ö½ÚµãµÄ¸¸½Úµã¾ÍÊÇÕâ¸öĞÂ½Úµã 
+    	//åˆšåˆšå¼¹å‡ºçš„ä¸¤ä¸ªèŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹å°±æ˜¯è¿™ä¸ªæ–°èŠ‚ç‚¹ 
     	left->SetParent(newNode);
     	right->SetParent(newNode);
-    	//·Åµ½¶ÓÁĞÖĞ
+    	//æ”¾åˆ°é˜Ÿåˆ—ä¸­
 	    pqNodes.push(newNode);
 	}      
 	root = pqNodes.top();
@@ -147,10 +147,10 @@ void HuffmanTree<T>::BuildHuffmanTree()
 } 
 
 template <typename T>
-//¼ÆËã¹ş·òÂü±àÂë,½á¹û±£´æÔÚMAPÖĞ 
+//è®¡ç®—å“ˆå¤«æ›¼ç¼–ç ,ç»“æœä¿å­˜åœ¨MAPä¸­ 
 void HuffmanTree<T>::CalcHuffmanCode(PNODE node)
 { 
-    //±¾ÖÊÊÇÏÈĞò±éÀú,Ò²ÊÇºÜ±¿µÄ·½·¨(ÒÔºóĞ´³öÒ»¸ö²»ÓÃµİ¹é,²»ÓÃÕ»µÄ°æ±¾À´)    
+    //æœ¬è´¨æ˜¯å…ˆåºéå†,ä¹Ÿæ˜¯å¾ˆç¬¨çš„æ–¹æ³•(ä»¥åå†™å‡ºä¸€ä¸ªä¸ç”¨é€’å½’,ä¸ç”¨æ ˆçš„ç‰ˆæœ¬æ¥)    
     if((!treeBuilt) || (node==NULL))
     	return;
 	codeCalced = true;
@@ -158,19 +158,19 @@ void HuffmanTree<T>::CalcHuffmanCode(PNODE node)
 	{
 	    huffmanCodes.insert( PAIR(node->Data(),string(code.begin(),code.end())) );
 	}
-	//×óÎª0 
+	//å·¦ä¸º0 
  	code.push_back('0');
     CalcHuffmanCode(node->LeftChild());
     code.pop_back();
-    //ÓÒÎª1 
+    //å³ä¸º1 
     code.push_back('1');
     CalcHuffmanCode(node->RightChild());
     code.pop_back();  	    
 } 
 
 template <typename T>
-//½âÂëº¯Êı,¸ù¾İscr½âÂë³ö¶ÔÓ¦µÄÊı¾İ,´æ·ÅÔÚÊı×édÖĞ,Êı×é´óĞ¡ÓÉsize¾ö¶¨
-//·µ»ØÖµ:0,½âÂëÊ§°Ü(±ÈÈçÊ÷Ã»ÓĞ½¨Á¢ºÃ);Èô³É¹¦,·µ»ØÓĞĞ§Êı¾İÔªËØ¸öÊı 
+//è§£ç å‡½æ•°,æ ¹æ®scrè§£ç å‡ºå¯¹åº”çš„æ•°æ®,å­˜æ”¾åœ¨æ•°ç»„dä¸­,æ•°ç»„å¤§å°ç”±sizeå†³å®š
+//è¿”å›å€¼:0,è§£ç å¤±è´¥(æ¯”å¦‚æ ‘æ²¡æœ‰å»ºç«‹å¥½);è‹¥æˆåŠŸ,è¿”å›æœ‰æ•ˆæ•°æ®å…ƒç´ ä¸ªæ•° 
 int HuffmanTree<T>::Decode(const char* scr,T* d,const int size)
 {
     if(!treeBuilt)
@@ -180,13 +180,13 @@ int HuffmanTree<T>::Decode(const char* scr,T* d,const int size)
     int pos = 0;
     while(*temp)
     {
-        //0,Íù×ó×ß	
+        //0,å¾€å·¦èµ°	
         if(*temp == '0' && currentNode->LeftChild()!=NULL)
         {
             currentNode = currentNode->LeftChild();
             temp++;
         }
-        //1,ÍùÓÒ×ß 
+        //1,å¾€å³èµ° 
         else if(*temp == '1' && currentNode->RightChild()!=NULL)
         {
             currentNode = currentNode->RightChild();
@@ -194,12 +194,12 @@ int HuffmanTree<T>::Decode(const char* scr,T* d,const int size)
         }
         else
         	temp++;
-        //Èç¹ûÊÇÒ¶×Ó½Úµã¾Í´ÓÕ»ÖĞÈ¡³ö¶ÔÓ¦µÄ±àÂë,²¢´Ó¸ùÖØĞÂ¿ªÊ¼½âÂë	
+        //å¦‚æœæ˜¯å¶å­èŠ‚ç‚¹å°±ä»æ ˆä¸­å–å‡ºå¯¹åº”çš„ç¼–ç ,å¹¶ä»æ ¹é‡æ–°å¼€å§‹è§£ç 	
         if(currentNode->LeftChild()==NULL && currentNode->RightChild()==NULL)
         {
             d[pos] = currentNode->Data();
             pos++;
-            //È·±£²»»á³öÏÖÒç³ö           
+            //ç¡®ä¿ä¸ä¼šå‡ºç°æº¢å‡º           
             if(pos>=size)
             	return size;
         	currentNode = root;
@@ -210,7 +210,7 @@ int HuffmanTree<T>::Decode(const char* scr,T* d,const int size)
 }         
 
 template <typename T>
-//ÓÃºóĞò±éÀúÀ´É¾³ıËùÓĞ½Úµã(ÆäÊµÊÇÏàµ±±¿µÄ·½·¨,¿ÉÊÇÎÒÏë²»³ö¸üºÃµÄÁË) 
+//ç”¨ååºéå†æ¥åˆ é™¤æ‰€æœ‰èŠ‚ç‚¹(å…¶å®æ˜¯ç›¸å½“ç¬¨çš„æ–¹æ³•,å¯æ˜¯æˆ‘æƒ³ä¸å‡ºæ›´å¥½çš„äº†) 
 void HuffmanTree<T>::DeleteNodes(PNODE node)
 {
     if(node == NULL)
@@ -220,7 +220,7 @@ void HuffmanTree<T>::DeleteNodes(PNODE node)
 	delete node;
 }	
 
-//ÈıÖÖ±éÀú,²»ÓÃÎÒ·Ï»°ÁË°É?:-) 
+//ä¸‰ç§éå†,ä¸ç”¨æˆ‘åºŸè¯äº†å§?:-) 
 template <typename T>
 void HuffmanTree<T>::PreTraverse(std::ostream& out,PNODE r)
 {

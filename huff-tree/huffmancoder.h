@@ -7,7 +7,7 @@
 
 using namespace huffman;
 
-// ¹ş·òÂü±àÂë½âÂëÆ÷Àà
+// å“ˆå¤«æ›¼ç¼–ç è§£ç å™¨ç±»
 class HuffmanCoder
 {
 	public:
