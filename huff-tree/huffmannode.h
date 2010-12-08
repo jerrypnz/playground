@@ -1,32 +1,32 @@
-//¹ş·òÂü±àÂë½âÂëÖ®STLÊµÏÖ 
-//×÷Õß:Jerry
-//ÈÕÆÚ:15-06-06 01:10
+//å“ˆå¤«æ›¼ç¼–ç è§£ç ä¹‹STLå®ç° 
+//ä½œè€…:Jerry
+//æ—¥æœŸ:15-06-06 01:10
  
 
 #ifndef HUFFMANNODE_H
 #define HUFFMANNODE_H
 #include <iostream>
 
-//ÃüÃû¿Õ¼ä¶¨Òå 
+//å‘½åç©ºé—´å®šä¹‰ 
 namespace huffman
 {
 
-//¹ş·òÂüÊ÷½ÚµãÀà 
+//å“ˆå¤«æ›¼æ ‘èŠ‚ç‚¹ç±» 
 template <typename T>
 class HuffmanNode
 {
     private:
-        //×óÓÒº¢×ÓÖ¸Õë 
+        //å·¦å³å­©å­æŒ‡é’ˆ 
         HuffmanNode *_leftChild,*_rightChild;
         HuffmanNode *_parent;
-        //È¨Öµ 
+        //æƒå€¼ 
         long _weight;
-        //Êı¾İ(Ä£°å»¯ÁË) 
+        //æ•°æ®(æ¨¡æ¿åŒ–äº†) 
         T _data;
         
-        //¹¹Ôìº¯ÊıÉùÃ÷ÎªË½ÓĞ,ËùÒÔ²»ÄÜÖ±½Ó¹¹Ôì¶ÔÏó
-        //±ÈÈçHuffmanNode<char> fooNode;ÕâÑùµÄ¶¨Òå¾Í²»ÄÜÍ¨¹ı±àÒë 
-        //ÒªµÃµ½Ò»¸ö½Úµã,±ØĞëÍ¨¹ı¾²Ì¬³ÉÔ±º¯ÊıCreateNode 
+        //æ„é€ å‡½æ•°å£°æ˜ä¸ºç§æœ‰,æ‰€ä»¥ä¸èƒ½ç›´æ¥æ„é€ å¯¹è±¡
+        //æ¯”å¦‚HuffmanNode<char> fooNode;è¿™æ ·çš„å®šä¹‰å°±ä¸èƒ½é€šè¿‡ç¼–è¯‘ 
+        //è¦å¾—åˆ°ä¸€ä¸ªèŠ‚ç‚¹,å¿…é¡»é€šè¿‡é™æ€æˆå‘˜å‡½æ•°CreateNode 
         HuffmanNode(T data,long weight,HuffmanNode* left,HuffmanNode* right,HuffmanNode *parent)
 		:_data(data),
          _weight(weight),
@@ -47,7 +47,7 @@ class HuffmanNode
         
 	public:
 	    
-	    //Õâ¸öÄÚ²¿ÀàÖ»ÓĞÒ»¸öÖØÔØÁËµÄ()ÔËËã·û,ÓÃÔÚÓÅÏÈ¶ÓÁĞÖĞ,ÓÃÓÚ±È½ÏÁ½¸ö½Úµã 
+	    //è¿™ä¸ªå†…éƒ¨ç±»åªæœ‰ä¸€ä¸ªé‡è½½äº†çš„()è¿ç®—ç¬¦,ç”¨åœ¨ä¼˜å…ˆé˜Ÿåˆ—ä¸­,ç”¨äºæ¯”è¾ƒä¸¤ä¸ªèŠ‚ç‚¹ 
 	    class Smaller
 	    {
 	        public:
@@ -57,13 +57,13 @@ class HuffmanNode
 	            }
          };   
          
-        //ÕâÊÇÎ¨Ò»µÄ´´½¨¶ÔÏóµÄ½Ó¿Ú,ËüÈ·±£ÁË¶ÔÏó´´½¨ÔÚ¶ÑÉÏ,·½±ã¹ÜÀí  
+        //è¿™æ˜¯å”¯ä¸€çš„åˆ›å»ºå¯¹è±¡çš„æ¥å£,å®ƒç¡®ä¿äº†å¯¹è±¡åˆ›å»ºåœ¨å †ä¸Š,æ–¹ä¾¿ç®¡ç†  
         static HuffmanNode* CreateNode(T data,long weight,HuffmanNode* left=NULL,HuffmanNode* right=NULL,HuffmanNode* parent=NULL)
         {
             return new HuffmanNode(data,weight,left,right,parent);
         }       
 		
-		//Ò»ÏµÁĞµÄgetterºÍsetter³ÉÔ±º¯Êı(ÔõÃ´ÄÇÃ´ÏñJava?:-)) 
+		//ä¸€ç³»åˆ—çš„getterå’Œsetteræˆå‘˜å‡½æ•°(æ€ä¹ˆé‚£ä¹ˆåƒJava?:-)) 
 		void SetLeftChild(HuffmanNode *left)
 		{
 		    _leftChild = left;
@@ -104,7 +104,7 @@ class HuffmanNode
 		    return _data;
 		}    
 		
-		//ÖØÔØµÄ"<"ºÍ">"ÔËËã·û,ÓÃÓÚ±È½ÏÁ½¸ö½Úµã´óĞ¡ 
+		//é‡è½½çš„"<"å’Œ">"è¿ç®—ç¬¦,ç”¨äºæ¯”è¾ƒä¸¤ä¸ªèŠ‚ç‚¹å¤§å° 
 		bool operator<(const HuffmanNode& other) const
 		{
 		    return this->_weight <= other._weight;
@@ -120,7 +120,7 @@ class HuffmanNode
             return out<<"(Data:"<<node._data<<" Weight:"<<node._weight<<")";
         }    
           		      
-		//Îö¹¹º¯Êı,É¾³ı±¾¶ÔÏóµÄÄÚ´æ,ËùÒÔÃ»ÓĞÁËÄÚ´æĞ¹Â©ÎÊÌâ (´óÉµ¹Ï,¸ù±¾´ï²»µ½Ä¿µÄ!) 
+		//ææ„å‡½æ•°,åˆ é™¤æœ¬å¯¹è±¡çš„å†…å­˜,æ‰€ä»¥æ²¡æœ‰äº†å†…å­˜æ³„æ¼é—®é¢˜ (å¤§å‚»ç“œ,æ ¹æœ¬è¾¾ä¸åˆ°ç›®çš„!) 
 		~HuffmanNode()
   		{
   		    #ifdef _DEBUG

@@ -6,7 +6,7 @@
 #include "huffmantree.h"
 
 using namespace std;
-//¹ş·òÂüÊ÷ÔÚhuffmanÃüÃû¿Õ¼äÀï,ÒªÊ¹ÓÃµÄ»°¾ÍÒª¼ÓÉÏÕâÒ»¾ä 
+//å“ˆå¤«æ›¼æ ‘åœ¨huffmanå‘½åç©ºé—´é‡Œ,è¦ä½¿ç”¨çš„è¯å°±è¦åŠ ä¸Šè¿™ä¸€å¥ 
 using namespace huffman;
 
 typedef HuffmanTree<char> MyTree;
@@ -17,25 +17,25 @@ int main(int argc, char *argv[])
     char buffer[100];
     char tempData='#';
     long tempWeight; 
-    cout<<"¹ş·òÂü±àÂë½âÂë²âÊÔ³ÌĞò"<<endl;
-    cout<<"×÷Õß:Jerry"<<endl;
+    cout<<"å“ˆå¤«æ›¼ç¼–ç è§£ç æµ‹è¯•ç¨‹åº"<<endl;
+    cout<<"ä½œè€…:Jerry"<<endl;
     cout<<endl<<endl; 
-    cout<<"ÇëÊäÈëÒ»ÏµÁĞµÄ×Ö·ûºÍ¶ÔÓ¦µÄÈ¨Öµ:(0½áÊø)"<<endl; 
+    cout<<"è¯·è¾“å…¥ä¸€ç³»åˆ—çš„å­—ç¬¦å’Œå¯¹åº”çš„æƒå€¼:(0ç»“æŸ)"<<endl; 
     while(tempData!='0')
     {
-        cout<<"×Ö·û:";
+        cout<<"å­—ç¬¦:";
         cin>>tempData;
-        cout<<"È¨Öµ:";
+        cout<<"æƒå€¼:";
         cin>>tempWeight;
         if(tempData!='0')
         	tempTree.PushData(tempData,tempWeight);
      } 
-     cout<<"ÕıÔÚ½¨Á¢¹ş·òÂüÊ÷..."<<endl;    
+     cout<<"æ­£åœ¨å»ºç«‹å“ˆå¤«æ›¼æ ‘..."<<endl;    
     tempTree.BuildHuffmanTree();
     //tempTree.PrintAllNodes(cout);
-    cout<<"ÕıÔÚ±àÂë..."<<endl; 
+    cout<<"æ­£åœ¨ç¼–ç ..."<<endl; 
     MyTree::CODEMAP& temp = tempTree.GetCodeMap();
-    cout<<"¹ş·òÂü±àÂëÈçÏÂ:"<<endl;
+    cout<<"å“ˆå¤«æ›¼ç¼–ç å¦‚ä¸‹:"<<endl;
     string sq;
     for(MyTree::ITERATOR it = temp.begin();it!=temp.end();it++)
     {
@@ -43,13 +43,13 @@ int main(int argc, char *argv[])
        sq += it->second;
     }    
     int pos = tempTree.Decode(sq.c_str(),buffer,100);
-    cout<<"½âÂë²âÊÔ:"<<endl;
-    cout<<"´ı½âÂëÊı¾İ:"<<sq<<endl;
-    cout<<"½âÂëºó:";
+    cout<<"è§£ç æµ‹è¯•:"<<endl;
+    cout<<"å¾…è§£ç æ•°æ®:"<<sq<<endl;
+    cout<<"è§£ç å:";
     for(int i=0;i<pos;i++)
     	cout<<buffer[i];
-	cout<<"\nÔ­Êı¾İ³¤¶È:"<<strlen(buffer)<<endl;
- 	cout<<"±àÂëºóÊı¾İ³¤¶È:"<<sq.length()/8+1<<endl; 
+	cout<<"\nåŸæ•°æ®é•¿åº¦:"<<strlen(buffer)<<endl;
+ 	cout<<"ç¼–ç åæ•°æ®é•¿åº¦:"<<sq.length()/8+1<<endl; 
 	cout<<endl;
     system("PAUSE");
     return 0;
