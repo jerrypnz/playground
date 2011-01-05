@@ -4,3 +4,6 @@ unix/dlhello/libfoo.so
 unix/dlhello/main
 huff-tree/main
 num2chinese/num2chinese
+httpd/tags
+unix/ipc-unix-domain-sock
+unix/tags
