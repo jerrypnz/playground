@@ -1,147 +1,123 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <sys/epoll.h>
+#include <netinet/in.h>
+
 #include "core.h"
 
-#define MAX_MSG_SIZE 512
+#define MAX_BACKLOG     20
+#define MAX_EVENTS      20
 
-int worker_main(worker_ctx_t *wk_ctx) {
-    char    msg[MAX_MSG_SIZE];
-    ssize_t msg_len = 0;
-    pid_t   pid = getpid();
+int  server_main(server_t *server) {
+    int rc;
 
-    msg[0] = '\0';
-
-    printf("Worker process running, pid:%u, socket fd:%d\n", pid, wk_ctx->ctl_sock_fd);
     for(;;) {
-        msg_len = read(wk_ctx->ctl_sock_fd, msg, MAX_MSG_SIZE);
-        if (msg_len < 0) {
-            perror("Error receiving data from socket");
-            exit(-1);
-        } else if(msg_len == 0) {
-            printf("Socket closed, exiting\n");
-            close(wk_ctx->ctl_sock_fd);
-            exit(0);
-        } 
+        switch (server->state) {
+            case RUNNING:
+                rc = server_run(server);
+                break;
 
-        msg[msg_len] = '\0';
+            case INITIALIZING:
+                rc = server_init(server);
+                break;
 
-        printf("Message received. Size: %d\n", msg_len);
-        printf("Message: %s\n", msg);
+            case STOPPING:
+                rc = server_stop(server);
+                break;
+
+            case COMPLETE:
+                rc = server_destroy(server);
+                return;
+        }
+
+        if (rc == -1) {
+            fprintf(stderr, "Fatal error detecting during server running, stopping server");
+        }
     }
 }
 
 
-int worker_init(worker_ctx_t *wk_ctx, server_ctx_t *server_ctx, int ctl_sock_fd) {
-    memset(wk_ctx, 0, sizeof(worker_ctx_t));
-    wk_ctx->ctl_sock_fd = ctl_sock_fd;
-    wk_ctx->server_ctx = server_ctx;
-    return 0;
-}
+int  server_init(server_t *server) {
+    int                 listen_fd, epoll_fd;
+    struct sockaddr_in  addr;
+    struct epoll_event  ev;
 
+    bzero(server, sizeof(server_t));
 
-int server_init(server_ctx_t *server_ctx, server_setting_t *setting) {
-    pid_t           pid;
-    int             tmp_fds[2];
-    int             i;
-    worker_t        *wk_list, *wk_iter;
-    worker_ctx_t    wk_ctx;
-
-    memset(server_ctx, 0, sizeof(server_ctx_t));
-    server_ctx->setting = setting;
-    server_ctx->worker_size = setting->initial_worker_count;
-
-    wk_list = (worker_t*) malloc(server_ctx->worker_size * sizeof(worker_t));
-    if (wk_list == NULL) {
-        perror("Error allcating memory");
+    // ---------- Create and bind listen socket fd --------------
+    listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (listen_fd == -1) {
+        perror("Error creating socket");
         return -1;
     }
-    memset(wk_list, 0, server_ctx->worker_size * sizeof(worker_t));
 
-    server_ctx->worker_list = wk_list;
+    bzero(&addr, sizeof(struct sockaddr_in));
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(server->port);
 
-    for (i = 0; i < server_ctx->worker_size; i++) {
-        if (socketpair(AF_UNIX, SOCK_STREAM, 0, tmp_fds) < 0) {
-            perror("Error opening sockets");
-            return -1;
-        }
-
-        if ((pid = fork()) < 0) {
-            perror("error forking worker process");
-            return -1;
-        } else if (pid > 0) {
-            wk_iter = server_ctx->worker_list + i;
-            wk_iter->pid = pid;
-            wk_iter->ctl_sock_fd = tmp_fds[0];
-            close(tmp_fds[1]);
-        } else {  /* child process */
-            worker_init(&wk_ctx, server_ctx, tmp_fds[1]);
-            close(tmp_fds[0]);
-            worker_main(&wk_ctx); 
-        }
-
+    if (bind(listen_fd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) == -1) {
+        perror("Error binding address");
+        return -1;
     }
 
-    return 0;
+    server->listen_fd = listen_fd;
+
+    // ------------ Init epoll ----------------------------------
+    epoll_fd = epoll_create(10);
+    if (epoll_fd == -1) {
+        perror("Error initializing epoll");
+        return -1;
+    }
+
+    ev.events = EPOLLIN;
+    ev.data.fd = listen_fd;
+    if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_fd, &ev) == -1) {
+        perror("Error adding listen socket fd to epoll")
+        return -1;
+    }
+
+    server->epoll_fd = epoll_fd;
+
+    // ------------ Start listening ------------------------------
+    if (listen(listen_fd, MAX_BACKLOG) == -1) {
+        perror("Error listening");
+        return -1;
+    }
+
 }
 
-int server_event_cycle(server_ctx_t *server_ctx) {
-    char    input_buffer[MAX_MSG_SIZE];
-    char    *msg = 0;
-    int     idx;
-    int     msg_len;
-    int     read_len;
-
-    input_buffer[0] = '\0';
-    for(;;) {
-        input_buffer[0] = '\0';
-        fgets(input_buffer, MAX_MSG_SIZE, stdin);
-        if (input_buffer[0] == '\0') {
-            printf("Exiting...\n");
-            break;
-        }
-
-        read_len = strlen(input_buffer);
-        input_buffer[read_len - 1] = '\0';
-        if(read_len-1 < 3) {
-            printf("Correct msg format: <worker_id> <msg>\n");
-            continue;
-        }
-
-        input_buffer[1] = '\0';
-        idx = atoi(input_buffer);
-        if (idx < 0 || idx >= server_ctx->worker_size) {
-            printf("Invalid process index: %d\n", idx);
-            continue;
-        }
-        msg = input_buffer + 2;
-        msg_len = strlen(msg);
-        printf("Sending message to process:%d, fd:%d, msg:%s, msg size:%d\n", 
-                server_ctx->worker_list[idx].pid, 
-                server_ctx->worker_list[idx].ctl_sock_fd, 
-                msg, 
-                msg_len);
-        write(server_ctx->worker_list[idx].ctl_sock_fd, msg, msg_len);
+int  add_handler(server_t *server, handler_fn func) {
+    handler_t       *new_handler;
+    new_handler = malloc(sizeof(handler_t));
+    if (new_handler == NULL) {
+        fprintf(stderr, "Error allocating memory");
+        return -1;
     }
 
-    return 0;
-}
+    new_handler->handle = func;
+    new_handler->next = NULL;
 
-int server_destroy(server_ctx_t *server_ctx) {
-    int exit_status, i;
-
-    for (i = 0; i < server_ctx->worker_size; i++) {
-        close(server_ctx->worker_list[i].ctl_sock_fd);
+    if (server->new_handler == NULL) {
+        server->handler = new_handler;
+        server->_handler_tail = new_handler;
+        return 0;
     }
 
-    for (i = 0; i < server_ctx->worker_size; i++) {
-        waitpid(server_ctx->worker_list[i].pid, &exit_status, 0);
-        printf("worker[pid=%d] exit status: %d\n", server_ctx->worker_list[i].pid, WEXITSTATUS(exit_status));
-    }
-
-    free(server_ctx->worker_list);
-
-    return 0;
+    server->_handler_tail->next = new_handler;
+    server->_handler_tail = new_handler;
 }
 
 
+int  server_run(server_t *server);
+int  server_stop(server_t *server);
+int  server_destroy(server_t *server);
+
+int  accept_conn(server_t *server);
+
+int  handle_conn_event(server_t *server, int conn_fd);

@@ -1,45 +1,83 @@
 #ifndef __CORE_H
-
 #define __CORE_H
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
 
-typedef struct _server_setting_t {
-    int         port;
-    size_t      initial_worker_count;
-} server_setting_t;
+#define MAX_CONNECTIONS     2048;
 
-typedef struct _worker_t {
-    pid_t       pid;
-    int         ctl_sock_fd;
-} worker_t;
+struct _server;
+struct _handler;
+struct _connection;
+struct _request;
+struct _response;
 
-typedef struct _server_ctx_t {
-    int         listen_fd;
-    size_t      worker_size;
-    worker_t    *worker_list;
-    server_setting_t    *setting;
-} server_ctx_t;
+enum _server_state {
+    RUNNING,
+    STOPPING,
+    COMPLETE
+};
 
-typedef struct _worker_ctx_t {
-    int             ctl_sock_fd;
-    server_ctx_t    *server_ctx;
-} worker_ctx_t;
+struct _server {
+    int                 listen_fd;
+    int                 epoll_fd;
+    unsigned short      port;
+    _server_state       state;
+    struct _handler     *handler;
+    struct _handler     *_handler_tail;
+    struct _connection  *connections[MAX_CONNECTIONS];
+};
 
-typedef struct _worker_ctl_msg_t {
-    int         cmd;
-    int         data;
-} worker_ctl_msg_t;
+struct _request {
+    char            *path;
+    connection_t    *connection;
+};
+
+struct _response {
+    
+};
+
+enum _conn_state {
+    IDLE,
+    PARSING,
+    HANDLING,
+    WRITING,
+    COMPLETE,
+    ERROR
+};
+
+struct _connection {
+    int                 sock_fd;
+    _conn_state         state;
+    struct _request     *req;
+    struct _response    *resp;
+    struct _server      *server;
+};
+
+typedef int (*handler_fn)(struct _handler *handler, const char* path, struct _request *req, struct _response *resp);
+
+struct _handler {
+    handler_fn          handle;
+    struct _handler     *next;
+};
 
 
-int worker_init(worker_ctx_t *wk_ctx, server_ctx_t *server_ctx, int ctl_sock_fd);
-int worker_main(worker_ctx_t *ctx);
+typedef _server     server_t;
+typedef _handler    handler_t;
+typedef _request    request_t;
+typedef _response   response_t;
+typedef _connection connection_t;
 
-int server_init(server_ctx_t *ctx, server_setting_t *settings);
-int server_event_cycle(server_ctx_t *ctx);
-int server_destroy(server_ctx_t *ctx);
+int  add_handler(server_t *server, handler_fn func);
 
-#endif /* end of include guard: __CORE_H */
+int  server_main(server_t *server);
+int  server_init(server_t *server);
+int  server_run(server_t *server);
+int  server_stop(server_t *server);
+int  server_destroy(server_t *server);
+
+int  epoll_dispatch(server_t *server);
+int  accept_conn(server_t *server);
+int  handle_conn_event(server_t *server, int fd);
+
+#define is_server_running(server) ((server)->state == RUNNING)
+
+#endif /* __CORE_H */
