@@ -1,6 +1,7 @@
 #ifndef __SERVER_H
 #define __SERVER_H
 
+#include <netinet/in.h>
 
 #define MAX_CONNECTIONS     2048
 
@@ -12,7 +13,7 @@ struct _request;
 struct _response;
 
 enum _server_state {
-    SERV_STAT_RUNNING,
+    SERV_STAT_RUNNING = 1,
     SERV_STAT_STOPPING,
     SERV_STAT_COMPLETE
 };
@@ -20,14 +21,19 @@ enum _server_state {
 struct _server {
     /* Configuration fields */
     unsigned short            port;
-    struct _handler_chain     *handler;
-    struct _handler_chain     *_handler_tail;
 
     /* Fields for the module implementation */
-    enum _server_state  _state;
     int                 _listen_fd;
     int                 _epoll_fd;
-    struct _connection  *_connections[MAX_CONNECTIONS];
+    enum _server_state  _state;
+
+    /* Linked list for handlers */
+    struct _handler_chain     *_handler_head;
+    struct _handler_chain     *_handler_tail;
+
+    /* Linked list for active connections */
+    struct _connection        *_conn_head;
+    struct _connection        *_conn_tail;
 };
 
 struct _request {
@@ -51,15 +57,20 @@ enum _conn_state {
 struct _connection {
     int                 sock_fd;
     enum _conn_state    state;
-    struct _request     *req;
-    struct _response    *resp;
     struct _server      *server;
+    struct _request     req;
+    struct _response    resp;
+    struct sockaddr_in  remo_addr;
+
+    /* Only for server module internal usage */
+    struct _connection  *next;
+    struct _connection  *prev;
 };
 
-typedef int (*fn_handler_init)    (struct _handler *handler);
-typedef int (*fn_handler_destroy) (struct _handler *handler);
-typedef int (*fn_handler_handle)  (struct _handler *handler, const char* path, 
-        struct _request *req, struct _response *resp);
+typedef int (*fn_handler_init)    (const struct _handler *handler);
+typedef int (*fn_handler_destroy) (const struct _handler *handler);
+typedef int (*fn_handler_handle)  (const struct _handler *handler, const char* path, 
+        const struct _request *req, const struct _response *resp);
 
 /**
  * Interface for handler objects
@@ -75,14 +86,16 @@ struct _handler_chain {
     struct _handler_chain     *next;
 };
 
-typedef struct _server     server_t;
-typedef struct _handler    handler_t;
-typedef struct _request    request_t;
-typedef struct _response   response_t;
-typedef struct _connection connection_t;
+typedef struct _server      server_t;
+typedef struct _handler     handler_t;
+typedef struct _request     request_t;
+typedef struct _response    response_t;
+typedef struct _connection  connection_t;
 
-int add_handler(server_t *server, handler_t handler);
-int server_main(server_t *server);
+server_t*   server_create(unsigned short port);
+int         server_destroy(server_t *server);
+int         server_main(server_t *server);
+int         server_add_handler(server_t *server, handler_t *handler);
 
 #define is_server_running(server) ((server)->state == SERV_STAT_RUNNING)
 

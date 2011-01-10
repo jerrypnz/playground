@@ -1,16 +1,19 @@
+#include "server.h"
 #include <stdio.h>
-#include "core.h"
 
 int main(int argc, const char *argv[])
 {
-    server_ctx_t        server_ctx;
-    server_setting_t    setting;
+    server_t    *server;
+    server = server_create(8081);
+    if (server == NULL) {
+        fprintf(stderr, "Error detecting during server creation");
+        return -1;
+    }
 
-    setting.initial_worker_count = 5;
-    setting.port = 8080;
+    if (server_main(server) < 0) {
+        fprintf(stderr, "Error detecting during server running");
+    }
 
-    server_init(&server_ctx, &setting);
-    server_event_cycle(&server_ctx);
-    server_destroy(&server_ctx);
+    server_destroy(server);
     return 0;
 }
