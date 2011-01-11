@@ -21,7 +21,7 @@ static int _server_stop(server_t *server);
 static int _accept_conn(server_t *server);
 static int _close_conn(server_t *server, connection_t *conn);
 static int _set_nonblocking(int fd);
-static int _handle_conn_event(server_t *server, int conn_fd, struct epoll_event *ev);
+static int _handle_conn_event(server_t *server, struct epoll_event *ev);
 
 
 server_t* server_create(unsigned short port) {
@@ -193,7 +193,7 @@ static int _server_run(server_t *server) {
             if (events[i].data.fd == listen_fd) {
                 _accept_conn(server);
             } else {
-                _handle_conn_event(server, events[i].data.fd, &events[i]);
+                _handle_conn_event(server, &events[i]);
             }
         }
 
@@ -234,7 +234,7 @@ static int _accept_conn(server_t *server) {
     // -------- Adding connection fd to epoll ------------------
     printf("Adding new connection to epoll...\n");
     _set_nonblocking(conn_fd);
-    ev.data.fd = conn_fd;
+    /*ev.data.fd = conn_fd;*/
     ev.data.ptr = conn;
     ev.events = EPOLLIN | EPOLLET;
     if (epoll_ctl(server->_epoll_fd, EPOLL_CTL_ADD, conn_fd, &ev) == -1) {
@@ -270,23 +270,28 @@ static int _accept_conn(server_t *server) {
 
 #define EPOLL_CLOSE_EVENTS (EPOLLRDHUP | EPOLLHUP | EPOLLERR)
 
-static int _handle_conn_event(server_t *server, int conn_fd, struct epoll_event *ev) {
-    int             nbytes;
+static int _handle_conn_event(server_t *server, struct epoll_event *ev) {
+    int             nbytes, conn_fd;
     char            buffer[512];
     connection_t    *conn;
-
-    printf("New event[fd:%d, event:%d]\n", conn_fd, ev->events);
 
     conn = (connection_t*) ev->data.ptr;
     if (conn == NULL) {
         printf("Invalid event: connection ptr is NULL\n");
     }
 
+    conn_fd = conn->sock_fd;
+    printf("New event[fd:%d, event:%d]\n", conn_fd, ev->events);
+
     if (EPOLLIN & ev->events) {
         nbytes = read(conn_fd, buffer, 511);
         if (nbytes > 0) {
+            buffer[nbytes] = '\0';
             printf("Read %d bytes from client.\n", nbytes);
             printf("Content: \n%s\n", buffer);
+        } else if (nbytes == 0) {
+            fprintf(stderr, "Unexpected EOF, closing connection");
+            _close_conn(server, conn);
         } else {
             perror("Error reading from client");
             _close_conn(server, conn);
@@ -302,11 +307,14 @@ static int _close_conn(server_t *server, connection_t *conn){
     if(epoll_ctl(server->_epoll_fd, EPOLL_CTL_DEL, conn->sock_fd, NULL)) {
         perror("Error removing fd from epoll");
     }
+
     close(conn->sock_fd);
-    conn->prev->next = conn->next;
-    if (conn->next != NULL) {
+
+    if (conn->prev != NULL)
+        conn->prev->next = conn->next;
+    if (conn->next != NULL) 
         conn->next->prev = conn->prev;
-    }
+
     free(conn);
     return 0;
 }
