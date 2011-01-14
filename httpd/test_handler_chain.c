@@ -69,8 +69,7 @@ void call_handlers() {
     server_destroy(server);
 }
 
-int main(int argc, const char *argv[])
-{
+int main(int argc, const char *argv[]) {
     init_server();
     call_handlers();
     return 0;
