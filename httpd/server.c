@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 
 #include "server.h"
+#include "http.h"
 
 #define MAX_BACKLOG     20
 #define MAX_EVENTS      20
@@ -236,7 +237,7 @@ static int _accept_conn(server_t *server) {
     _set_nonblocking(conn_fd);
     /*ev.data.fd = conn_fd;*/
     ev.data.ptr = conn;
-    ev.events = EPOLLIN | EPOLLET;
+    ev.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
     if (epoll_ctl(server->_epoll_fd, EPOLL_CTL_ADD, conn_fd, &ev) == -1) {
         perror("Error adding new connection to epoll");
         close(conn_fd);
@@ -269,10 +270,11 @@ static int _accept_conn(server_t *server) {
 
 
 #define EPOLL_CLOSE_EVENTS (EPOLLRDHUP | EPOLLHUP | EPOLLERR)
+#define CONN_BUFF_SIZE      2048
 
 static int _handle_conn_event(server_t *server, struct epoll_event *ev) {
-    int             nbytes, conn_fd;
-    char            buffer[512];
+    int             nread, nconsumed, conn_fd;
+    char            buffer[CONN_BUFF_SIZE];
     connection_t    *conn;
 
     conn = (connection_t*) ev->data.ptr;
@@ -283,27 +285,32 @@ static int _handle_conn_event(server_t *server, struct epoll_event *ev) {
     conn_fd = conn->sock_fd;
     printf("New event[fd:%d, event:%d]\n", conn_fd, ev->events);
 
+    nread = 0;
+    nconsumed = 0;
+
+    if (EPOLL_CLOSE_EVENTS & ev->events) {
+        printf("Client closed connection or error detected\n");
+        _close_conn(server, conn);
+    }
+
     if (EPOLLIN & ev->events) {
-        nbytes = read(conn_fd, buffer, 511);
-        if (nbytes > 0) {
-            buffer[nbytes] = '\0';
-            printf("Read %d bytes from client.\n", nbytes);
-            printf("Content: \n%s\n", buffer);
-        } else if (nbytes == 0) {
-            fprintf(stderr, "Unexpected EOF, closing connection");
-            _close_conn(server, conn);
+        nread = read(conn_fd, buffer, CONN_BUFF_SIZE);
+        if (nread > 0) {
+            printf("Read %d bytes from client.\n", nread);
+        } else if (nread == 0) {
+            fprintf(stderr, "Unexpected EOF\n");
         } else {
             perror("Error reading from client");
             _close_conn(server, conn);
         }
-    } else if (EPOLL_CLOSE_EVENTS & ev->events) {
-        printf("Closing connection\n");
-        _close_conn(server, conn);
     }
+    
     return 0;
 }
 
 static int _close_conn(server_t *server, connection_t *conn){
+    printf("Closing connection[fd: %d]\n", conn->sock_fd);
+
     if(epoll_ctl(server->_epoll_fd, EPOLL_CTL_DEL, conn->sock_fd, NULL)) {
         perror("Error removing fd from epoll");
     }

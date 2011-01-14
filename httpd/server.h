@@ -2,6 +2,7 @@
 #define __SERVER_H
 
 #include <netinet/in.h>
+#include "http.h"
 
 #define MAX_CONNECTIONS     2048
 
@@ -54,9 +55,11 @@ enum _conn_state {
     CONN_STATE_ERROR
 };
 
+
 struct _connection {
     int                 sock_fd;
     enum _conn_state    state;
+    http_parser_t       parser;
     struct _server      *server;
     struct _request     req;
     struct _response    resp;
