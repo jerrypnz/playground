@@ -1,10 +1,9 @@
 #include "server.h"
 #include <stdio.h>
 
-int main(int argc, const char *argv[])
-{
+int main(int argc, const char *argv[]) {
     server_t    *server;
-    server = server_create(8081);
+    server = server_create(8080);
     if (server == NULL) {
         fprintf(stderr, "Error detecting during server creation");
         return -1;
