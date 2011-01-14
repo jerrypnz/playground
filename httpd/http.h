@@ -1,79 +1,73 @@
-#include "core.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <netinet/in.h>
+#ifndef __HTTP_H
+#define __HTTP_H
+
+#define REQUEST_BUFFER_SIZE     1024
 
 enum _http_methods {
-    HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE
+    HTTP_METHOD_GET = 1, 
+    HTTP_METHOD_POST, 
+    HTTP_METHOD_PUT, 
+    HTTP_METHOD_DELETE,
+    HTTP_METHOD_HEAD,
+    HTTP_METHOD_TRACE,
+    HTTP_METHOD_CONNECT,
+    HTTP_METHOD_OPTIONS
 };
 
-enum _std_http_req_header_fields {
-    REQHDR_ACCEPT = 0,
-    REQHDR_ACCEPT_CHARSET,
-    REQHDR_ACCEPT_ENCODING,
-    REQHDR_ACCEPT_LANGUAGE,
-    REQHDR_AUTHORIZATION,
-    REQHDR_EXPECT,
-    REQHDR_FROM,
-    REQHDR_HOST,
-    REQHDR_IF_MATCH,
-    REQHDR_IF_MODIFIED_SINCE,
-    REQHDR_IF_NONE_MATCH,
-    REQHDR_IF_RANGE,
-    REQHDR_IF_UNMODIFIED_SINCE,
-    REQHDR_MAX_FORWARDS,
-    REQHDR_PROXY_AUTHORIZATION,
-    REQHDR_RANGE,
-    REQHDR_REFERER,
-    REQHDR_TE,
-    REQHDR_USER_AGENT 
+enum _http_versions {
+    HTTP_VERSION_0_9 = 1,
+    HTTP_VERSION_1_0,
+    HTTP_VERSION_1_1
 };
 
-const char  *_std_http_req_header_field_str[] = {
-    "Accept",
-    "Accept-Charset",
-    "Accept-Encoding",
-    "Accept-Language",
-    "Authorization",
-    "Expect",
-    "From",
-    "Host",
-    "If-Match",
-    "If-Modified-Since",
-    "If-None-Match",
-    "If-Range",
-    "If-Unmodified-Since",
-    "Max-Forwards",
-    "Proxy-Authorization",
-    "Range",
-    "Referer",
-    "TE",
-    "User-Agent"
+enum _parser_state {
+    PARSER_STATE_BAD_REQUEST = -1,
+    PARSER_STATE_COMPLETE = 0,
+    PARSER_STATE_METHOD,
+    PARSER_STATE_PATH,
+    PARSER_STATE_QUERY_STR,
+    PARSER_STATE_VERSION,
+    PARSER_STATE_HEADER_NAME,
+    PARSER_STATE_HEADER_VALUE,
+    PARSER_STATE_HEADER_CR,
+    PARSER_STATE_HREADER_LF,
+    PARSER_STATE_HEADER_COMPLETE,
+    PARSER_STATE_BODY
 };
 
-enum _http_trans_state {
-    TX_STAT_REQ_HEADER,
-    TX_STAT_REQ_BODY,
-    TX_STAT_PROCESSING,
-    TX_STAT_RESP_WRITING
-}
+enum _return_status {
+    STATUS_ERROR = -1,
+    STATUS_COMPLETE = 0,
+    STATUS_CONTINUE = 1
+};
 
-typedef int (*stat_handler)(http_trans_t *tx, void *data, size_t len);
-
-typedef struct _http_header_t {
+struct _http_header {
+    char    *name;
     char    *value;
-} http_header_t;
+};
 
-typedef struct _http_request_t {
-    int     method;
-    char    *path;
-    http_header_t   *hd;
-} http_request_t;
+struct _http_parser {
+    char                    *path;
+    char                    *query_str;
+    char                    *host;
+    enum _http_methods      method;
+    enum _http_versions     version;
+    int                     content_len;
+    struct _http_header     *headers;
 
-typedef struct _http_conn_t {
-    int                 sockfd;
-    int                 state;
-    struct sockaddr     *remoteaddr;
-    http_request_t      *request;
-} http_trans_t;
+    int                     _buf_idx;
+    char                    _buffer[REQUEST_BUFFER_SIZE];
+    enum _parser_state      _state;
+};
+
+
+typedef struct _http_parser     http_parser_t;
+typedef struct _http_header     http_header_t;
+
+int parser_init(const http_parser_t *parser);
+int parser_destroy(const http_parser_t *parser);
+int parser_reset(const http_parser_t *parser);
+int parser_do_parse(const http_parser_t *parser, const char *data, const size_t data_len, const size_t *consumed_len);
+
+
+#endif /* end of include guard: __HTTP_H */
