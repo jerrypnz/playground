@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 
-const char* test_request = 
+char* test_request = 
     "GET /home/hello.do?id=1001&name=hello HTTP/1.1\r\n"
     "Host: www.javaeye.com\r\n"
     "Connection: keep-alive\r\n"
@@ -42,13 +42,54 @@ void assert_headers();
 void test_parse_once() {
     int req_size, consumed_size, rc;
 
-    printf("Testing parsing all in one time\n");
+    printf("\n\nTesting parsing all in one time\n");
     req_size = strlen(test_request);
     rc = parser_do_header(&parser, test_request, req_size, &consumed_size);
     printf("Request size: %d, consumed size: %d, return status: %d\n", req_size, consumed_size, rc);
     dump_parser();
     assert(rc == STATUS_COMPLETE);
     assert(consumed_size == req_size);
+    assert_headers();
+}
+
+void test_parse_multiple_times() {
+    int     req_size, consumed_size, rc;
+    int     part1_size, part2_size, part3_size;
+    char    *data;
+
+    printf("\n\nTesting parsing all in multiple time\n");
+    data = test_request;
+    req_size = strlen(data);
+
+    part1_size = req_size / 3;
+    part2_size = req_size / 3 + 9;
+    part3_size = req_size - part1_size - part2_size;
+
+    // First time
+    rc = parser_do_header(&parser, data, part1_size, &consumed_size);
+    printf("First Time: Request size: %d, consumed size: %d, return status: %d\n", req_size, consumed_size, rc);
+    dump_parser();
+    assert(rc == STATUS_CONTINUE);
+    assert(consumed_size == part1_size);
+
+    data += consumed_size;
+
+    // Second time
+    rc = parser_do_header(&parser, data, part2_size, &consumed_size);
+    printf("Second Time: Request size: %d, consumed size: %d, return status: %d\n", req_size, consumed_size, rc);
+    dump_parser();
+    assert(rc == STATUS_CONTINUE);
+    assert(consumed_size == part2_size);
+
+    data += consumed_size;
+
+    // Third time
+    rc = parser_do_header(&parser, data, part3_size, &consumed_size);
+    printf("Third Time: Request size: %d, consumed size: %d, return status: %d\n", req_size, consumed_size, rc);
+
+    dump_parser();
+    assert(rc == STATUS_COMPLETE);
+    assert(consumed_size == part3_size);
     assert_headers();
 }
 
@@ -90,5 +131,7 @@ int main(int argc, const char *argv[])
 {
     parser_init(&parser);
     test_parse_once();
+    parser_reset(&parser);
+    test_parse_multiple_times();
     return 0;
 }
