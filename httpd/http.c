@@ -21,7 +21,6 @@ int parser_reset(http_parser_t *parser) {
 
     parser->method = NULL;
     parser->http_version = NULL;
-    parser->host = NULL;
     parser->path = NULL;
     parser->query_str = NULL;
     parser->content_len = 0;
