@@ -38,8 +38,16 @@ struct _server {
 };
 
 struct _request {
-    char                *path;
-    struct _connection  *connection;
+    char                    *path;
+    char                    *query_str;
+    char                    *method;
+    char                    *http_version;
+    int                     content_len;
+
+    struct _http_header     *headers;
+    int                     header_count;
+
+    struct _connection      *connection;
 };
 
 struct _response {
