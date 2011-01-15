@@ -2,7 +2,7 @@
 #define __HTTP_H
 
 #define REQUEST_BUFFER_SIZE     4096
-#define MAX_HEADER_SIZE         20
+#define MAX_HEADER_SIZE         25
 
 #include <stdlib.h>
 
