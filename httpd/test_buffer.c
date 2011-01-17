@@ -98,5 +98,6 @@ int main(int argc, const char *argv[])
     test_init_buffer();
     test_allocate_new();
     test_get_and_delete_buffer();
+    printf("Finished all tests.\n");
     return 0;
 }

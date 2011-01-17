@@ -4,7 +4,7 @@
 #define REQUEST_BUFFER_SIZE     4096
 #define MAX_HEADER_SIZE         25
 
-#include <stdlib.h>
+#include <stddef.h>
 
 enum _http_methods {
     HTTP_METHOD_EXTENDED = 0,

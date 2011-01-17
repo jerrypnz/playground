@@ -59,7 +59,6 @@ enum _conn_state {
     CONN_STATE_PARSING,
     CONN_STATE_HANDLING,
     CONN_STATE_WRITING,
-    CONN_STATE_COMPLETE,
     CONN_STATE_ERROR
 };
 
@@ -78,10 +77,9 @@ struct _connection {
     struct _connection  *prev;
 };
 
-typedef int (*fn_handler_init)    (const struct _handler *handler);
-typedef int (*fn_handler_destroy) (const struct _handler *handler);
-typedef int (*fn_handler_handle)  (const struct _handler *handler, const char* path, 
-        const struct _request *req, const struct _response *resp);
+typedef int (*fn_handler_init)    (struct _handler *handler);
+typedef int (*fn_handler_destroy) (struct _handler *handler);
+typedef int (*fn_handler_handle)  (struct _handler *handler, const char* path, struct _request *req, struct _response *resp);
 
 /**
  * Interface for handler objects
