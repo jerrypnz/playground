@@ -20,9 +20,15 @@ static int _server_init(server_t *server);
 static int _server_run(server_t *server);
 static int _server_stop(server_t *server);
 static int _accept_conn(server_t *server);
-static int _close_conn(server_t *server, connection_t *conn);
+
+static int _dispatch_conn_event(server_t *server, struct epoll_event *ev);
+
+static int _conn_handle_close_event(server_t *server, connection_t *conn);
+static int _conn_handle_read_event(server_t *server, connection_t *conn);
+static int _conn_handle_write_event(server_t *server, connection_t *conn);
+static int _conn_handle(server_t *server, connection_t *conn);
+
 static int _set_nonblocking(int fd);
-static int _handle_conn_event(server_t *server, struct epoll_event *ev);
 
 
 server_t* server_create(unsigned short port) {
@@ -194,7 +200,7 @@ static int _server_run(server_t *server) {
             if (events[i].data.fd == listen_fd) {
                 _accept_conn(server);
             } else {
-                _handle_conn_event(server, &events[i]);
+                _dispatch_conn_event(server, &events[i]);
             }
         }
 
@@ -207,6 +213,17 @@ static int _server_stop(server_t *server) {
     return 0;
 }
 
+
+static int _set_nonblocking(int sockfd) {
+    int opts;
+    opts = fcntl(sockfd, F_GETFL);
+    if (opts < 0) 
+        return -1;
+    opts |= O_NONBLOCK;
+    if (fcntl(sockfd, F_SETFL, opts) < 0)
+        return -1;
+    return 0;
+}
 
 
 static int _accept_conn(server_t *server) {
@@ -234,8 +251,11 @@ static int _accept_conn(server_t *server) {
 
     // -------- Adding connection fd to epoll ------------------
     printf("Adding new connection to epoll...\n");
-    _set_nonblocking(conn_fd);
-    /*ev.data.fd = conn_fd;*/
+    if (_set_nonblocking(conn_fd) == -1) {
+        perror("Error configuration connection to non-blocking");
+        return -1;
+    }
+
     ev.data.ptr = conn;
     ev.events = EPOLLIN | EPOLLET | EPOLLRDHUP;
     if (epoll_ctl(server->_epoll_fd, EPOLL_CTL_ADD, conn_fd, &ev) == -1) {
@@ -272,9 +292,7 @@ static int _accept_conn(server_t *server) {
 #define EPOLL_CLOSE_EVENTS (EPOLLRDHUP | EPOLLHUP | EPOLLERR)
 #define CONN_BUFF_SIZE      2048
 
-static int _handle_conn_event(server_t *server, struct epoll_event *ev) {
-    int             nread, nconsumed, conn_fd;
-    char            buffer[CONN_BUFF_SIZE];
+static int _dispatch_conn_event(server_t *server, struct epoll_event *ev) {
     connection_t    *conn;
 
     conn = (connection_t*) ev->data.ptr;
@@ -290,25 +308,47 @@ static int _handle_conn_event(server_t *server, struct epoll_event *ev) {
 
     if (EPOLL_CLOSE_EVENTS & ev->events) {
         printf("Client closed connection or error detected\n");
-        _close_conn(server, conn);
+        return _conn_handle_close_event(server, conn);
     }
 
+    // read event and write event should not be raised at the same time.
+    assert( (EPOLLIN & ev->events) ^ (EPOLLOUT & ev->events) );
+
     if (EPOLLIN & ev->events) {
-        nread = read(conn_fd, buffer, CONN_BUFF_SIZE);
-        if (nread > 0) {
-            printf("Read %d bytes from client.\n", nread);
-        } else if (nread == 0) {
-            fprintf(stderr, "Unexpected EOF\n");
-        } else {
-            perror("Error reading from client");
-            _close_conn(server, conn);
-        }
+        _conn_handle_read_event(server, conn);
+    } else if (EPOLLOUT & ev->events) {
+        _conn_handle_write_event(server, conn);
     }
     
     return 0;
 }
 
-static int _close_conn(server_t *server, connection_t *conn){
+
+static int _conn_handle_read_event(server_t *server, connection_t *conn) {
+    int             nread, nconsumed;
+    char            buffer[CONN_BUFF_SIZE];
+
+    nread = read(conn->sock_fd, buffer, CONN_BUFF_SIZE);
+
+    if (nread == 0) {
+        fprintf(stderr, "Unexpected EOF\n");
+    } else if (nread < 0) {
+        perror("Error reading from client");
+        return 1;
+    }
+
+    printf("Read %d bytes from client.\n", nread);
+
+    return 0;
+}
+
+
+static int _conn_handle_write_event(server_t *server, connection_t *conn) {
+    return 0;
+}
+
+
+static int _conn_handle_close_event(server_t *server, connection_t *conn){
     printf("Closing connection[fd: %d]\n", conn->sock_fd);
 
     if(epoll_ctl(server->_epoll_fd, EPOLL_CTL_DEL, conn->sock_fd, NULL)) {
@@ -326,13 +366,23 @@ static int _close_conn(server_t *server, connection_t *conn){
     return 0;
 }
 
-static int _set_nonblocking(int sockfd) {
-    int opts;
-    opts = fcntl(sockfd, F_GETFL);
-    if (opts < 0) 
-        return -1;
-    opts |= O_NONBLOCK;
-    if (fcntl(sockfd, F_SETFL, opts) < 0)
-        return -1;
-    return 0;
+static int _conn_handle(server_t *server, connection_t *conn) {
+
+    switch (conn->state) {
+        case CONN_STATE_IDLE:
+            break;
+
+        case CONN_STATE_PARSING:
+            break;
+
+        case CONN_STATE_HANDLING:
+            break;
+
+        case CONN_STATE_WRITING:
+            break;
+
+        case CONN_STATE_ERROR:
+            break;
+    }
+    
 }
