@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
+#include <assert.h>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -300,11 +301,7 @@ static int _dispatch_conn_event(server_t *server, struct epoll_event *ev) {
         printf("Invalid event: connection ptr is NULL\n");
     }
 
-    conn_fd = conn->sock_fd;
-    printf("New event[fd:%d, event:%d]\n", conn_fd, ev->events);
-
-    nread = 0;
-    nconsumed = 0;
+    printf("New event[fd:%d, event:%d]\n", conn->sock_fd, ev->events);
 
     if (EPOLL_CLOSE_EVENTS & ev->events) {
         printf("Client closed connection or error detected\n");
