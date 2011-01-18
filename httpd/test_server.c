@@ -51,9 +51,9 @@ void init_server() {
     server_add_handler(server, (handler_t*)h1);
     server_add_handler(server, (handler_t*)h2);
     assert(server->_handler_head != NULL);
-    assert(server->_handler_head->handler_obj == h1);
+    assert(server->_handler_head->handler_obj == (handler_t*)h1);
     assert(server->_handler_tail != NULL);
-    assert(server->_handler_tail->handler_obj == h2);
+    assert(server->_handler_tail->handler_obj == (handler_t*)h2);
 }
 
 void call_handlers() {
