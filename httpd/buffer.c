@@ -2,17 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static  buf_node_t  *_alloc_buf_node(const int buf_size) {
+static  buf_node_t  *_alloc_buf_node(const size_t buf_size) {
     buf_node_t      *buf;
     void            *mem;
 
     // Allocate the buffer node and the data buffer at the same time
     mem = malloc(sizeof(buf_node_t) + buf_size);
-    buf = (buf_node_t*) mem;
-    if (buf == NULL) {
+    if (mem == NULL) {
         fprintf(stderr, "Error allocating memory for buffer queue");
         return NULL;
     }
+
+    buf = (buf_node_t*) mem;
 
     buf->data = ((char*) mem + sizeof(buf_node_t));
     buf->buf_size = buf_size;
