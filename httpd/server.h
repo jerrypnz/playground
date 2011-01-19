@@ -3,6 +3,7 @@
 
 #include <netinet/in.h>
 #include "http.h"
+#include "buffer.h"
 
 #define MAX_CONNECTIONS     2048
 
@@ -71,6 +72,9 @@ struct _connection {
     struct _request     req;
     struct _response    resp;
     struct sockaddr_in  remo_addr;
+
+    buf_queue_t         *read_buf_q;
+    buf_queue_t         *write_buf_q;
 
     /* Only for server module internal usage */
     struct _connection  *next;

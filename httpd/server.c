@@ -13,9 +13,12 @@
 
 #include "server.h"
 #include "http.h"
+#include "buffer.h"
 
 #define MAX_BACKLOG     20
 #define MAX_EVENTS      20
+#define BUF_PAGE_SIZE   4096
+#define INIT_PAGES      1
 
 static int _server_init(server_t *server);
 static int _server_run(server_t *server);
@@ -273,6 +276,10 @@ static int _accept_conn(server_t *server) {
     conn->server = server;
     conn->state = CONN_STATE_IDLE;
 
+    // -------- Allocating read and write buffers -----
+    conn->read_buf_q = buf_create(BUF_PAGE_SIZE, INIT_PAGES);
+    conn->write_buf_q = buf_create(BUF_PAGE_SIZE, INIT_PAGES);
+
     // Add the connection to the server's connection pool, using
     // fd as index.
     if (server->_conn_head == NULL) {
@@ -322,10 +329,26 @@ static int _dispatch_conn_event(server_t *server, struct epoll_event *ev) {
 
 
 static int _conn_handle_read_event(server_t *server, connection_t *conn) {
-    int             nread, nconsumed;
-    char            buffer[CONN_BUFF_SIZE];
+    int             nread = 0;
+    buf_page_t      *buf_page;
+    char            *buffer;
+    size_t          buf_size;
 
-    nread = read(conn->sock_fd, buffer, CONN_BUFF_SIZE);
+    buf_page = buf_get_tail(conn->read_buf_q);
+
+    if (buf_page == NULL) {
+        buf_page = buf_alloc_new(conn->read_buf_q);
+        if (buf_page == NULL) {
+            fprintf(stderr, "Error allocating buffer");
+            return -1;
+        }
+    }
+
+    buf_size = buf_page->page_size - buf_page->data_offset - buf_page->data_size;
+    assert (buf_size >= 0);
+    buffer = (char*) buf_page->data + buf_page->data_offset + buf_page->data_size;
+
+    nread = read(conn->sock_fd, buffer, buf_size);
 
     if (nread == 0) {
         fprintf(stderr, "Unexpected EOF\n");
@@ -359,6 +382,8 @@ static int _conn_handle_close_event(server_t *server, connection_t *conn){
     if (conn->next != NULL) 
         conn->next->prev = conn->prev;
 
+    buf_destroy(conn->read_buf_q);
+    buf_destroy(conn->write_buf_q);
     free(conn);
     return 0;
 }
