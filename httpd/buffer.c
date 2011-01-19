@@ -2,21 +2,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static  buf_node_t  *_alloc_buf_node(const size_t buf_size) {
-    buf_node_t      *buf;
+static  buf_page_t  *_alloc_buf_page(const size_t page_size) {
+    buf_page_t      *buf;
     void            *mem;
 
     // Allocate the buffer node and the data buffer at the same time
-    mem = malloc(sizeof(buf_node_t) + buf_size);
+    mem = malloc(sizeof(buf_page_t) + page_size);
     if (mem == NULL) {
         fprintf(stderr, "Error allocating memory for buffer queue");
         return NULL;
     }
 
-    buf = (buf_node_t*) mem;
+    buf = (buf_page_t*) mem;
 
-    buf->data = ((char*) mem + sizeof(buf_node_t));
-    buf->buf_size = buf_size;
+    buf->data = ((char*) mem + sizeof(buf_page_t));
+    buf->page_size = page_size;
     buf->data_offset = 0;
     buf->data_size = 0;
     buf->_next = NULL;
@@ -25,10 +25,10 @@ static  buf_node_t  *_alloc_buf_node(const size_t buf_size) {
 }
 
 
-buf_queue_t  *buf_create(size_t buf_size, int init_capacity) {
+buf_queue_t  *buf_create(size_t page_size, int init_capacity) {
     int     i;
     buf_queue_t     *q;
-    buf_node_t      *buf;
+    buf_page_t      *buf;
 
     q = (buf_queue_t*) malloc(sizeof(buf_queue_t));
     if (q == NULL) {
@@ -36,7 +36,7 @@ buf_queue_t  *buf_create(size_t buf_size, int init_capacity) {
         return NULL;
     }
 
-    q->buf_size = buf_size;
+    q->page_size = page_size;
     q->len = 0;
     q->_head = NULL;
     q->_tail = NULL;
@@ -45,7 +45,7 @@ buf_queue_t  *buf_create(size_t buf_size, int init_capacity) {
     if (init_capacity > 0) {
 
         for (i = 0; i < init_capacity; i++) {
-            buf = _alloc_buf_node(q->buf_size);
+            buf = _alloc_buf_page(q->page_size);
             if (buf == NULL)
                 goto end;
 
@@ -65,7 +65,7 @@ end:
 
 int  buf_destroy(buf_queue_t *buf_q) {
     int i;
-    buf_node_t  *buf, *it;
+    buf_page_t  *buf, *it;
 
     for (it = buf_q->_head; it != NULL; ) {
         buf = it;
@@ -85,8 +85,8 @@ int  buf_destroy(buf_queue_t *buf_q) {
 }
 
 
-buf_node_t   *buf_alloc_new(buf_queue_t *buf_q) {
-    buf_node_t      *buf;
+buf_page_t   *buf_alloc_new(buf_queue_t *buf_q) {
+    buf_page_t      *buf;
 
     // Use the nodes from free list first.
     if (buf_q->_free_list != NULL) {
@@ -96,7 +96,7 @@ buf_node_t   *buf_alloc_new(buf_queue_t *buf_q) {
         buf->data_size = 0;
         buf->_next = NULL;
     } else {
-        buf = _alloc_buf_node(buf_q->buf_size);
+        buf = _alloc_buf_page(buf_q->page_size);
         if (buf == NULL) {
             return NULL;
         }
@@ -116,13 +116,16 @@ buf_node_t   *buf_alloc_new(buf_queue_t *buf_q) {
 }
 
 
-buf_node_t   *buf_get_head(buf_queue_t *buf_q) {
+buf_page_t   *buf_get_head(buf_queue_t *buf_q) {
     return buf_q->_head;
 }
 
+buf_page_t   *buf_get_tail(buf_queue_t *buf_q) {
+    return buf_q->_tail;
+}
 
 void    buf_remove_head(buf_queue_t *buf_q) {
-    buf_node_t      *buf;
+    buf_page_t      *buf;
 
     if (buf_q->_head == NULL)
         return;
