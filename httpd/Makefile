@@ -23,6 +23,8 @@ server.o: http.h buffer.h
 test_%: test_%.o %.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
+test_server: buffer.o
+
 .PHONY: clean
 clean:
 	-rm -f $(objects) $(executable) $(tests) $(testobjs)
