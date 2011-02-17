@@ -1,4 +1,4 @@
-#include "server.h"
+#include "handler.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,37 +40,39 @@ bar_handler* create_bar_handler() {
     return handler;
 }
 
-server_t    *server;
-foo_handler *h1;
-bar_handler *h2;
+filter_chain_t      chain;
+foo_handler         *h1;
+bar_handler         *h2;
+filter_t            f1, f2;
 
-void init_server() {
-    server = server_create(8081);
+void init_filter_chain() {
+    bzero(&chain, sizeof(filter_chain_t));
+    bzero(&f1, sizeof(filter_t));
+    bzero(&f2, sizeof(filter_t));
+
     h1 = create_foo_handler();
     h2 = create_bar_handler();
-    server_add_handler(server, (handler_t*)h1);
-    server_add_handler(server, (handler_t*)h2);
-    assert(server->_handler_head != NULL);
-    assert(server->_handler_head->handler_obj == (handler_t*)h1);
-    assert(server->_handler_tail != NULL);
-    assert(server->_handler_tail->handler_obj == (handler_t*)h2);
+    f1.handler = (handler_t*)h1;
+    f2.handler = (handler_t*)h2;
+
+    filter_chain_add(&chain, &f1);
+    filter_chain_add(&chain, &f2);
+    assert(chain.head != NULL);
+    assert(chain.head->handler == (handler_t*)h1);
+    assert(chain.tail != NULL);
+    assert(chain.tail->handler == (handler_t*)h2);
 }
 
 void call_handlers() {
-    struct _handler_chain  *cur;
-    cur = server->_handler_head;
-    for(; cur != NULL; cur = cur->next) {
-        cur->handler_obj->handle(cur->handler_obj, "test", NULL, NULL);
-    }
+    filter_chain_do_filter(&chain, "test", NULL, NULL);
     printf("foo handler data: 0x%X\n", h1->data);
     printf("bar handler data: %s\n", h2->data);
     assert(h1->data == 0xCAFEBABE);
     assert(strcmp("0xCAFEBABE", h2->data) == 0);
-    server_destroy(server);
 }
 
 int main(int argc, const char *argv[]) {
-    init_server();
+    init_filter_chain();
     call_handlers();
     return 0;
 }

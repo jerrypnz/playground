@@ -47,48 +47,13 @@ server_t* server_create(unsigned short port) {
 }
 
 int server_destroy(server_t *server) {
-    struct _handler_chain   *handler_it, *handler_prev;
-    fn_handler_destroy      destroy_func;
-    
-    // ------------ Destroy handlers ----------------------------
-    for (handler_it = server->_handler_head; handler_it != NULL;) {
-        handler_prev = handler_it;
-        handler_it = handler_it->next;
-        destroy_func = handler_prev->handler_obj->destroy;
-        if (destroy_func != NULL) {
-            destroy_func(handler_prev->handler_obj);
-        }
-        free(handler_prev);
-    }
+    // --------- Destroy the site object
+    site_destroy(server->site);
 
     // --------- Destroy server -------------------
     free(server);
     return 0;
 }
-
-int server_add_handler(server_t *server, handler_t *handler) {
-    struct _handler_chain  *new_handler;
-
-    new_handler = malloc(sizeof(struct _handler_chain));
-    if (new_handler == NULL) {
-        fprintf(stderr, "Error allocating memory");
-        return -1;
-    }
-
-    new_handler->handler_obj = handler;
-    new_handler->next = NULL;
-
-    if (server->_handler_head == NULL) {
-        server->_handler_head = new_handler;
-        server->_handler_tail = new_handler;
-        return 0;
-    }
-
-    server->_handler_tail->next = new_handler;
-    server->_handler_tail = new_handler;
-    return 0;
-}
-
 
 int  server_main(server_t *server) {
     int rc = 0;
@@ -133,8 +98,6 @@ static int  _server_init(server_t *server) {
     int                     listen_fd, epoll_fd;
     struct sockaddr_in      addr;
     struct epoll_event      ev;
-    struct _handler_chain   *handler_it;
-    fn_handler_init         init_func;
 
     // ---------- Create and bind listen socket fd --------------
     listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -175,13 +138,6 @@ static int  _server_init(server_t *server) {
 
     server->_epoll_fd = epoll_fd;
     
-    // ------------ Init handlers --------------------------------
-    for(handler_it = server->_handler_head; handler_it != NULL; handler_it = handler_it->next) {
-        init_func = handler_it->handler_obj->init;
-        if (init_func != NULL)
-            init_func(handler_it->handler_obj);
-    }
-
     return 0;
 }
 
@@ -368,7 +324,7 @@ static int _conn_handle_write_event(server_t *server, connection_t *conn) {
 }
 
 
-static int _conn_handle_close_event(server_t *server, connection_t *conn){
+static int _conn_handle_close_event(server_t *server, connection_t *conn) {
     printf("Closing connection[fd: %d]\n", conn->sock_fd);
 
     if(epoll_ctl(server->_epoll_fd, EPOLL_CTL_DEL, conn->sock_fd, NULL)) {

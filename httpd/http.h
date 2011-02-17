@@ -6,6 +6,11 @@
 
 #include <stddef.h>
 
+typedef struct _request         request_t;
+typedef struct _response        response_t;
+typedef struct _http_parser     http_parser_t;
+typedef struct _http_header     http_header_t;
+
 enum _http_methods {
     HTTP_METHOD_EXTENDED = 0,
     HTTP_METHOD_GET = 1, 
@@ -49,6 +54,23 @@ enum _return_status {
     STATUS_CONTINUE = 1
 };
 
+struct _request {
+    char                    *path;
+    char                    *query_str;
+    char                    *method;
+    char                    *http_version;
+    int                     content_len;
+
+    struct _http_header     *headers;
+    int                     header_count;
+
+    struct _connection      *connection;
+};
+
+struct _response {
+    
+};
+
 struct _http_header {
     char    *name;
     char    *value;
@@ -76,13 +98,9 @@ struct _http_parser {
 };
 
 
-typedef struct _http_parser     http_parser_t;
-typedef struct _http_header     http_header_t;
-
 int parser_init(http_parser_t *parser);
 int parser_destroy(http_parser_t *parser);
 int parser_reset(http_parser_t *parser);
 int parser_do_header(http_parser_t *parser, const char *data, const size_t data_len, size_t *consumed_len);
-
 
 #endif /* end of include guard: __HTTP_H */

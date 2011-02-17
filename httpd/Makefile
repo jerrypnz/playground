@@ -1,12 +1,12 @@
 CC = gcc
-CFLAGS ?= -g
+CFLAGS ?= -g -Wall
 INCLUDES = -I.
 LDFLAGS ?=
 
-objects = http.o buffer.o server.o main.o
+objects = http.o buffer.o server.o main.o handler.o location.o
 executable = tinyhttpd
-testobjs = test_http.o test_buffer.o test_server.o
-tests = test_http test_buffer test_server 
+testobjs = test_http.o test_buffer.o test_handler.o test_location.o
+tests = test_http test_buffer test_handler test_location
 
 .PHONY: all
 all: $(executable) $(tests)
