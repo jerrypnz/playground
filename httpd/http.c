@@ -1,4 +1,5 @@
 #include "http.h"
+#include "common.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -23,7 +24,6 @@ int parser_reset(http_parser_t *parser) {
     parser->http_version = NULL;
     parser->path = NULL;
     parser->query_str = NULL;
-    parser->content_len = 0;
 
     parser->header_count = 0;
 
@@ -47,14 +47,14 @@ int parser_reset(http_parser_t *parser) {
     }
 
 
-int parser_do_header(http_parser_t *parser, const char *data, const size_t data_len, size_t *consumed_len) {
+int parser_parse_request(http_parser_t *parser, const char *data, const size_t data_len, size_t *consumed_len) {
     printf("Parsing HTTP request\n");
     int     i, rc;
     char    ch;
 
     for (i = 0; i < data_len;){
 
-        if (parser->_state == PARSER_STATE_HEADER_COMPLETE ||
+        if (parser->_state == PARSER_STATE_COMPLETE ||
              parser->_state == PARSER_STATE_BAD_REQUEST) {
             break;
         } 
@@ -177,7 +177,11 @@ int parser_do_header(http_parser_t *parser, const char *data, const size_t data_
                 break;
 
             case PARSER_STATE_HEADER_COMPLETE_CR:
-                EXPECT_CHAR(parser, ch, '\n', PARSER_STATE_HEADER_COMPLETE);
+                EXPECT_CHAR(parser, ch, '\n', PARSER_STATE_COMPLETE);
+                break;
+
+            default:
+                fprintf(stderr, "Unexpected state: %d\n", parser->_state);
                 break;
 
         }
@@ -186,7 +190,7 @@ int parser_do_header(http_parser_t *parser, const char *data, const size_t data_
     *consumed_len = i;
 
     switch (parser->_state) {
-        case PARSER_STATE_HEADER_COMPLETE:
+        case PARSER_STATE_COMPLETE:
             rc = STATUS_COMPLETE;
             break;
             

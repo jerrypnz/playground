@@ -34,5 +34,6 @@ buf_page_t   *buf_alloc_new(buf_queue_t *buf_queue);
 buf_page_t   *buf_get_head(buf_queue_t *buf_queue);
 buf_page_t   *buf_get_tail(buf_queue_t *buf_queue);
 void          buf_remove_head(buf_queue_t *buf_queue);
+void          buf_compact_page(buf_page_t *page);
 
 #endif /* end of include guard: __BUFFER_H */

@@ -3,7 +3,7 @@ CFLAGS ?= -g -Wall
 INCLUDES = -I.
 LDFLAGS ?=
 
-objects = http.o buffer.o server.o main.o handler.o location.o
+objects = http.o buffer.o server.o main.o handler.o location.o phase.o
 executable = tinyhttpd
 testobjs = test_http.o test_buffer.o test_handler.o test_location.o
 tests = test_http test_buffer test_handler test_location
@@ -18,7 +18,7 @@ tinyhttpd: $(objects)
 %.o: %.c %.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-server.o: http.h buffer.h
+server.o: http.h buffer.h location.h
 
 test_%: test_%.o %.o
 	$(CC) $(LDFLAGS) $^ -o $@

@@ -7,17 +7,13 @@ typedef struct _handler         handler_t;
 typedef struct _filter          filter_t;
 typedef struct _filter_chain    filter_chain_t;
 
-typedef int (*fn_handler_init)    (handler_t *handler);
-typedef int (*fn_handler_destroy) (handler_t *handler);
-typedef int (*fn_handler_handle)  (handler_t *handler, const char* path, request_t *req, response_t *resp);
-
 /**
  * Interface for handler objects
  */
 struct _handler {
-    fn_handler_init     init;
-    fn_handler_handle   handle;
-    fn_handler_destroy  destroy;
+    int     (*init) (handler_t *handler);
+    int     (*destroy) (handler_t *handler);
+    int     (*handle) (handler_t *handler, const char* path, request_t *req);
 };
 
 enum _filter_flags {
@@ -42,6 +38,6 @@ enum _filter_return_code {
 };
 
 void filter_chain_add(filter_chain_t *chain, filter_t *ft);
-int  filter_chain_do_filter(filter_chain_t *chain, const char* path, request_t *req, response_t *resp);
+int  filter_chain_do_filter(filter_chain_t *chain, const char* path, request_t *req);
 
 #endif /* end of include guard: __HANDLER_H */

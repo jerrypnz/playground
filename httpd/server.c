@@ -12,8 +12,8 @@
 #include <netinet/in.h>
 
 #include "server.h"
-#include "http.h"
-#include "buffer.h"
+#include "phase.h"
+#include "common.h"
 
 #define MAX_BACKLOG     20
 #define MAX_EVENTS      20
@@ -23,14 +23,11 @@
 static int _server_init(server_t *server);
 static int _server_run(server_t *server);
 static int _server_stop(server_t *server);
+
 static int _accept_conn(server_t *server);
-
+static int _close_conn(server_t *server, connection_t *conn);
 static int _dispatch_conn_event(server_t *server, struct epoll_event *ev);
-
-static int _conn_handle_close_event(server_t *server, connection_t *conn);
-static int _conn_handle_read_event(server_t *server, connection_t *conn);
-static int _conn_handle_write_event(server_t *server, connection_t *conn);
-static int _conn_handle(server_t *server, connection_t *conn);
+static int _run_conn_phases(server_t *server, connection_t *conn);
 
 static int _set_nonblocking(int fd);
 
@@ -230,7 +227,6 @@ static int _accept_conn(server_t *server) {
     conn->prev = NULL;
     conn->sock_fd = conn_fd;
     conn->server = server;
-    conn->state = CONN_STATE_IDLE;
 
     // -------- Allocating read and write buffers -----
     conn->read_buf_q = buf_create(BUF_PAGE_SIZE, INIT_PAGES);
@@ -247,84 +243,17 @@ static int _accept_conn(server_t *server) {
         server->_conn_tail = conn;
     }
 
+    // Init state
+    conn->phase_ctx.current_phase = PHASE_IDLE;
+    conn->phase_ctx.data = NULL;
+
     printf("Ready to serve the client...\n");
 
     return 0;
 }
 
 
-#define EPOLL_CLOSE_EVENTS (EPOLLRDHUP | EPOLLHUP | EPOLLERR)
-#define CONN_BUFF_SIZE      2048
-
-static int _dispatch_conn_event(server_t *server, struct epoll_event *ev) {
-    connection_t    *conn;
-
-    conn = (connection_t*) ev->data.ptr;
-    if (conn == NULL) {
-        printf("Invalid event: connection ptr is NULL\n");
-    }
-
-    printf("New event[fd:%d, event:%d]\n", conn->sock_fd, ev->events);
-
-    if (EPOLL_CLOSE_EVENTS & ev->events) {
-        printf("Client closed connection or error detected\n");
-        return _conn_handle_close_event(server, conn);
-    }
-
-    // read event and write event should not be raised at the same time.
-    assert( (EPOLLIN & ev->events) ^ (EPOLLOUT & ev->events) );
-
-    if (EPOLLIN & ev->events) {
-        _conn_handle_read_event(server, conn);
-    } else if (EPOLLOUT & ev->events) {
-        _conn_handle_write_event(server, conn);
-    }
-    
-    return 0;
-}
-
-
-static int _conn_handle_read_event(server_t *server, connection_t *conn) {
-    int             nread = 0;
-    buf_page_t      *buf_page;
-    char            *buffer;
-    size_t          buf_size;
-
-    buf_page = buf_get_tail(conn->read_buf_q);
-
-    if (buf_page == NULL) {
-        buf_page = buf_alloc_new(conn->read_buf_q);
-        if (buf_page == NULL) {
-            fprintf(stderr, "Error allocating buffer");
-            return -1;
-        }
-    }
-
-    buf_size = buf_page->page_size - buf_page->data_offset - buf_page->data_size;
-    assert (buf_size >= 0);
-    buffer = (char*) buf_page->data + buf_page->data_offset + buf_page->data_size;
-
-    nread = read(conn->sock_fd, buffer, buf_size);
-
-    if (nread == 0) {
-        fprintf(stderr, "Unexpected EOF\n");
-    } else if (nread < 0) {
-        perror("Error reading from client");
-        return 1;
-    }
-
-    printf("Read %d bytes from client.\n", nread);
-
-    return 0;
-}
-
-
-static int _conn_handle_write_event(server_t *server, connection_t *conn) {
-    return 0;
-}
-
-
-static int _conn_handle_close_event(server_t *server, connection_t *conn) {
+static int _close_conn(server_t *server, connection_t *conn) {
     printf("Closing connection[fd: %d]\n", conn->sock_fd);
 
     if(epoll_ctl(server->_epoll_fd, EPOLL_CTL_DEL, conn->sock_fd, NULL)) {
@@ -344,23 +273,91 @@ static int _conn_handle_close_event(server_t *server, connection_t *conn) {
     return 0;
 }
 
-static int _conn_handle(server_t *server, connection_t *conn) {
 
-    switch (conn->state) {
-        case CONN_STATE_IDLE:
-            break;
-
-        case CONN_STATE_PARSING:
-            break;
-
-        case CONN_STATE_HANDLING:
-            break;
-
-        case CONN_STATE_WRITING:
-            break;
-
-        case CONN_STATE_ERROR:
-            break;
-    }
-    
+int conn_read(connection_t *conn) {
+    return 0;
 }
+
+
+int conn_write_to_buffer(connection_t *conn, const void* data, const size_t data_len) {
+    return 0;
+}
+
+
+int conn_do_write(connection_t *conn) {
+    return 0;
+}
+
+
+#define EPOLL_CLOSE_EVENTS (EPOLLRDHUP | EPOLLHUP | EPOLLERR)
+#define CONN_BUFF_SIZE      2048
+
+static int _dispatch_conn_event(server_t *server, struct epoll_event *ev) {
+    connection_t    *conn;
+
+    conn = (connection_t*) ev->data.ptr;
+    if (conn == NULL) {
+        printf("Invalid event: connection ptr is NULL\n");
+        return -1;
+    }
+
+    printf("New event[fd:%d, event:%d]\n", conn->sock_fd, ev->events);
+
+    if (EPOLL_CLOSE_EVENTS & ev->events) {
+        printf("Client closed connection or error detected\n");
+        return _close_conn(server, conn);
+    }
+
+    // read event and write event should not be raised at the same time.
+    assert( (EPOLLIN & ev->events) ^ (EPOLLOUT & ev->events) );
+
+    return _run_conn_phases(server, conn);
+}
+
+
+#define CHANGE_PHASE(conn, phase) { \
+    (conn)->phase_ctx.current_phase = (phase); \
+    (conn)->phase_ctx.data = NULL; \
+}
+
+static int _run_conn_phases(server_t *server, connection_t *conn) {
+    int             rc;
+    conn_phase      cur_phase;
+    
+    for(;;) {
+        cur_phase = conn->phase_ctx.current_phase;
+        rc = std_phases[cur_phase].handle(server, conn);
+
+        printf("Finished phase: %d, return code: %d\n", cur_phase, rc);
+
+        switch (rc) {
+            case STATUS_COMPLETE:
+                CHANGE_PHASE(conn, std_phases[cur_phase].next_phase);
+                break;
+
+            case STATUS_ERROR:
+                CHANGE_PHASE(conn, PHASE_ERROR);
+                break;
+
+            case STATUS_CONTINUE:
+                goto phase_end;
+        }
+
+    }
+
+phase_end:
+    // Finished running all the phases
+    if (PHASE_NULL == conn->phase_ctx.current_phase) {
+        if (conn->keep_alive) {
+            // Change phase to IDLE, waiting for next request
+            CHANGE_PHASE(conn, PHASE_IDLE);
+        } else {
+            // Close the connection otherwise
+            _close_conn(server, conn);
+        }
+    }
+
+    return 0;
+}
+
+

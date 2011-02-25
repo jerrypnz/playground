@@ -14,7 +14,7 @@ typedef struct {
     char        data[64];
 } bar_handler;
 
-int foo_handler_handle(handler_t *handler, const char *path, request_t *req, response_t *resp) {
+int foo_handler_handle(handler_t *handler, const char *path, request_t *req) {
     foo_handler  *this = (foo_handler*) handler;
     this->data = 0xCAFEBABE;
     printf("foo handler finished.\n");
@@ -27,7 +27,7 @@ foo_handler* create_foo_handler() {
     return handler;
 }
 
-int bar_handler_handle(handler_t *handler, const char *path, request_t *req, response_t *resp) {
+int bar_handler_handle(handler_t *handler, const char *path, request_t *req) {
     bar_handler *this = (bar_handler*) handler;
     strncpy(this->data, "0xCAFEBABE", 64);
     printf("bar handler finished.\n");
@@ -64,7 +64,7 @@ void init_filter_chain() {
 }
 
 void call_handlers() {
-    filter_chain_do_filter(&chain, "test", NULL, NULL);
+    filter_chain_do_filter(&chain, "test", NULL);
     printf("foo handler data: 0x%X\n", h1->data);
     printf("bar handler data: %s\n", h2->data);
     assert(h1->data == 0xCAFEBABE);

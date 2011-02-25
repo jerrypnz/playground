@@ -13,12 +13,12 @@ void filter_chain_add(filter_chain_t *chain, filter_t *ft) {
     }
 }
 
-int filter_chain_do_filter(filter_chain_t *chain, const char* path, request_t *req, response_t *resp) {
+int filter_chain_do_filter(filter_chain_t *chain, const char* path, request_t *req) {
     int         rc;
     filter_t    *ft;
 
     for (ft = chain->head; ft != NULL; ft = ft->next) {
-        rc = ft->handler->handle(ft->handler, path, req, resp);
+        rc = ft->handler->handle(ft->handler, path, req);
         if (rc != FT_CONTINUE)
             break;
     }

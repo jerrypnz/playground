@@ -91,7 +91,7 @@ buf_page_t   *buf_alloc_new(buf_queue_t *buf_q) {
     // Use the nodes from free list first.
     if (buf_q->_free_list != NULL) {
         buf = buf_q->_free_list;
-        buf_q->_free_list = buf_q->_free_list->_next;
+        buf_q->_free_list = buf->_next;
         buf->data_offset = 0;
         buf->data_size = 0;
         buf->_next = NULL;
@@ -139,3 +139,14 @@ void    buf_remove_head(buf_queue_t *buf_q) {
     buf_q->_free_list = buf;
 }
 
+void  buf_compact_page(buf_page_t *page) {
+    char    *data_start;
+    if (page->data_offset == 0) {
+        // No need to compact
+        return;
+    }
+
+    data_start = (char*)page->data + page->data_offset;
+    memmove(page->data, data_start, page->data_size);
+    page->data_offset = 0;
+}

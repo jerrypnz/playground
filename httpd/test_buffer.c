@@ -93,6 +93,27 @@ void test_get_and_delete_buffer() {
 }
 
 
+void test_compact_buffer() {
+    buf_page_t  *buf;
+    buf = buf_alloc_new(buf_q);
+
+    assert(buf != NULL);
+    assert(buf->page_size == page_size);
+    assert(buf->_next == NULL);
+    assert(buf->data != NULL);
+    assert(buf->data_offset == 0);
+    assert(buf->data_size == 0);
+
+    buf->data_offset = 100;
+    strncpy((char*)buf->data + 100, test_data[0], buf->page_size - 100);
+    buf->data_size = strlen(test_data[0]) + 1;
+
+    buf_compact_page(buf);
+    assert(buf->data_offset == 0);
+    assert(strncmp(test_data[0], (char*)buf->data, buf->page_size) == 0);
+}
+
+
 void assert_free_list_count(int expected_count) {
     int         count = 0;
     buf_page_t  *buf;
@@ -113,6 +134,9 @@ int main(int argc, const char *argv[])
     test_allocate_new();
     test_get_buffer_tail();
     test_get_and_delete_buffer();
+    printf("Testing compact buffer\n");
+    test_compact_buffer();
+    buf_destroy(buf_q);
     printf("Finished all tests.\n");
     return 0;
 }
