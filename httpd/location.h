@@ -24,7 +24,7 @@ struct _site {
 
 site_t      *site_create(const char* host);
 int         site_destroy(site_t *site);
-int         site_add_location(site_t *site, const location_t *loc);
+int         site_add_location(site_t *site, location_t *loc);
 location_t  *site_find_location(site_t *site, const char *path);
 
 #endif /* end of include guard: __LOCATION_H */

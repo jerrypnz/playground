@@ -57,7 +57,8 @@ void dump_parser();
 void assert_headers();
 
 void test_parse_once() {
-    int req_size, consumed_size, rc;
+    int     req_size, rc;
+    size_t  consumed_size;
 
     printf("\n\nTesting parsing all in one time\n");
     req_size = strlen(test_request);
@@ -71,7 +72,8 @@ void test_parse_once() {
 
 
 void test_parse_once_with_extra_data() {
-    int req_size, consumed_size, rc;
+    int     req_size, rc;
+    size_t  consumed_size;
 
     printf("\n\nTesting parsing all in one time with extra data left\n");
     req_size = strlen(test_request_2);
@@ -84,7 +86,8 @@ void test_parse_once_with_extra_data() {
 }
 
 void test_parse_multiple_times() {
-    int     req_size, consumed_size, rc;
+    int     req_size, rc;
+    size_t  consumed_size;
     int     part1_size, part2_size, part3_size;
     char    *data;
 

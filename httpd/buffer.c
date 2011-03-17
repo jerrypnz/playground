@@ -1,6 +1,7 @@
 #include "buffer.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static  buf_page_t  *_alloc_buf_page(const size_t page_size) {
     buf_page_t      *buf;
@@ -64,7 +65,6 @@ end:
 
 
 int  buf_destroy(buf_queue_t *buf_q) {
-    int i;
     buf_page_t  *buf, *it;
 
     for (it = buf_q->_head; it != NULL; ) {

@@ -29,7 +29,7 @@ int site_destroy(site_t *site) {
 }
 
 
-int site_add_location(site_t *site, const location_t *loc) {
+int site_add_location(site_t *site, location_t *loc) {
     assert(site != NULL);
 
     if (loc ==  NULL) {
