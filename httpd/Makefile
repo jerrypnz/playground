@@ -32,6 +32,13 @@ clean:
 
 tests: $(tests)
 	@for test in $^; do \
-		echo "--------------- Running test: " $$test "---------------------------"; \
+		echo "---- Running test: " $$test "---"; \
 		./$$test; \
-	done
+		if [ $$? -ne 0 ]; then \
+			echo "Test failed"; \
+			break; \
+		fi; \
+		echo "---- $$test passed --- "; \
+		echo "\n"; \
+	done; \
+	echo "---- All tests passed ---"
