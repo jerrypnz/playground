@@ -137,6 +137,5 @@ int main(int argc, const char *argv[])
     printf("Testing compact buffer\n");
     test_compact_buffer();
     buf_destroy(buf_q);
-    printf("Finished all tests.\n");
     return 0;
 }
