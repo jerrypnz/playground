@@ -52,6 +52,7 @@ const http_header_t     expected_headers[] = {
 };
 
 http_parser_t   parser;
+request_t       request;
 
 void dump_parser();
 void assert_headers();
@@ -131,16 +132,16 @@ void dump_parser() {
     int i;
 
     printf("--------- Parser State -----------------------\n");
-    printf("Method: %s\n", parser.method);
-    printf("Path: %s\n", parser.path);
-    printf("Query String: %s\n", parser.query_str);
-    printf("HTTP Version: %s\n", parser.http_version);
-    printf("Header count: %d\n", parser.header_count);
+    printf("Method: %s\n", parser.req->method);
+    printf("Path: %s\n", parser.req->path);
+    printf("Query String: %s\n", parser.req->query_str);
+    printf("HTTP Version: %d\n", parser.req->version);
+    printf("Header count: %d\n", parser.req->header_count);
     printf("Headers: \n");
     printf("------------\n");
 
-    for (i = 0; i < parser.header_count; i++) {
-        printf("\r%s: %s\n", parser.headers[i].name, parser.headers[i].value);
+    for (i = 0; i < parser.req->raw_header_count; i++) {
+        printf("\r%s: %s\n", parser.req->raw_headers_in[i].name, parser.req->raw_headers_in[i].value);
     }
 
     printf("----------------------------------------------\n");
@@ -148,21 +149,26 @@ void dump_parser() {
 
 void assert_headers() {
     int expected_header_size, i;
+    request_t       *req;
 
     expected_header_size = sizeof(expected_headers) / sizeof(http_header_t);
 
+    req = parser.req;
+
     printf("Expecting %d headers\n", expected_header_size);
-    assert(expected_header_size == parser.header_count);
+    assert(expected_header_size == req->raw_header_count);
     printf("Checked\n");
 
-    for (i = 0; i < parser.header_count; i++) {
-        assert(strcmp(expected_headers[i].name,  parser.headers[i].name) == 0);
-        assert(strcmp(expected_headers[i].value, parser.headers[i].value) == 0);
+    for (i = 0; i < req->raw_header_count; i++) {
+        assert(strcmp(expected_headers[i].name,  req->raw_headers_in[i].name) == 0);
+        assert(strcmp(expected_headers[i].value, req->raw_headers_in[i].value) == 0);
     }
 }
 
 int main(int argc, const char *argv[])
 {
+    //bzero(&request, sizeof(request_t));
+    parser.req = &request;
     parser_init(&parser);
     test_parse_once();
     parser_reset(&parser);

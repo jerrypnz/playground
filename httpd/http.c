@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+static http_version_e _resolve_http_version(const char* version_str);
+
 int parser_init(http_parser_t *parser) {
     printf("Init parser init\n");
     parser_reset(parser);
@@ -20,24 +22,18 @@ int parser_reset(http_parser_t *parser) {
     // The first part of the request must be HTTP method.
     parser->_state = PARSER_STATE_METHOD;
 
-    parser->method = NULL;
-    parser->http_version = NULL;
-    parser->path = NULL;
-    parser->query_str = NULL;
-
-    parser->header_count = 0;
-
     // Make the buffer an empty string
-    parser->_buffer[0] = '\0';
-    parser->_buf_idx = 0;
-    parser->_cur_tok = parser->_buffer;
+    parser->req->_buffer_in[0] = '\0';
+    parser->req->_buf_in_idx = 0;
+    parser->req->raw_header_count = 0;
+    parser->_cur_tok = parser->req->_buffer_in;
     return 0;
 }
 
 
-#define START_NEW_TOKEN(parser)                 ( (parser)->_cur_tok = (parser)->_buffer + (parser)->_buf_idx )
-#define FILL_NEXT_CHAR(parser, ch)              ( (parser)->_buffer[(parser)->_buf_idx++] = (ch) )
-#define FINISH_CUR_TOKEN(parser)                ( (parser)->_buffer[(parser)->_buf_idx++] = '\0' )
+#define START_NEW_TOKEN(parser)                 ( (parser)->_cur_tok = (parser)->req->_buffer_in + (parser)->req->_buf_in_idx )
+#define FILL_NEXT_CHAR(parser, ch)              ( (parser)->req->_buffer_in[(parser)->req->_buf_in_idx++] = (ch) )
+#define FINISH_CUR_TOKEN(parser)                ( (parser)->req->_buffer_in[(parser)->req->_buf_in_idx++] = '\0' )
 
 #define EXPECT_CHAR(parser, ch, expected_ch, next_state) \
     if ((ch) == (expected_ch)) { \
@@ -49,8 +45,9 @@ int parser_reset(http_parser_t *parser) {
 
 int parser_parse_request(http_parser_t *parser, const char *data, const size_t data_len, size_t *consumed_len) {
     printf("Parsing HTTP request\n");
-    int     i, rc;
-    char    ch;
+    http_version_e      ver;
+    int                 i, rc;
+    char                ch;
 
     for (i = 0; i < data_len;){
 
@@ -65,7 +62,7 @@ int parser_parse_request(http_parser_t *parser, const char *data, const size_t d
             case PARSER_STATE_METHOD:
                 if (ch == ' ') {
                     FINISH_CUR_TOKEN(parser);
-                    parser->method = parser->_cur_tok;
+                    parser->req->method = parser->_cur_tok;
                     parser->_state = PARSER_STATE_PATH;
                     START_NEW_TOKEN(parser);
                 } else if (ch < 'A' || ch > 'Z') {
@@ -78,12 +75,12 @@ int parser_parse_request(http_parser_t *parser, const char *data, const size_t d
             case PARSER_STATE_PATH:
                 if (ch == '?') {
                     FINISH_CUR_TOKEN(parser);
-                    parser->path = parser->_cur_tok;
+                    parser->req->path = parser->_cur_tok;
                     parser->_state = PARSER_STATE_QUERY_STR;
                     START_NEW_TOKEN(parser);
                 } else if (ch == ' ') {
                     FINISH_CUR_TOKEN(parser);
-                    parser->path = parser->_cur_tok;
+                    parser->req->path = parser->_cur_tok;
                     parser->_state = PARSER_STATE_VERSION;
                     START_NEW_TOKEN(parser);
                 } else {
@@ -94,7 +91,7 @@ int parser_parse_request(http_parser_t *parser, const char *data, const size_t d
             case PARSER_STATE_QUERY_STR:
                 if (ch == ' ') {
                     FINISH_CUR_TOKEN(parser);
-                    parser->query_str = parser->_cur_tok;
+                    parser->req->query_str = parser->_cur_tok;
                     parser->_state = PARSER_STATE_VERSION;
                     START_NEW_TOKEN(parser);
                 } else {
@@ -128,7 +125,12 @@ int parser_parse_request(http_parser_t *parser, const char *data, const size_t d
 
                     case '\r':
                         FINISH_CUR_TOKEN(parser);
-                        parser->http_version = parser->_cur_tok;
+                        ver = _resolve_http_version(parser->_cur_tok);
+                        if (ver == HTTP_VERSION_UNKNOW) {
+                            parser->_state = PARSER_STATE_BAD_REQUEST;
+                            break;
+                        }
+                        parser->req->version = ver;
                         parser->_state = PARSER_STATE_HEADER_CR;
                         START_NEW_TOKEN(parser);
                         break;
@@ -138,7 +140,7 @@ int parser_parse_request(http_parser_t *parser, const char *data, const size_t d
             case PARSER_STATE_HEADER_NAME:
                 if (ch == ':') {
                     FINISH_CUR_TOKEN(parser);
-                    parser->headers[parser->header_count].name = parser->_cur_tok;
+                    parser->req->raw_headers_in[parser->req->raw_header_count].name = parser->_cur_tok;
                     parser->_state = PARSER_STATE_HEADER_COLON;
                     START_NEW_TOKEN(parser);
                 } else {
@@ -153,8 +155,8 @@ int parser_parse_request(http_parser_t *parser, const char *data, const size_t d
             case PARSER_STATE_HEADER_VALUE:
                 if (ch == '\r') {
                     FINISH_CUR_TOKEN(parser);
-                    parser->headers[parser->header_count].value = parser->_cur_tok;
-                    parser->header_count++;
+                    parser->req->raw_headers_in[parser->req->raw_header_count].value = parser->_cur_tok;
+                    parser->req->raw_header_count++;
                     parser->_state = PARSER_STATE_HEADER_CR;
                     START_NEW_TOKEN(parser);
                 } else {
@@ -204,4 +206,16 @@ int parser_parse_request(http_parser_t *parser, const char *data, const size_t d
     }
 
     return rc;
+}
+
+static http_version_e _resolve_http_version(const char* version_str) {
+    if (strcmp(version_str, "1.1") == 0) {
+        return HTTP_VERSION_1_1;
+    } else if (strcmp(version_str, "1.0") == 0) {
+        return HTTP_VERSION_1_0;
+    } else if (strcmp(version_str, "0.9") == 0) {
+        return HTTP_VERSION_0_9;
+    }
+
+    return HTTP_VERSION_UNKNOW;
 }

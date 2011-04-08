@@ -15,6 +15,7 @@ typedef struct _http_header     http_header_t;
 typedef struct _common_headers  common_headers_t;
 
 typedef enum {
+    HTTP_VERSION_UNKNOW = -1,
     HTTP_VERSION_0_9 = 9,
     HTTP_VERSION_1_0 = 10,
     HTTP_VERSION_1_1 = 11
@@ -81,8 +82,14 @@ struct _common_headers {
     char                    *accept_ranges;
 
     char                    *content_type;
-    int                     *content_len;
+    unsigned int            content_len;
 
+};
+
+
+struct _http_header {
+    char    *name;
+    char    *value;
 };
 
 
@@ -98,27 +105,24 @@ struct _request {
     int                     header_count;
 
     buf_queue_t             *out_buf_q;
-};
 
+    // Unresolved raw headers of the request
+    http_header_t           raw_headers_in[MAX_HEADER_SIZE];
+    int                     raw_header_count;
 
-struct _http_header {
-    char    *name;
-    char    *value;
+    // All the request header fields' are stored in this buffer 
+    char                    _buffer_in[REQUEST_BUFFER_SIZE];
+    int                     _buf_in_idx;
+
+    // Most of the header fields' are stored in this buffer 
+    char                    _buffer_out[REQUEST_BUFFER_SIZE];
+    int                     _buf_out_idx;
 };
 
 
 struct _http_parser {
-    char                    *path;
-    char                    *query_str;
-    char                    *method;
-    char                    *http_version;
-
-    http_header_t           headers[MAX_HEADER_SIZE];
-    int                     header_count;
-
-    // All the fields' value is stored in this buffer 
-    char                    _buffer[REQUEST_BUFFER_SIZE];
-    int                     _buf_idx;
+    // The request struct
+    request_t               *req;
 
     // Current token, it points to an offset to _buffer
     char                    *_cur_tok;
