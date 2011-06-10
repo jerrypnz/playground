@@ -43,7 +43,7 @@ int parser_reset(http_parser_t *parser) {
     }
 
 
-int parser_parse_request(http_parser_t *parser, const char *data, const size_t data_len, size_t *consumed_len) {
+int parse_request(http_parser_t *parser, const char *data, const size_t data_len, size_t *consumed_len) {
     printf("Parsing HTTP request\n");
     http_version_e      ver;
     int                 i, rc;
