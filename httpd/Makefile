@@ -1,12 +1,12 @@
 CC = gcc
-CFLAGS ?= -g -Wall
+CFLAGS ?= -g -rdynamic -Wall
 INCLUDES = -I.
-LDFLAGS ?=
+LDFLAGS ?= -g -rdynamic
 
-objects = http.o buffer.o server.o main.o handler.o location.o phase.o
+objects = http.o buffer.o server.o main.o handler.o location.o phase.o stacktrace.o
 executable = tinyhttpd
-testobjs = test_http.o test_buffer.o test_handler.o test_location.o
-tests = test_http test_buffer test_handler test_location
+testobjs = test_http.o test_buffer.o test_handler.o test_location.o test_server.o
+tests = test_http test_buffer test_handler test_location test_server
 
 .PHONY: all
 all: $(executable) $(tests)
@@ -18,12 +18,12 @@ tinyhttpd: $(objects)
 %.o: %.c %.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-server.o: http.h buffer.h location.h
+server.o: http.h buffer.h location.h phase.h
 
-test_%: test_%.o %.o
+test_%: test_%.o %.o stacktrace.o
 	$(CC) $(LDFLAGS) $^ -o $@
 
-test_server: buffer.o
+test_server: buffer.o phase.o location.o
 
 .PHONY: clean
 clean:
@@ -39,6 +39,6 @@ tests: $(tests)
 			break; \
 		fi; \
 		echo "---- $$test passed --- "; \
-		echo "\n"; \
+		echo ""; \
 	done; \
 	echo "---- All tests passed ---"
