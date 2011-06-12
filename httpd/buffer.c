@@ -133,6 +133,9 @@ void    buf_remove_head(buf_queue_t *buf_q) {
     // Remove from the buffer list
     buf = buf_q->_head;
     buf_q->_head = buf->_next;
+    if (buf == buf_q->_tail) { // The last page is removed, so we must also set _tail to NULL
+        buf_q->_tail = NULL;
+    }
 
     // Insert the node to the free list for reusing
     buf->_next = buf_q->_free_list;
