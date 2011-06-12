@@ -1,5 +1,6 @@
 #include "http.h"
 #include "common.h"
+#include "stacktrace.h"
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
@@ -196,6 +197,7 @@ void assert_headers() {
 
 int main(int argc, const char *argv[])
 {
+    print_stacktrace_on_error();
     //bzero(&request, sizeof(request_t));
     parser.req = &request;
     parser_init(&parser);
