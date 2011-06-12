@@ -3,6 +3,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -14,6 +15,7 @@
 #include "server.h"
 #include "phase.h"
 #include "common.h"
+#include "location.h"
 
 #define MAX_BACKLOG     20
 #define MAX_EVENTS      20
@@ -274,12 +276,91 @@ static int _close_conn(server_t *server, connection_t *conn) {
 }
 
 
+// Currently, read until EOF or EAGAIN or error.
 int conn_read(connection_t *conn) {
+    int         rc = 0;
+    void        *dest_ptr = NULL;
+    size_t      buf_cap = 0;
+    buf_page_t  *pg = NULL;
+
+    assert (conn->read_buf_q != NULL);
+    pg = buf_get_tail(conn->read_buf_q);
+    if (pg == NULL) {
+        pg = buf_alloc_new(conn->read_buf_q);
+    } else {
+        buf_compact_page(pg);
+    }
+
+    buf_cap = pg->page_size - pg->data_size - pg->data_offset;
+    dest_ptr = pg->data + pg->data_offset + pg->data_size;
+
+    for(;;) {
+        if (buf_cap <= 0) {
+            pg = buf_alloc_new(conn->read_buf_q);
+            dest_ptr = pg->data;
+            buf_cap = pg->page_size;
+        }
+        rc = read(conn->sock_fd, dest_ptr, buf_cap);
+        if (rc > 0) {
+            pg->data_size += rc;
+            dest_ptr += rc;
+            buf_cap -= rc;
+        } else if (rc == -1) {
+            if (errno == EAGAIN)
+                return 0;
+            perror("Error reading from socket");
+            return -1;
+        } else {
+            fprintf(stderr, "Read EOF on connection %d\n", conn->sock_fd);
+            return 0;
+        }
+    }
+
     return 0;
 }
 
 
-int conn_write_to_buffer(connection_t *conn, const void* data, const size_t data_len) {
+int conn_write_to_buffer(connection_t *conn, const void* data, size_t data_len) {
+    buf_page_t      *pg;
+    size_t          cap, sz_to_cpy;
+    void            *src_ptr;
+    void            *dest_ptr;
+
+    src_ptr = data;
+
+    pg = buf_get_tail(conn->write_buf_q);
+    if (pg == NULL) {
+        pg = buf_alloc_new(conn->write_buf_q);
+        if (pg == NULL) {
+            fprintf(stderr, "Error allocating new buffer page");
+            return -1;
+        }
+    } else {
+        buf_compact_page(pg);
+    }
+
+    dest_ptr = pg->data + pg->data_size;
+    cap = pg->page_size - pg->data_size;
+
+    while (data_len > 0) {
+        sz_to_cpy = data_len < cap ? data_len : cap;
+        memcpy(dest_ptr, src_ptr, sz_to_cpy);
+        cap -= sz_to_cpy;
+        data_len -= sz_to_cpy;
+        src_ptr += sz_to_cpy;
+        dest_ptr += sz_to_cpy;
+        pg->data_size += sz_to_cpy;
+        if (cap <= 0 && data_len > 0) {
+            pg = buf_alloc_new(conn->write_buf_q);
+            if (pg == NULL) {
+                fprintf(stderr, "Error allocating new buffer page");
+                return -1;
+            }
+            dest_ptr = pg->data;
+            cap = pg->page_size;
+        }
+    }
+
     return 0;
 }
 
