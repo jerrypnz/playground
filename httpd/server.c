@@ -278,7 +278,7 @@ static int _close_conn(server_t *server, connection_t *conn) {
 
 // Currently, read until EOF or EAGAIN or error.
 int conn_read(connection_t *conn) {
-    int         rc = 0;
+    ssize_t     sz_read = 0;
     void        *dest_ptr = NULL;
     size_t      buf_cap = 0;
     buf_page_t  *pg = NULL;
@@ -300,13 +300,13 @@ int conn_read(connection_t *conn) {
             dest_ptr = pg->data;
             buf_cap = pg->page_size;
         }
-        rc = read(conn->sock_fd, dest_ptr, buf_cap);
-        if (rc > 0) {
-            pg->data_size += rc;
-            dest_ptr += rc;
-            buf_cap -= rc;
-        } else if (rc == -1) {
-            if (errno == EAGAIN)
+        sz_read = read(conn->sock_fd, dest_ptr, buf_cap);
+        if (sz_read > 0) {
+            pg->data_size += sz_read;
+            dest_ptr += sz_read;
+            buf_cap -= sz_read;
+        } else if (sz_read == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
                 return 0;
             perror("Error reading from socket");
             return -1;
@@ -366,6 +366,47 @@ int conn_write_to_buffer(connection_t *conn, const void* data, size_t data_len) 
 
 
 int conn_do_write(connection_t *conn) {
+    ssize_t     sz_written = 0;
+    size_t      sz_to_write = 0;
+    buf_page_t  *pg = NULL;
+    void        *offset;
+    
+    pg = buf_get_head(conn->write_buf_q);
+    if (pg == NULL)
+        return 0;
+
+    offset = pg->data + pg->data_offset;
+    sz_to_write = pg->data_size;
+
+    while (sz_to_write > 0) {
+        sz_written = write(conn->sock_fd, offset, sz_to_write);
+
+        if (sz_written < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+                return 0;
+            else 
+                return -1;
+        } else if (sz_written == 0) {
+            return 0
+        }
+
+        offset += sz_written;
+        sz_to_write -= sz_written;
+        pg->data_offset += sz_written;
+        pg->data_size -= sz_written;
+
+        if (sz_to_write <= 0) {
+            // Move to next page
+            buf_remove_head(conn->write_buf_q);
+            pg = buf_get_head(conn->write_buf_q);
+            if (pg != NULL) {
+                offset = pg->data + pg->data_offset;
+                sz_to_write = pg->data_size;
+            }
+        }
+
+    }
+
     return 0;
 }
 
