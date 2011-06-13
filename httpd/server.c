@@ -387,7 +387,7 @@ int conn_do_write(connection_t *conn) {
             else 
                 return -1;
         } else if (sz_written == 0) {
-            return 0
+            return 0;
         }
 
         offset += sz_written;
