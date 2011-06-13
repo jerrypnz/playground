@@ -6,7 +6,7 @@
 
 struct _buf_page {
     void                    *data;
-    int                     data_offset;    // Starting offset of the effective data
+    size_t                  data_offset;    // Starting offset of the effective data
     size_t                  data_size;      // Size of the effective data
     size_t                  page_size;       // Total size of the buffer
 
