@@ -1,3 +1,6 @@
 *.o
-server
-test_*
+tinyhttpd
+test_location
+test_buffer
+test_handler
+test_http
