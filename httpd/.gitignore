@@ -4,3 +4,4 @@ test_location
 test_buffer
 test_handler
 test_http
+test_server
