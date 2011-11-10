@@ -93,6 +93,8 @@ int         conn_read(connection_t *conn);
 int         conn_write_to_buffer(connection_t *conn, const void* data, size_t data_len);
 int         conn_do_write(connection_t *conn);
 
+int         conn_toggle_write_event(connection_t *conn, unsigned short on);
+
 #define is_server_running(server) ((server)->state == SERV_STAT_RUNNING)
 
 #endif /* __SERVER_H */

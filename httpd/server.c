@@ -411,6 +411,9 @@ int conn_do_write(connection_t *conn) {
 }
 
 
+int conn_toggle_write_event(connection_t *conn, unsigned short on) {
+}
+
 #define EPOLL_CLOSE_EVENTS (EPOLLRDHUP | EPOLLHUP | EPOLLERR)
 #define CONN_BUFF_SIZE      2048
 
