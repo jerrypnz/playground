@@ -7,3 +7,4 @@ num2chinese/num2chinese
 httpd/tags
 unix/ipc-unix-domain-sock
 unix/tags
+unix/syslog-test
