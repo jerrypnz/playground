@@ -247,8 +247,8 @@ static int _read_from_buffer(iostream_t *stream) {
                 assert(n == stream->read_bytes);
                 callback = stream->read_callback;
                 stream->read_callback = NULL;
-                stream->read_bytes = 0;
                 callback(stream, local_buf, stream->read_bytes);
+                stream->read_bytes = 0;
                 res = 1;
             }
             break;
