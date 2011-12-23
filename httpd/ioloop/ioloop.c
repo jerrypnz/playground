@@ -20,10 +20,15 @@ struct _callback {
     void                *args;
 };
 
-struct ioloop {
+struct _io_callback {
+    io_handler      callback;
+    void            *args;
+};
+
+struct _ioloop {
     int                 epoll_fd;
     int                 state;
-    io_handler          *handlers;
+    struct _io_callback *handlers;
     struct _callback    callbacks[MAX_CALLBACKS];
     int                 callback_num;
 };
@@ -34,12 +39,11 @@ enum IOLOOP_STATES {
     STOPPED = 2
 };
 
-static int _set_nonblocking(int sockfd);
 
 ioloop_t *ioloop_create(unsigned int maxfds) {
-    ioloop_t        *loop = NULL;
-    int             epoll_fd;
-    io_handler      *handlers = NULL;
+    ioloop_t                 *loop = NULL;
+    int                      epoll_fd;
+    struct _io_callback      *handlers = NULL;
     
     loop = (ioloop_t*) calloc (1, sizeof(ioloop_t));
     if (loop == NULL) {
@@ -49,13 +53,13 @@ ioloop_t *ioloop_create(unsigned int maxfds) {
     bzero(loop, sizeof(ioloop_t));
 
 
-    handlers = (io_handler*) calloc(maxfds, sizeof(io_handler));
+    handlers = (struct _io_callback*) calloc(maxfds, sizeof(struct _io_callback));
     if (handlers == NULL) {
         perror("Could not allocate memory for IO handlers");
         return NULL;
     }
 
-    bzero(handlers, maxfds * sizeof(io_handler));
+    bzero(handlers, maxfds * sizeof(struct _io_callback));
 
 
     epoll_fd = epoll_create(maxfds);
@@ -68,6 +72,7 @@ ioloop_t *ioloop_create(unsigned int maxfds) {
     loop->epoll_fd = epoll_fd;
     loop->state = INITIALIZED;
     loop->callback_num = 0;
+    return loop;
 }
 
 
@@ -78,13 +83,11 @@ int ioloop_destroy(ioloop_t *loop) {
 }
 
 
-int ioloop_add_handler(ioloop_t *loop, int fd, io_handler handler, unsigned int events) {
+int ioloop_update_handler(ioloop_t *loop, int fd, unsigned int events, io_handler handler, void *args) {
     struct epoll_event     ev;
 
-    // -------- Adding connection fd to epoll ------------------
-    printf("Adding new connection to epoll...\n");
-    if (_set_nonblocking(fd) == -1) {
-        perror("Error configuration connection to non-blocking");
+    if (handler == NULL) {
+        fprintf(stderr, "Handler should not be NULL!");
         return -1;
     }
 
@@ -95,26 +98,8 @@ int ioloop_add_handler(ioloop_t *loop, int fd, io_handler handler, unsigned int 
         return -1;
     }
 
-    loop->handlers[fd] = handler;
-    return 0;
-}
-
-
-int ioloop_update_handler(ioloop_t *loop, int fd, io_handler handler, unsigned int events) {
-    struct epoll_event     ev;
-
-    printf("Updating event handler for fd %d\n", fd);
-
-    ev.data.fd = fd;
-    ev.events = events | EPOLLET;
-    if (epoll_ctl(loop->epoll_fd, EPOLL_CTL_MOD, fd, &ev) == -1) {
-        perror("Error adding fd to epoll");
-        return -1;
-    }
-
-    if (handler != NULL) {
-        loop->handlers[fd] = handler;
-    }
+    loop->handlers[fd].callback = handler;
+    loop->handlers[fd].args = args;
     return 0;
 }
 
@@ -123,8 +108,9 @@ io_handler  ioloop_remove_handler(ioloop_t *loop, int fd) {
     int         res;
     io_handler  handler;
     printf("Removing handler for fd %d\n", fd);
-    handler = loop->handlers[fd];
-    loop->handlers[fd] = NULL;
+    handler = loop->handlers[fd].callback;
+    loop->handlers[fd].callback = NULL;
+    loop->handlers[fd].args = NULL;
     res = epoll_ctl(loop->epoll_fd, EPOLL_CTL_DEL, fd, NULL);
     if (res < 0) {
         perror("Error removing fd from epoll");
@@ -138,8 +124,9 @@ io_handler  ioloop_remove_handler(ioloop_t *loop, int fd) {
 
 int ioloop_start(ioloop_t *loop) {
     struct epoll_event  events[MAX_EVENTS];
-    int                 epoll_fd, nfds, i, fd, res;
+    int                 epoll_fd, nfds, i, fd;
     io_handler          handler;
+    void                *args;
 
     if (loop->state != INITIALIZED) {
         fprintf(stderr, "Could not restart an IO loop");
@@ -167,17 +154,19 @@ int ioloop_start(ioloop_t *loop) {
         for (i = 0; i < nfds; i++) {
             fd = events[i].data.fd;
             printf("Event %d triggered on fd %d\n", events[i].events, fd);
-            handler = loop->handlers[fd];
+            handler = loop->handlers[fd].callback;
+            args = loop->handlers[fd].args;
             if (handler == NULL) {
                 printf("Event triggered with a NULL handler on fd %d\n", fd);
                 continue;
             }
-            handler(loop, fd, events[i].events);
+            handler(loop, fd, events[i].events, args);
         }
     }
 
     close(epoll_fd);
     //TODO Other cleanup work here.
+    return 0;
 }
 
 
@@ -192,16 +181,6 @@ int ioloop_add_callback(ioloop_t *loop, callback_handler handler, void *args) {
     loop->callbacks[n].callback = handler;
     loop->callbacks[n].args = args;
     loop->callback_num ++;
-}
-
-
-static int _set_nonblocking(int sockfd) {
-    int opts;
-    opts = fcntl(sockfd, F_GETFL);
-    if (opts < 0) 
-        return -1;
-    opts |= O_NONBLOCK;
-    if (fcntl(sockfd, F_SETFL, opts) < 0)
-        return -1;
     return 0;
 }
+

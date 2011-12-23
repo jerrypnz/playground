@@ -6,24 +6,23 @@
 #define MAX_TIMEOUTS    100
 
 
-typedef unsigned char byte;
+struct _ioloop;
 
+typedef struct _ioloop ioloop_t;
 
-// Defined in the implementation file
-struct ioloop;
-
-typedef struct ioloop ioloop_t;
-
-typedef void (*io_handler)(ioloop_t *loop, int fd, unsigned int events);
+typedef void (*io_handler)(ioloop_t *loop, int fd, unsigned int events, void *args);
 typedef void (*callback_handler)(ioloop_t *loop, void *args);
 
 ioloop_t    *ioloop_create(unsigned int maxfds);
 int          ioloop_destroy(ioloop_t *loop);
 int          ioloop_start(ioloop_t *loop);
 int          ioloop_stop(ioloop_t *loop);
-int          ioloop_add_handler(ioloop_t *loop, int fd, io_handler handler, unsigned int events);
-int          ioloop_update_handler(ioloop_t *loop, int fd, io_handler handler, unsigned int events);
+int          ioloop_update_handler(ioloop_t *loop, int fd, unsigned int events, io_handler handler, void *args);
 io_handler   ioloop_remove_handler(ioloop_t *loop, int fd);
 int          ioloop_add_callback(ioloop_t *loop, callback_handler handler, void *args);
+void        *ioloop_set_attachment(ioloop_t *loop, void *attachment);
+void        *ioloop_get_attachment(ioloop_t *loop);
+
+int     set_nonblocking(int sockfd);
 
 #endif /* end of include guard: __IOLOOP_H */

@@ -1,4 +1,5 @@
 #include "ioloop.h"
+#include "iostream.h"
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -7,16 +8,19 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 
-static void connection_handler(ioloop_t *loop, int fd, unsigned int events);
-static void echo_handler(ioloop_t *loop, int fd, unsigned int events);
-static void send_welcome_message(ioloop_t *loop, void* args);
+static void connection_handler(ioloop_t *loop, int fd, unsigned int events, void *args);
+static void connection_close_handler(iostream_t *stream);
+static void read_bytes(iostream_t *stream, void* data, size_t len);
+int set_nonblocking(int sockfd);
 
-static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events) {
+static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, void *args) {
     size_t      addr_len;
     int         conn_fd;
     struct sockaddr_in  remo_addr;
+    iostream_t *stream;
 
     // -------- Accepting connection ----------------------------
     printf("Accepting new connection...\n");
@@ -28,35 +32,32 @@ static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int event
         return;
     }
 
-    ioloop_add_handler(loop, conn_fd, echo_handler, EPOLLIN);
-    ioloop_add_callback(loop, send_welcome_message, (void*)conn_fd);
-}
-
-static void send_welcome_message(ioloop_t *loop, void* args) {
-    int fd = (int)args;
-    char msg[] = "Welcome to echo server powered by libioloop!\n";
-    write(fd, msg, sizeof(msg));
-}
-
-
-static void echo_handler(ioloop_t *loop, int fd, unsigned int events) {
-    char    buffer[1024];
-    int     nread;
-    if (events & EPOLLIN) {
-        nread = read(fd, buffer, 1024);
-        if (nread == 0) {
-            printf("Connection closed or error condition occurs: %d\n", fd);
-            ioloop_remove_handler(loop, fd);
-            close(fd);
-            return;
-        } else if (nread < 0 && errno != EAGAIN && errno != EWOULDBLOCK) {
-            perror("Error reading");
-            return;
-        }
-        buffer[nread] = '\0';
-        printf("Read from client: %s", buffer);
-        write(fd, buffer, nread);
+    if (set_nonblocking(conn_fd)) {
+        perror("Error configuring Non-blocking");
+        return;
     }
+    stream = iostream_create(loop, conn_fd, 1024, 1024);
+    iostream_set_close_handler(stream, connection_close_handler);
+    iostream_read_bytes(stream, 16, read_bytes, NULL);
+}
+
+
+static void read_bytes(iostream_t *stream, void* data, size_t len) {
+    char    *str = (char*) data;
+    int     i;
+
+    printf("Data read: ");
+    for (i = 0; i < len; i++) {
+        putchar(str[i]);
+    }
+    putchar('\n');
+
+    iostream_read_bytes(stream, 16, read_bytes, NULL);
+}
+
+
+static void connection_close_handler(iostream_t *stream) {
+    printf("Connection closed\n");
 }
 
 int main(int argc, const char *argv[]) {
@@ -92,7 +93,19 @@ int main(int argc, const char *argv[]) {
         return -1;
     }
 
-    ioloop_add_handler(loop, listen_fd, connection_handler, EPOLLIN);
+    ioloop_update_handler(loop, listen_fd, EPOLLIN, connection_handler, NULL);
     ioloop_start(loop);
     return 0;
 }
+
+int set_nonblocking(int sockfd) {
+    int opts;
+    opts = fcntl(sockfd, F_GETFL);
+    if (opts < 0) 
+        return -1;
+    opts |= O_NONBLOCK;
+    if (fcntl(sockfd, F_SETFL, opts) < 0)
+        return -1;
+    return 0;
+}
+
