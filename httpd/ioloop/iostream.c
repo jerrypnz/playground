@@ -108,6 +108,7 @@ error:
 
 int iostream_close(iostream_t *stream) {
     ioloop_remove_handler(stream->ioloop, stream->fd);
+    stream->close_callback(stream);
     close(stream->fd);
     buffer_destroy(stream->read_buf);
     buffer_destroy(stream->write_buf);
@@ -128,10 +129,24 @@ int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, re
         return 0;
     }
     _add_event(stream, EPOLLIN);
+    return 0;
 }
 
 
 int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callback) {
+    if (is_reading(stream)) {
+        return -1;
+    }
+    assert(*delimiter != '\0');
+    stream->read_callback = callback;
+    stream->stream_callback = NULL;
+    stream->read_delimiter = delimiter;
+    stream->read_type = READ_UNTIL;
+    _read_to_buffer(stream);
+    if (_read_from_buffer(stream)) {
+        return 0;
+    }
+    _add_event(stream, EPOLLIN);
     return 0;
 }
 
@@ -211,9 +226,6 @@ static size_t _read_to_buffer(iostream_t *stream) {
         total += n;
     }
     stream->read_buf_size += total;
-    if (total == 0) {
-        iostream_close(stream);
-    }
     return total;
 }
 
@@ -221,7 +233,7 @@ static size_t _read_to_buffer(iostream_t *stream) {
 #define LOCAL_BUFSIZE 4096
 
 static int _read_from_buffer(iostream_t *stream) {
-    int     res = 0;
+    int     res = 0, idx;
     char    local_buf[LOCAL_BUFSIZE];
     size_t  n;
     read_handler    callback;
@@ -233,6 +245,7 @@ static int _read_from_buffer(iostream_t *stream) {
                 // Streaming mode, offer data
                 n = buffer_consume(stream->read_buf, stream->read_bytes, _stream_callback_wrapper, stream);
                 stream->read_bytes -= n;
+                stream->read_buf_size -= n;
                 if (stream->read_bytes <= 0) {
                     callback = stream->read_callback;
                     stream->read_callback = NULL;
@@ -247,8 +260,21 @@ static int _read_from_buffer(iostream_t *stream) {
                 assert(n == stream->read_bytes);
                 callback = stream->read_callback;
                 stream->read_callback = NULL;
-                callback(stream, local_buf, stream->read_bytes);
                 stream->read_bytes = 0;
+                stream->read_buf_size -= n;
+                callback(stream, local_buf, n);
+                res = 1;
+            }
+            break;
+
+        case READ_UNTIL:
+            idx = buffer_locate(stream->read_buf, stream->read_delimiter);
+            if (idx > 0) {
+                n = buffer_read_to(stream->read_buf, idx + strlen(stream->read_delimiter), local_buf, LOCAL_BUFSIZE);
+                callback = stream->read_callback;
+                stream->read_callback = NULL;
+                stream->read_buf_size -= n;
+                callback(stream, local_buf, n);
                 res = 1;
             }
             break;

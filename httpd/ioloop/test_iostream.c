@@ -14,7 +14,11 @@
 static void connection_handler(ioloop_t *loop, int fd, unsigned int events, void *args);
 static void connection_close_handler(iostream_t *stream);
 static void read_bytes(iostream_t *stream, void* data, size_t len);
+static void read_headers(iostream_t *stream, void *data, size_t len);
+static void dump_data(void *data, size_t len);
 int set_nonblocking(int sockfd);
+
+static int read_mode = 0;
 
 static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, void *args) {
     size_t      addr_len;
@@ -38,21 +42,31 @@ static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int event
     }
     stream = iostream_create(loop, conn_fd, 1024, 1024);
     iostream_set_close_handler(stream, connection_close_handler);
+    if (read_mode == 0)
+        iostream_read_bytes(stream, 16, read_bytes, NULL);
+    else
+        iostream_read_until(stream, "\r\n\r\n", read_headers);
+}
+
+static void read_bytes(iostream_t *stream, void* data, size_t len) {
+    dump_data(data, len);
     iostream_read_bytes(stream, 16, read_bytes, NULL);
 }
 
+static void read_headers(iostream_t *stream, void *data, size_t len) {
+    dump_data(data, len);
+    iostream_read_until(stream, "\r\n\r\n", read_headers);
+}
 
-static void read_bytes(iostream_t *stream, void* data, size_t len) {
+static void dump_data(void *data, size_t len) {
     char    *str = (char*) data;
     int     i;
 
-    printf("Data read: ");
+    printf("Data read:\n------------------\n");
     for (i = 0; i < len; i++) {
         putchar(str[i]);
     }
-    putchar('\n');
-
-    iostream_read_bytes(stream, 16, read_bytes, NULL);
+    printf("\n--------------------\n");
 }
 
 
@@ -91,6 +105,12 @@ int main(int argc, const char *argv[]) {
     if (listen(listen_fd, 10) == -1) {
         perror("Error listening");
         return -1;
+    }
+
+    if (argc > 2) {
+        fprintf(stderr, "Testing read_until two blank lines(\\r\\n\\r\\n)\n");
+    } else {
+        fprintf(stderr, "Testing read 16 bytes");
     }
 
     ioloop_update_handler(loop, listen_fd, EPOLLIN, connection_handler, NULL);

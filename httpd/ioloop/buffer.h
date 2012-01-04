@@ -17,5 +17,6 @@ size_t       buffer_write_from_fd(buffer_t *buf, int fd, size_t len);
 size_t       buffer_read_to(buffer_t *buf, size_t len, void *target, size_t capacity);
 size_t       buffer_read_to_fd(buffer_t *buf, size_t len, int to_fd);
 size_t       buffer_consume(buffer_t *buf, size_t len, consumer_func cb, void *args);
+int          buffer_locate(buffer_t *buf, const char *delimiter);
 
 #endif /* end of include guard: __BUFFER_H */

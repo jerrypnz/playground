@@ -137,6 +137,24 @@ void test_consume() {
     assert(buffer_consume(buf, 3, _print_consumer, SECRET_ARG) == 3);
 }
 
+void test_locate() {
+    char        data[] = "abcde";
+    char        data1[] = "0123456789";
+    buffer_t    *buf = create_buffer(10);
+
+    assert(buffer_write(buf, data, strlen(data)) == 0);
+    assert(buffer_locate(buf, "cd") == 2);
+    assert(buffer_locate(buf, "kkk") < 0);
+
+    assert(buffer_consume(buf, 10, _print_consumer, SECRET_ARG) == strlen(data));
+
+    assert(buffer_write(buf, data1, strlen(data1)) == 0);
+    assert(buffer_locate(buf, "012") == 0);
+    assert(buffer_locate(buf, "3456") == 3);
+    assert(buffer_locate(buf, "89") == 8);
+    assert(buffer_locate(buf, "kkk") < 0);
+}
+
 int main(int argc, const char *argv[]) {
     test_basic_case();
     test_overflow();
@@ -145,5 +163,6 @@ int main(int argc, const char *argv[]) {
     test_write_from_fd();
     test_write_from_fd_overflow();
     test_consume();
+    test_locate();
     return 0;
 }

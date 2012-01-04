@@ -167,6 +167,62 @@ size_t buffer_read_to_fd(buffer_t *buf, size_t len, int to_fd) {
 }
 
 
+#define MAX_DELIM_LEN 20
+
+int buffer_locate(buffer_t *buf, const char *delimiter) {
+    char    tmp[MAX_DELIM_LEN];
+    char    last_char;
+    char    *sub;
+    int     idx = -1;
+    size_t  delim_len;
+
+    if (buf->size <= 0 || *delimiter == '\0') {
+        return -1;
+    }
+
+    if (buf->head < buf->tail) {
+        last_char = buf->data[buf->tail];
+        buf->data[buf->tail] = '\0';
+        sub = strstr((char*)buf->data + buf->head, delimiter);
+        buf->data[buf->tail] = last_char;
+        if (sub != NULL) {
+            idx = (sub - (char*)buf->data) - buf->head;
+            goto finish;
+        }
+    } else {
+        last_char = buf->data[buf->capacity - 1];
+        buf->data[buf->capacity - 1] = '\0';
+        sub = strstr((char*)buf->data + buf->head, delimiter);
+        buf->data[buf->capacity - 1] = last_char;
+        if (sub != NULL) {
+            idx = (sub - (char*)buf->data) - buf->head;
+            goto finish;
+        }
+
+        delim_len = strlen(delimiter);
+        memcpy(tmp, buf->data + buf->capacity - delim_len, delim_len);
+        memcpy(tmp + delim_len, buf->data, delim_len);
+        tmp[delim_len * 2 + 1] = '\0';
+        sub = strstr(tmp, delimiter);
+        if (sub != NULL) {
+            idx = buf->capacity - delim_len - buf->head + (sub - tmp);
+            goto finish;
+        }
+
+        last_char = buf->data[buf->tail];
+        buf->data[buf->tail] = '\0';
+        sub = strstr((char*)buf->data, delimiter);
+        buf->data[buf->tail] = last_char;
+        if (sub != NULL) {
+            idx = (sub - (char*)buf->data) + (buf->capacity - buf->head);
+            goto finish;
+        }
+    }
+
+finish:
+    return idx;
+}
+
 __inline__ static void _do_write(buffer_t *buf, byte_t *data, size_t len) {
     memcpy(buf->data + buf->tail, data, len);
     buf->size += len;
@@ -180,9 +236,10 @@ __inline__ static void _do_read_to(buffer_t *buf, byte_t *target, size_t len) {
 }
 
 __inline__ static void _do_consume(buffer_t *buf, size_t len, consumer_func func, void *args) {
-    func(buf->data + buf->head, len, args);
+    const void *data = buf->data + buf->head;
     buf->size -= len;
     buf->head = (buf->head + len) % buf->capacity;
+    func(data, len, args);
 }
 
 __inline__ static size_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len) {
@@ -196,8 +253,8 @@ __inline__ static size_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len) {
         }
         len -= n;
         total += n;
-        buf->size -= len;
-        buf->head = (buf->head + len) % buf->capacity;
+        buf->size -= n;
+        buf->head = (buf->head + n) % buf->capacity;
     }
     return total;
 }
@@ -216,7 +273,7 @@ __inline__ static size_t _do_write_from_fd(buffer_t *buf, int from_fd, size_t le
         }
         total += n;
         buf->size += n;
-        buf->tail = (buf->tail + len) % buf->capacity;
+        buf->tail = (buf->tail + n) % buf->capacity;
     }
     return total;
 }
