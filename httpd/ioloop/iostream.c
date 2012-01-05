@@ -62,7 +62,7 @@ static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void 
 static void _handle_error(iostream_t *stream, unsigned int events);
 static void _handle_read(iostream_t *stream);
 static void _handle_write(iostream_t *stream);
-static size_t _read_to_buffer(iostream_t *stream);
+static ssize_t _read_to_buffer(iostream_t *stream);
 static int _read_from_buffer(iostream_t *stream);
 static int _add_event(iostream_t *stream, unsigned int events);
 static void _stream_callback_wrapper(void *data, size_t len, void *args);
@@ -254,8 +254,8 @@ static int _add_event(iostream_t *stream, unsigned int event) {
 
 #define READ_SIZE 1024
 
-static size_t _read_to_buffer(iostream_t *stream) {
-    size_t  n;
+static ssize_t _read_to_buffer(iostream_t *stream) {
+    ssize_t  n;
     n = buffer_write_from_fd(stream->read_buf, stream->fd, READ_SIZE);
     if (n < 0) {
         iostream_close(stream);
