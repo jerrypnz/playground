@@ -6,14 +6,21 @@
 #include <string.h>
 #include <assert.h>
 #include <sys/epoll.h>
+#include <unistd.h>
 
 enum READ_OP_TYPES {
     READ_BYTES = 1,
     READ_UNTIL = 2
 };
 
+enum STREAM_STATE {
+    NORMAL = 1,
+    CLOSED = 2
+};
+
 struct _iostream {
     int         fd;
+    int         state;
     ioloop_t    *ioloop;
 
     read_handler    read_callback;
@@ -39,6 +46,7 @@ struct _iostream {
 
 #define is_reading(stream) ((stream)->read_callback != NULL)
 #define is_writing(stream) ((stream)->write_callback != NULL)
+#define is_closed(stream)  ((stream)->state == CLOSED)
 
 #define check_reading(stream)  \
     if (is_reading(stream)) {  \
@@ -85,6 +93,7 @@ iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_size, si
     stream->write_buf = out_buf;
     stream->read_buf = in_buf;
     stream->fd = sockfd;
+    stream->state = NORMAL;
     stream->ioloop = loop;
     stream->read_callback = NULL;
     stream->write_callback = NULL;
@@ -108,15 +117,25 @@ error:
 
 int iostream_close(iostream_t *stream) {
     ioloop_remove_handler(stream->ioloop, stream->fd);
-    stream->close_callback(stream);
     close(stream->fd);
+    stream->close_callback(stream);
+    stream->state = CLOSED;
+    return 0;
+}
+
+
+int iostream_destroy(iostream_t *stream) {
     buffer_destroy(stream->read_buf);
     buffer_destroy(stream->write_buf);
     free(stream);
     return 0;
 }
 
+
 int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, read_handler stream_callback) {
+    if (sz == 0) {
+        return -1;
+    }
     if (is_reading(stream)) {
         return -1;
     }
@@ -124,9 +143,16 @@ int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, re
     stream->stream_callback = stream_callback;
     stream->read_bytes = sz;
     stream->read_type = READ_BYTES;
-    _read_to_buffer(stream);
-    if (_read_from_buffer(stream)) {
-        return 0;
+    for (;;) {
+        if (_read_from_buffer(stream)) {
+            return 0;
+        }
+        if (is_closed(stream)) {
+            return -1;
+        }
+        if (_read_to_buffer(stream) == 0) {
+            break;
+        }
     }
     _add_event(stream, EPOLLIN);
     return 0;
@@ -142,9 +168,16 @@ int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callba
     stream->stream_callback = NULL;
     stream->read_delimiter = delimiter;
     stream->read_type = READ_UNTIL;
-    _read_to_buffer(stream);
-    if (_read_from_buffer(stream)) {
-        return 0;
+    for (;;) {
+        if (_read_from_buffer(stream)) {
+            return 0;
+        }
+        if (is_closed(stream)) {
+            return -1;
+        }
+        if (_read_to_buffer(stream) == 0) {
+            break;
+        }
     }
     _add_event(stream, EPOLLIN);
     return 0;
@@ -158,11 +191,13 @@ int iostream_write(iostream_t *stream, void *data, size_t len, write_handler cal
 
 int iostream_set_error_handler(iostream_t *stream, error_handler callback) {
     stream->error_callback = callback;
+    return 0;
 }
 
 
 int iostream_set_close_handler(iostream_t *stream, close_handler callback) {
     stream->close_callback = callback;
+    return 0;
 }
 
 static void _handle_error(iostream_t *stream, unsigned int events) {
@@ -220,13 +255,14 @@ static int _add_event(iostream_t *stream, unsigned int event) {
 #define READ_SIZE 1024
 
 static size_t _read_to_buffer(iostream_t *stream) {
-    size_t  n = 1, total = 0;
-    while (n > 0) {
-        n = buffer_write_from_fd(stream->read_buf, stream->fd, READ_SIZE);
-        total += n;
+    size_t  n;
+    n = buffer_write_from_fd(stream->read_buf, stream->fd, READ_SIZE);
+    if (n < 0) {
+        iostream_close(stream);
+        return -1;
     }
-    stream->read_buf_size += total;
-    return total;
+    stream->read_buf_size += n;
+    return n;
 }
 
 
@@ -237,15 +273,12 @@ static int _read_from_buffer(iostream_t *stream) {
     char    local_buf[LOCAL_BUFSIZE];
     size_t  n;
     read_handler    callback;
-    read_handler    stream_cb;
 
     switch(stream->read_type) {
         case READ_BYTES:
             if (stream->stream_callback != NULL) {
                 // Streaming mode, offer data
-                n = buffer_consume(stream->read_buf, stream->read_bytes, _stream_callback_wrapper, stream);
-                stream->read_bytes -= n;
-                stream->read_buf_size -= n;
+                buffer_consume(stream->read_buf, stream->read_bytes, _stream_callback_wrapper, stream);
                 if (stream->read_bytes <= 0) {
                     callback = stream->read_callback;
                     stream->read_callback = NULL;
@@ -286,5 +319,8 @@ static int _read_from_buffer(iostream_t *stream) {
 
 static void _stream_callback_wrapper(void *data, size_t len, void *args) {
     iostream_t  *stream = (iostream_t*) args;
+    stream->read_bytes -= len;
+    stream->read_buf_size -= len;
     stream->stream_callback(stream, data, len);
 }
+

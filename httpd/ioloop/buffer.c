@@ -21,7 +21,7 @@ __inline__ static void _do_write(buffer_t *buf, byte_t *data, size_t len);
 __inline__ static void _do_read_to(buffer_t *buf, byte_t *target, size_t len);
 __inline__ static void _do_consume(buffer_t *buf, size_t len, consumer_func func, void *args);
 __inline__ static size_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len);
-__inline__ static size_t _do_write_from_fd(buffer_t *buf, int from_fd, size_t len);
+__inline__ static ssize_t _do_write_from_fd(buffer_t *buf, int from_fd, size_t len);
 
 
 buffer_t *buffer_create(size_t size) {
@@ -76,12 +76,16 @@ int buffer_write(buffer_t *buf, void *data, size_t len) {
 }
 
 
-size_t buffer_write_from_fd(buffer_t *buf, int fd, size_t len) {
-    size_t  write_len, n, total = 0;
+ssize_t buffer_write_from_fd(buffer_t *buf, int fd, size_t len) {
+    ssize_t  write_len, n, total = 0;
 
     len = MIN(len, buf->capacity - buf->size);
     write_len = MIN(len, buf->capacity - buf->tail);
     n = _do_write_from_fd(buf, fd, write_len);
+
+    if (n < 0) {
+        return -1;
+    }
 
     // No more to read, just return
     if (n < write_len) {
@@ -92,6 +96,9 @@ size_t buffer_write_from_fd(buffer_t *buf, int fd, size_t len) {
     total += n;
     if (write_len > 0) {
         n = _do_write_from_fd(buf, fd, write_len);
+        if (n < 0) {
+            return -1;
+        }
         total += n;
     }
     return total;
@@ -260,16 +267,18 @@ __inline__ static size_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len) {
 }
 
 
-__inline__ static size_t _do_write_from_fd(buffer_t *buf, int from_fd, size_t len) {
+__inline__ static ssize_t _do_write_from_fd(buffer_t *buf, int from_fd, size_t len) {
     ssize_t     n, total = 0;
     while(total < len) {
         n = read(from_fd, buf->data + buf->tail, len);
         if (n < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 break;
+            } else {
+                return -1;
             }
         } else if (n == 0) {
-            break;
+            return -1;
         }
         total += n;
         buf->size += n;

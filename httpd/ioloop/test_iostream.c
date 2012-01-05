@@ -110,7 +110,7 @@ int main(int argc, const char *argv[]) {
     if (argc > 2) {
         fprintf(stderr, "Testing read_until two blank lines(\\r\\n\\r\\n)\n");
     } else {
-        fprintf(stderr, "Testing read 16 bytes");
+        fprintf(stderr, "Testing read 16 bytes\n");
     }
 
     ioloop_update_handler(loop, listen_fd, EPOLLIN, connection_handler, NULL);
