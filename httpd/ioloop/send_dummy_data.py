@@ -1,5 +1,8 @@
+#!/usr/bin/python
+
 import socket
 import sys
+import time
 
 HOST = 'localhost'    # The remote host
 PORT = 9999          # The same port as used by the server
@@ -25,6 +28,7 @@ if s is None:
 filename = sys.argv[1]
 try:
     with open(filename) as f:
-        s.send(f.read(4096))
+        for l in f:
+            s.send(l)
 finally:
     s.close()

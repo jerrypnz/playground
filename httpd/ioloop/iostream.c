@@ -58,14 +58,14 @@ struct _iostream {
         return -1;             \
     }
 
-static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void *args);
+static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, const void *args);
 static void _handle_error(iostream_t *stream, unsigned int events);
 static void _handle_read(iostream_t *stream);
 static void _handle_write(iostream_t *stream);
 static ssize_t _read_to_buffer(iostream_t *stream);
 static int _read_from_buffer(iostream_t *stream);
 static int _add_event(iostream_t *stream, unsigned int events);
-static void _stream_callback_wrapper(void *data, size_t len, void *args);
+static void _stream_callback_wrapper(const void *data, size_t len, void *args);
 
 iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_size, size_t write_buf_size) {
     iostream_t  *stream;
@@ -101,7 +101,7 @@ iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_size, si
     stream->error_callback = NULL;
     stream->sendfile_fd = -1;
 
-    if (_add_event(stream, EPOLLERR) < 0) {
+    if (ioloop_add_handler(stream->ioloop, stream->fd, EPOLLERR, _handle_io_events, stream) < 0) {
         perror("Error add EPOLLERR event");
         goto error;
     }
@@ -116,6 +116,9 @@ error:
 }
 
 int iostream_close(iostream_t *stream) {
+    if (is_closed(stream)) {
+        return -1;
+    }
     ioloop_remove_handler(stream->ioloop, stream->fd);
     close(stream->fd);
     stream->close_callback(stream);
@@ -133,10 +136,8 @@ int iostream_destroy(iostream_t *stream) {
 
 
 int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, read_handler stream_callback) {
+    check_reading(stream);
     if (sz == 0) {
-        return -1;
-    }
-    if (is_reading(stream)) {
         return -1;
     }
     stream->read_callback = callback;
@@ -160,9 +161,7 @@ int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, re
 
 
 int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callback) {
-    if (is_reading(stream)) {
-        return -1;
-    }
+    check_reading(stream);
     assert(*delimiter != '\0');
     stream->read_callback = callback;
     stream->stream_callback = NULL;
@@ -184,7 +183,8 @@ int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callba
 }
 
 
-int iostream_write(iostream_t *stream, void *data, size_t len, write_handler callback) {
+int iostream_write(iostream_t *stream, const void *data, size_t len, write_handler callback) {
+    check_writing(stream);
     return 0;
 }
 
@@ -201,26 +201,37 @@ int iostream_set_close_handler(iostream_t *stream, close_handler callback) {
 }
 
 static void _handle_error(iostream_t *stream, unsigned int events) {
-    stream->error_callback(stream, events);
+    error_handler err_cb = stream->error_callback;
+    if (err_cb != NULL)
+        stream->error_callback(stream, events);
     iostream_close(stream);
 }
 
-static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void *args) {
+static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, const void *args) {
     iostream_t      *stream = (iostream_t*) args;
     unsigned int    event;
 
-    if (events | EPOLLIN) {
+    if (events & EPOLLIN) {
+        printf("Handling read on socket fd %d\n", stream->fd);
         _handle_read(stream);
     }
-    if (events | EPOLLOUT) {
+    if (events & EPOLLOUT) {
+        printf("Handling write on socket fd %d\n", stream->fd);
         _handle_write(stream);
     }
-    if (events | EPOLLERR) {
+    if (events & EPOLLERR) {
+        printf("Handling error on socket fd %d\n", stream->fd);
         _handle_error(stream, events);
         return;
     }
-    if (events | EPOLLHUP) {
+    if (events & EPOLLHUP) {
+        printf("Handling hangup on socket fd %d\n", stream->fd);
         iostream_close(stream);
+        return;
+    }
+
+    if (is_closed(stream)) {
+        fprintf(stderr, "Stream closed");
         return;
     }
 
@@ -232,7 +243,8 @@ static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void 
         event |= EPOLLOUT;
     }
     stream->events = event;
-    ioloop_update_handler(stream->ioloop, fd, stream->events, _handle_io_events, stream);
+    printf("Updating epoll events for socket fd %d, event %d\n", stream->fd, event);
+    ioloop_update_handler(stream->ioloop, fd, stream->events);
 }
 
 static void _handle_read(iostream_t *stream) {
@@ -247,7 +259,7 @@ static void _handle_write(iostream_t *stream) {
 static int _add_event(iostream_t *stream, unsigned int event) {
     if ((stream->events & event) == 0) {
         stream->events |= event;
-        return ioloop_update_handler(stream->ioloop, stream->fd, stream->events, _handle_io_events, stream);
+        return ioloop_update_handler(stream->ioloop, stream->fd, stream->events);
     }
     return -1;
 }
@@ -317,7 +329,7 @@ static int _read_from_buffer(iostream_t *stream) {
 }
 
 
-static void _stream_callback_wrapper(void *data, size_t len, void *args) {
+static void _stream_callback_wrapper(const void *data, size_t len, void *args) {
     iostream_t  *stream = (iostream_t*) args;
     stream->read_bytes -= len;
     stream->read_buf_size -= len;

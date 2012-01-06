@@ -9,11 +9,11 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 
-static void connection_handler(ioloop_t *loop, int fd, unsigned int events, void *args);
-static void echo_handler(ioloop_t *loop, int fd, unsigned int events, void *args);
-static void send_welcome_message(ioloop_t *loop, void* args);
+static void connection_handler(ioloop_t *loop, int fd, unsigned int events, const void *args);
+static void echo_handler(ioloop_t *loop, int fd, unsigned int events, const void *args);
+static void send_welcome_message(ioloop_t *loop, const void* args);
 
-static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, void *args) {
+static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, const void *args) {
     size_t      addr_len;
     int         conn_fd;
     struct sockaddr_in  remo_addr;
@@ -28,18 +28,18 @@ static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int event
         return;
     }
 
-    ioloop_update_handler(loop, conn_fd, EPOLLIN, echo_handler, NULL);
+    ioloop_add_handler(loop, conn_fd, EPOLLIN, echo_handler, NULL);
     ioloop_add_callback(loop, send_welcome_message, (void*)conn_fd);
 }
 
-static void send_welcome_message(ioloop_t *loop, void* args) {
+static void send_welcome_message(ioloop_t *loop, const void* args) {
     int fd = (int)args;
     char msg[] = "Welcome to echo server powered by libioloop!\n";
     write(fd, msg, sizeof(msg));
 }
 
 
-static void echo_handler(ioloop_t *loop, int fd, unsigned int events, void *args) {
+static void echo_handler(ioloop_t *loop, int fd, unsigned int events, const void *args) {
     char    buffer[1024];
     int     nread;
     if (events & EPOLLIN) {
@@ -92,7 +92,7 @@ int main(int argc, const char *argv[]) {
         return -1;
     }
 
-    ioloop_update_handler(loop, listen_fd, EPOLLIN, connection_handler, NULL);
+    ioloop_add_handler(loop, listen_fd, EPOLLIN, connection_handler, NULL);
     ioloop_start(loop);
     return 0;
 }
