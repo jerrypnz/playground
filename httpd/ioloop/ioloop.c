@@ -17,12 +17,12 @@
 
 struct _callback {
     callback_handler    callback;
-    const void          *args;
+    void          *args;
 };
 
 struct _io_callback {
     io_handler      callback;
-    const void      *args;
+    void      *args;
 };
 
 struct _ioloop {
@@ -82,7 +82,7 @@ int ioloop_destroy(ioloop_t *loop) {
     return 0;
 }
 
-int ioloop_add_handler(ioloop_t *loop, int fd, unsigned int events, io_handler handler, const void *args) {
+int ioloop_add_handler(ioloop_t *loop, int fd, unsigned int events, io_handler handler, void *args) {
     struct epoll_event     ev;
 
     if (handler == NULL) {
@@ -138,7 +138,7 @@ int ioloop_start(ioloop_t *loop) {
     struct epoll_event  events[MAX_EVENTS];
     int                 epoll_fd, nfds, i, fd;
     io_handler          handler;
-    const void          *args;
+    void          *args;
 
     if (loop->state != INITIALIZED) {
         fprintf(stderr, "Could not restart an IO loop");
@@ -188,8 +188,11 @@ int ioloop_stop(ioloop_t *loop) {
 }
 
 
-int ioloop_add_callback(ioloop_t *loop, callback_handler handler, const void *args) {
+int ioloop_add_callback(ioloop_t *loop, callback_handler handler, void *args) {
     int n = loop->callback_num;
+    if (n >= MAX_CALLBACKS) {
+        return -1;
+    }
     loop->callbacks[n].callback = handler;
     loop->callbacks[n].args = args;
     loop->callback_num ++;

@@ -58,14 +58,18 @@ struct _iostream {
         return -1;             \
     }
 
-static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, const void *args);
+static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void *args);
 static void _handle_error(iostream_t *stream, unsigned int events);
 static void _handle_read(iostream_t *stream);
 static void _handle_write(iostream_t *stream);
-static ssize_t _read_to_buffer(iostream_t *stream);
-static int _read_from_buffer(iostream_t *stream);
 static int _add_event(iostream_t *stream, unsigned int events);
-static void _stream_callback_wrapper(const void *data, size_t len, void *args);
+
+static ssize_t _read_from_socket(iostream_t *stream);
+static int     _read_from_buffer(iostream_t *stream);
+static ssize_t _write_to_buffer(iostream_t *stream, void *data, size_t len);
+static ssize_t _write_to_socket(iostream_t *stream);
+
+static void _stream_callback_wrapper(void *data, size_t len, void *args);
 
 iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_size, size_t write_buf_size) {
     iostream_t  *stream;
@@ -151,7 +155,7 @@ int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, re
         if (is_closed(stream)) {
             return -1;
         }
-        if (_read_to_buffer(stream) == 0) {
+        if (_read_from_socket(stream) == 0) {
             break;
         }
     }
@@ -174,7 +178,7 @@ int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callba
         if (is_closed(stream)) {
             return -1;
         }
-        if (_read_to_buffer(stream) == 0) {
+        if (_read_from_socket(stream) == 0) {
             break;
         }
     }
@@ -183,7 +187,7 @@ int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callba
 }
 
 
-int iostream_write(iostream_t *stream, const void *data, size_t len, write_handler callback) {
+int iostream_write(iostream_t *stream, void *data, size_t len, write_handler callback) {
     check_writing(stream);
     return 0;
 }
@@ -207,7 +211,7 @@ static void _handle_error(iostream_t *stream, unsigned int events) {
     iostream_close(stream);
 }
 
-static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, const void *args) {
+static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void *args) {
     iostream_t      *stream = (iostream_t*) args;
     unsigned int    event;
 
@@ -248,7 +252,7 @@ static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, const
 }
 
 static void _handle_read(iostream_t *stream) {
-    _read_to_buffer(stream);
+    _read_from_socket(stream);
     _read_from_buffer(stream);
 }
 
@@ -266,7 +270,7 @@ static int _add_event(iostream_t *stream, unsigned int event) {
 
 #define READ_SIZE 1024
 
-static ssize_t _read_to_buffer(iostream_t *stream) {
+static ssize_t _read_from_socket(iostream_t *stream) {
     ssize_t  n;
     n = buffer_write_from_fd(stream->read_buf, stream->fd, READ_SIZE);
     if (n < 0) {
@@ -329,10 +333,17 @@ static int _read_from_buffer(iostream_t *stream) {
 }
 
 
-static void _stream_callback_wrapper(const void *data, size_t len, void *args) {
+static void _stream_callback_wrapper(void *data, size_t len, void *args) {
     iostream_t  *stream = (iostream_t*) args;
     stream->read_bytes -= len;
     stream->read_buf_size -= len;
     stream->stream_callback(stream, data, len);
 }
 
+static ssize_t _write_to_buffer(iostream_t *stream, void *data, size_t len) {
+    return 0;
+}
+
+static ssize_t _write_to_socket(iostream_t *stream) {
+    return 0;
+}

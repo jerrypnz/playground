@@ -108,7 +108,7 @@ void test_write_from_fd_overflow() {
 
 #define SECRET_ARG "foobar"
 
-static void _print_consumer(const void *data, size_t len, void *args) {
+static void _print_consumer(void *data, size_t len, void *args) {
     char *str = (char*) data;
     int i;
 
@@ -155,7 +155,7 @@ void test_locate() {
     assert(buffer_locate(buf, "kkk") < 0);
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, char *argv[]) {
     test_basic_case();
     test_overflow();
     test_multiple_readwrite();

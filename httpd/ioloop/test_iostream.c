@@ -11,16 +11,16 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 
-static void connection_handler(ioloop_t *loop, int fd, unsigned int events, const void *args);
+static void connection_handler(ioloop_t *loop, int fd, unsigned int events, void *args);
 static void connection_close_handler(iostream_t *stream);
-static void read_bytes(iostream_t *stream, const void* data, size_t len);
-static void read_headers(iostream_t *stream, const void *data, size_t len);
-static void dump_data(const void *data, size_t len);
+static void read_bytes(iostream_t *stream, void* data, size_t len);
+static void read_headers(iostream_t *stream, void *data, size_t len);
+static void dump_data(void *data, size_t len);
 int set_nonblocking(int sockfd);
 
 static int read_mode = 0;
 
-static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, const void *args) {
+static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, void *args) {
     size_t      addr_len;
     int         conn_fd;
     struct sockaddr_in  remo_addr;
@@ -48,17 +48,17 @@ static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int event
         iostream_read_until(stream, "\r\n\r\n", read_headers);
 }
 
-static void read_bytes(iostream_t *stream, const void* data, size_t len) {
+static void read_bytes(iostream_t *stream, void* data, size_t len) {
     dump_data(data, len);
     iostream_read_bytes(stream, 16, read_bytes, NULL);
 }
 
-static void read_headers(iostream_t *stream, const void *data, size_t len) {
+static void read_headers(iostream_t *stream, void *data, size_t len) {
     dump_data(data, len);
     iostream_read_until(stream, "\r\n\r\n", read_headers);
 }
 
-static void dump_data(const void *data, size_t len) {
+static void dump_data(void *data, size_t len) {
     char    *str = (char*) data;
     int     i;
 
@@ -74,7 +74,7 @@ static void connection_close_handler(iostream_t *stream) {
     printf("Connection closed\n");
 }
 
-int main(int argc, const char *argv[]) {
+int main(int argc, char *argv[]) {
     ioloop_t               *loop;
     int                     listen_fd;
     struct sockaddr_in      addr;

@@ -176,7 +176,7 @@ size_t buffer_read_to_fd(buffer_t *buf, size_t len, int to_fd) {
 
 #define MAX_DELIM_LEN 20
 
-int buffer_locate(buffer_t *buf, const char *delimiter) {
+int buffer_locate(buffer_t *buf, char *delimiter) {
     char    tmp[MAX_DELIM_LEN];
     char    last_char;
     char    *sub;
@@ -243,7 +243,7 @@ __inline__ static void _do_read_to(buffer_t *buf, byte_t *target, size_t len) {
 }
 
 __inline__ static void _do_consume(buffer_t *buf, size_t len, consumer_func func, void *args) {
-    const void *data = buf->data + buf->head;
+    void *data = buf->data + buf->head;
     buf->size -= len;
     buf->head = (buf->head + len) % buf->capacity;
     func(data, len, args);
