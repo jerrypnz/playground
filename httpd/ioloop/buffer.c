@@ -20,7 +20,7 @@ struct _buffer {
 __inline__ static void _do_write(buffer_t *buf, byte_t *data, size_t len);
 __inline__ static void _do_read_to(buffer_t *buf, byte_t *target, size_t len);
 __inline__ static void _do_consume(buffer_t *buf, size_t len, consumer_func func, void *args);
-__inline__ static size_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len);
+__inline__ static ssize_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len);
 __inline__ static ssize_t _do_write_from_fd(buffer_t *buf, int from_fd, size_t len);
 
 
@@ -147,14 +147,18 @@ size_t buffer_consume(buffer_t *buf, size_t len, consumer_func cb, void *args) {
 }
 
 
-size_t buffer_read_to_fd(buffer_t *buf, size_t len, int to_fd) {
-    size_t     read_len, total;
-    size_t     n;
+ssize_t buffer_read_to_fd(buffer_t *buf, size_t len, int to_fd) {
+    size_t      read_len;
+    ssize_t     total, n;
 
     len = MIN(buf->size, len);
     total = 0;
     read_len = MIN(len, buf->capacity - buf->head);
     n = _do_read_to_fd(buf, to_fd, read_len);
+
+    if (n < 0) {
+        return -1;
+    }
 
     // If the first part is not written completely, we
     // just return and don't try the next part.
@@ -167,6 +171,9 @@ size_t buffer_read_to_fd(buffer_t *buf, size_t len, int to_fd) {
 
     if (read_len > 0) {
         n = _do_read_to_fd(buf, to_fd, read_len);
+        if (n < 0) {
+            return -1;
+        }
         total += n;
     }
 
@@ -249,13 +256,15 @@ __inline__ static void _do_consume(buffer_t *buf, size_t len, consumer_func func
     func(data, len, args);
 }
 
-__inline__ static size_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len) {
+__inline__ static ssize_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len) {
     ssize_t     n, total = 0;
     while (len > 0) {
         n = write(to_fd, buf->data + buf->head, len);
         if (n < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) {
                 break;
+            } else {
+                return -1;
             }
         }
         len -= n;

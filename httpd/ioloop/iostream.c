@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include <errno.h>
 
 enum READ_OP_TYPES {
     READ_BYTES = 1,
@@ -37,8 +38,10 @@ struct _iostream {
 
     buffer_t    *read_buf;
     size_t      read_buf_size;
+    size_t      read_buf_cap;
     buffer_t    *write_buf;
     size_t      write_buf_size;
+    size_t      write_buf_cap;
 
     int         sendfile_fd;
 };
@@ -67,11 +70,12 @@ static int _add_event(iostream_t *stream, unsigned int events);
 static ssize_t _read_from_socket(iostream_t *stream);
 static int     _read_from_buffer(iostream_t *stream);
 static ssize_t _write_to_buffer(iostream_t *stream, void *data, size_t len);
-static ssize_t _write_to_socket(iostream_t *stream);
+static int     _write_to_socket(iostream_t *stream);
+static ssize_t _write_to_socket_direct(iostream_t *stream, void *data, size_t len);
 
 static void _stream_callback_wrapper(void *data, size_t len, void *args);
 
-iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_size, size_t write_buf_size) {
+iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_capacity, size_t write_buf_capacity) {
     iostream_t  *stream;
     buffer_t    *in_buf, *out_buf;
 
@@ -82,12 +86,12 @@ iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_size, si
     }
     bzero(stream, sizeof(iostream_t));
 
-    in_buf = buffer_create(read_buf_size);
+    in_buf = buffer_create(read_buf_capacity);
     if (in_buf == NULL ) {
         perror("Error creating read buffer");
         goto error;
     }
-    out_buf = buffer_create(write_buf_size);
+    out_buf = buffer_create(write_buf_capacity);
     if (out_buf == NULL) {
         perror("Error creating write buffer");
         goto error;
@@ -95,7 +99,9 @@ iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_size, si
 
     stream->events = 0;
     stream->write_buf = out_buf;
+    stream->write_buf_cap = write_buf_capacity;
     stream->read_buf = in_buf;
+    stream->read_buf_cap = read_buf_capacity;
     stream->fd = sockfd;
     stream->state = NORMAL;
     stream->ioloop = loop;
@@ -188,7 +194,31 @@ int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callba
 
 
 int iostream_write(iostream_t *stream, void *data, size_t len, write_handler callback) {
+    ssize_t     n;
     check_writing(stream);
+
+    if (len == 0) {
+        return -1;
+    }
+
+    stream->write_callback = callback;
+    n = _write_to_socket_direct(stream, data, len);
+    if (n < 0) {
+        return -1;
+    } else if (n == len) {
+        // Lucky! All the data are written directly, skipping the buffer completely.
+        return 0;
+    }
+
+    if (_write_to_buffer(stream, (char*)data + n, len - n) < 0) {
+        return -1;
+    }
+
+    // Try to write to the socket
+    if (_write_to_socket(stream) > 0) {
+        return 0;
+    }
+    _add_event(stream, EPOLLOUT);
     return 0;
 }
 
@@ -257,7 +287,7 @@ static void _handle_read(iostream_t *stream) {
 }
 
 static void _handle_write(iostream_t *stream) {
-
+    _write_to_socket(stream);
 }
 
 static int _add_event(iostream_t *stream, unsigned int event) {
@@ -341,9 +371,73 @@ static void _stream_callback_wrapper(void *data, size_t len, void *args) {
 }
 
 static ssize_t _write_to_buffer(iostream_t *stream, void *data, size_t len) {
+    if (len > stream->write_buf_cap - stream->write_buf_size) {
+        return -1;
+    }
+    if (buffer_write(stream->write_buf, data, len) < 0) {
+        return -1;
+    }
+    stream->write_buf_size += len;
     return 0;
 }
 
-static ssize_t _write_to_socket(iostream_t *stream) {
-    return 0;
+#define WRITE_CHUNK_SIZE 1024
+
+static int _write_to_socket(iostream_t *stream) {
+    ssize_t         n;
+    write_handler   callback;
+
+    for(;;) {
+        n = buffer_read_to_fd(stream->write_buf, WRITE_CHUNK_SIZE, stream->fd);
+        if (n < 0) {
+            iostream_close(stream);
+            return -1;
+        }
+        stream->write_buf_size -= n;
+        if (n < WRITE_CHUNK_SIZE) {
+            break;
+        }
+    }
+    if (stream->write_buf_size <= 0) {
+        callback = stream->write_callback;
+        stream->write_callback = NULL;
+        if (callback != NULL) {
+            callback(stream);
+        }
+        return 1;
+    } else {
+        return 0;
+    }
 }
+
+static ssize_t _write_to_socket_direct(iostream_t *stream, void *data, size_t len) {
+    ssize_t         n;
+    write_handler   callback;
+
+    if (stream->write_buf_size > 0) {
+        // If there is data in the buffer, we could not write to socket directly.
+        return 0;
+    }
+
+    n = write(stream->fd, data, len);
+    if (n < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            return 0;
+        } else {
+            iostream_close(stream);
+            return -1;
+        }
+    }
+
+    if (n == len) {
+        // If we could write all the data once, call the callback function now.
+        callback = stream->write_callback;
+        stream->write_callback = NULL;
+        if (callback != NULL) {
+            callback(stream);
+        }
+    }
+
+    return n;
+}
+
