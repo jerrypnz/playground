@@ -58,8 +58,8 @@ static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int event
             break;
             
         case 1:
-            fprintf(stderr, "Testing read_until two blank lines(\\r\\n\\r\\n)\n");
-            iostream_read_until(stream, "\r\n\r\n", read_headers);
+            fprintf(stderr, "Testing read_until two blank lines(\\n\\n)\n");
+            iostream_read_until(stream, "\n\n", read_headers);
             break;
 
         case 2:
@@ -68,8 +68,8 @@ static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int event
             break;
 
         default:
-            fprintf(stderr, "Unknown mode: testing read_until two blank lines(\\r\\n\\r\\n)\n");
-            iostream_read_until(stream, "\r\n\r\n", read_headers);
+            fprintf(stderr, "Unknown mode: read_until two blank lines(\\n\\n)\n");
+            iostream_read_until(stream, "\n\n", read_headers);
             break;
     }
 }
@@ -81,13 +81,16 @@ static void read_bytes(iostream_t *stream, void* data, size_t len) {
 
 static void read_headers(iostream_t *stream, void *data, size_t len) {
     dump_data(data, len);
-    iostream_read_until(stream, "\r\n\r\n", read_headers);
+    iostream_read_until(stream, "\n\n", read_headers);
 }
 
 static void write_texts(iostream_t *stream) {
     static int counter = 0;
     char    buf[200];
     snprintf(buf, 200, "%d: 1234567890abcdefghijklmnopqrstuvwxyz-=_+{}()\r\n", counter++);
+    if (counter == 1000) {
+        counter = 0;
+    }
     iostream_write(stream, buf, strlen(buf), write_texts);
 }
 
@@ -105,6 +108,7 @@ static void dump_data(void *data, size_t len) {
 
 static void connection_close_handler(iostream_t *stream) {
     printf("Connection closed\n");
+    iostream_destroy(stream);
 }
 
 int main(int argc, char *argv[]) {

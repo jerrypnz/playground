@@ -13,7 +13,7 @@
 #include <sys/epoll.h>
 #include <netinet/in.h>
 
-#define MAX_CALLBACKS 20
+#define MAX_CALLBACKS 100
 
 struct _callback {
     callback_handler    callback;
@@ -25,12 +25,17 @@ struct _io_callback {
     void      *args;
 };
 
+struct _callback_chain {
+    struct _callback    callbacks[MAX_CALLBACKS];
+    int                 callback_num;
+};
+
 struct _ioloop {
     int                 epoll_fd;
     int                 state;
     struct _io_callback *handlers;
-    struct _callback    callbacks[MAX_CALLBACKS];
-    int                 callback_num;
+    struct _callback_chain  callback_chains[2];
+    int                     callback_chain_idx;
 };
 
 enum IOLOOP_STATES {
@@ -71,7 +76,9 @@ ioloop_t *ioloop_create(unsigned int maxfds) {
     loop->handlers = handlers;
     loop->epoll_fd = epoll_fd;
     loop->state = INITIALIZED;
-    loop->callback_num = 0;
+    loop->callback_chains[0].callback_num = 0;
+    loop->callback_chains[1].callback_num = 0;
+    loop->callback_chain_idx = 0;
     return loop;
 }
 
@@ -132,11 +139,12 @@ io_handler  ioloop_remove_handler(ioloop_t *loop, int fd) {
 
 
 #define MAX_EVENTS    20
-#define EPOLL_TIMEOUT 100
+#define EPOLL_DEFAULT_TIMEOUT 100
 
 int ioloop_start(ioloop_t *loop) {
     struct epoll_event  events[MAX_EVENTS];
-    int                 epoll_fd, nfds, i, fd;
+    struct _callback_chain  *current_chain;
+    int                 epoll_fd, nfds, i, fd, epoll_timeout;
     io_handler          handler;
     void          *args;
 
@@ -148,15 +156,22 @@ int ioloop_start(ioloop_t *loop) {
     loop->state = RUNNING;
     while (loop->state == RUNNING) {
         // Handle callbacks
-        if (loop->callback_num > 0) {
-            for (i = 0; i < loop->callback_num; i++) {
-                loop->callbacks[i].callback(loop, loop->callbacks[i].args);
+        current_chain = loop->callback_chains + loop->callback_chain_idx;
+        if (current_chain->callback_num > 0) {
+            loop->callback_chain_idx = (loop->callback_chain_idx + 1) % 2;
+            for (i = 0; i < current_chain->callback_num; i++) {
+                current_chain->callbacks[i].callback(loop, current_chain->callbacks[i].args);
             }
-            loop->callback_num = 0;
+            current_chain->callback_num = 0;
         }
 
         // Wait for events
-        nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, EPOLL_TIMEOUT);
+        epoll_timeout = EPOLL_DEFAULT_TIMEOUT;
+        if (loop->callback_chains[loop->callback_chain_idx].callback_num > 0) {
+            // There are callbacks that needs running, so we do not wait in epoll_wait
+            epoll_timeout = 0;
+        }
+        nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, epoll_timeout);
         if (nfds == -1) {
             perror("epoll_wait");
             continue;
@@ -189,13 +204,14 @@ int ioloop_stop(ioloop_t *loop) {
 
 
 int ioloop_add_callback(ioloop_t *loop, callback_handler handler, void *args) {
-    int n = loop->callback_num;
+    struct _callback_chain  *current_chain = loop->callback_chains + loop->callback_chain_idx;
+    int n = current_chain->callback_num;
     if (n >= MAX_CALLBACKS) {
         return -1;
     }
-    loop->callbacks[n].callback = handler;
-    loop->callbacks[n].args = args;
-    loop->callback_num ++;
+    current_chain->callbacks[n].callback = handler;
+    current_chain->callbacks[n].args = args;
+    current_chain->callback_num ++;
     return 0;
 }
 

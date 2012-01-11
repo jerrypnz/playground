@@ -73,7 +73,11 @@ static ssize_t _write_to_buffer(iostream_t *stream, void *data, size_t len);
 static int     _write_to_socket(iostream_t *stream);
 static ssize_t _write_to_socket_direct(iostream_t *stream, void *data, size_t len);
 
-static void _stream_callback_wrapper(void *data, size_t len, void *args);
+static void _finish_stream_callback(ioloop_t *loop, void *args);
+static void _finish_read_callback(ioloop_t *loop, void *args);
+static void _finish_write_callback(ioloop_t *loop, void *args);
+
+static void _stream_consumer_func(void *data, size_t len, void *args);
 
 iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_capacity, size_t write_buf_capacity) {
     iostream_t  *stream;
@@ -316,32 +320,18 @@ static ssize_t _read_from_socket(iostream_t *stream) {
 
 static int _read_from_buffer(iostream_t *stream) {
     int     res = 0, idx;
-    char    local_buf[LOCAL_BUFSIZE];
-    size_t  n;
-    read_handler    callback;
 
     switch(stream->read_type) {
         case READ_BYTES:
             if (stream->stream_callback != NULL) {
                 // Streaming mode, offer data
-                buffer_consume(stream->read_buf, stream->read_bytes, _stream_callback_wrapper, stream);
                 if (stream->read_bytes <= 0) {
-                    callback = stream->read_callback;
-                    stream->read_callback = NULL;
-                    stream->read_bytes = 0;
-                    // When streaming ends, call the read_callback with NULL to indicate the finish.
-                    callback(stream, NULL, 0);
                     res = 1;
+                } else {
+                    ioloop_add_callback(stream->ioloop, _finish_stream_callback, stream);
                 }
             } else if (stream->read_buf_size >= stream->read_bytes) {
-                // Normal mode, call read callback
-                n = buffer_read_to(stream->read_buf, stream->read_bytes, local_buf, LOCAL_BUFSIZE);
-                assert(n == stream->read_bytes);
-                callback = stream->read_callback;
-                stream->read_callback = NULL;
-                stream->read_bytes = 0;
-                stream->read_buf_size -= n;
-                callback(stream, local_buf, n);
+                ioloop_add_callback(stream->ioloop, _finish_read_callback, stream);
                 res = 1;
             }
             break;
@@ -349,11 +339,8 @@ static int _read_from_buffer(iostream_t *stream) {
         case READ_UNTIL:
             idx = buffer_locate(stream->read_buf, stream->read_delimiter);
             if (idx > 0) {
-                n = buffer_read_to(stream->read_buf, idx + strlen(stream->read_delimiter), local_buf, LOCAL_BUFSIZE);
-                callback = stream->read_callback;
-                stream->read_callback = NULL;
-                stream->read_buf_size -= n;
-                callback(stream, local_buf, n);
+                stream->read_bytes = idx + strlen(stream->read_delimiter);
+                ioloop_add_callback(stream->ioloop, _finish_read_callback, stream);
                 res = 1;
             }
             break;
@@ -363,7 +350,46 @@ static int _read_from_buffer(iostream_t *stream) {
 }
 
 
-static void _stream_callback_wrapper(void *data, size_t len, void *args) {
+static void _finish_stream_callback(ioloop_t *loop, void *args) {
+    iostream_t  *stream = (iostream_t*) args;
+    read_handler    callback = stream->read_callback;
+
+    buffer_consume(stream->read_buf, stream->read_bytes, _stream_consumer_func, stream);
+    if (stream->read_bytes <= 0) {
+        stream->read_callback = NULL;
+        stream->read_bytes = 0;
+        // When streaming ends, call the read_callback with NULL to indicate the finish.
+        callback(stream, NULL, 0);
+    }
+}
+
+static void _finish_read_callback(ioloop_t *loop, void *args) {
+    char            local_buf[LOCAL_BUFSIZE];
+    iostream_t      *stream = (iostream_t*) args;
+    read_handler    callback = stream->read_callback;
+    size_t          n;
+
+    // Normal mode, call read callback
+    n = buffer_read_to(stream->read_buf, stream->read_bytes, local_buf, LOCAL_BUFSIZE);
+    assert(n == stream->read_bytes);
+    callback = stream->read_callback;
+    stream->read_callback = NULL;
+    stream->read_bytes = 0;
+    stream->read_buf_size -= n;
+    callback(stream, local_buf, n);
+}
+
+static void _finish_write_callback(ioloop_t *loop, void *args) {
+    iostream_t      *stream = (iostream_t*) args;
+    write_handler   callback = stream->write_callback;
+
+    stream->write_callback = NULL;
+    if (callback != NULL) {
+        callback(stream);
+    }
+}
+
+static void _stream_consumer_func(void *data, size_t len, void *args) {
     iostream_t  *stream = (iostream_t*) args;
     stream->read_bytes -= len;
     stream->read_buf_size -= len;
@@ -385,7 +411,6 @@ static ssize_t _write_to_buffer(iostream_t *stream, void *data, size_t len) {
 
 static int _write_to_socket(iostream_t *stream) {
     ssize_t         n;
-    write_handler   callback;
 
     for(;;) {
         n = buffer_read_to_fd(stream->write_buf, WRITE_CHUNK_SIZE, stream->fd);
@@ -399,11 +424,7 @@ static int _write_to_socket(iostream_t *stream) {
         }
     }
     if (stream->write_buf_size <= 0) {
-        callback = stream->write_callback;
-        stream->write_callback = NULL;
-        if (callback != NULL) {
-            callback(stream);
-        }
+        ioloop_add_callback(stream->ioloop, _finish_write_callback, stream);
         return 1;
     } else {
         return 0;
@@ -412,7 +433,6 @@ static int _write_to_socket(iostream_t *stream) {
 
 static ssize_t _write_to_socket_direct(iostream_t *stream, void *data, size_t len) {
     ssize_t         n;
-    write_handler   callback;
 
     if (stream->write_buf_size > 0) {
         // If there is data in the buffer, we could not write to socket directly.
@@ -431,11 +451,7 @@ static ssize_t _write_to_socket_direct(iostream_t *stream, void *data, size_t le
 
     if (n == len) {
         // If we could write all the data once, call the callback function now.
-        callback = stream->write_callback;
-        stream->write_callback = NULL;
-        if (callback != NULL) {
-            callback(stream);
-        }
+        ioloop_add_callback(stream->ioloop, _finish_write_callback, stream);
     }
 
     return n;
