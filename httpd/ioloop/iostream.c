@@ -226,6 +226,9 @@ int iostream_write(iostream_t *stream, void *data, size_t len, write_handler cal
     return 0;
 }
 
+int iostream_sendfile(iostream_t *stream, int in_fd, size_t len, write_handler callback) {
+
+}
 
 int iostream_set_error_handler(iostream_t *stream, error_handler callback) {
     stream->error_callback = callback;
