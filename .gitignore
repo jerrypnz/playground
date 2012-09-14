@@ -1,8 +1,8 @@
-projects/project-euler/Problem18
-projects/project-euler/a.out
-projects/huff-tree/main
-projects/num2chinese/num2chinese
-projects/httpd/tags
+c-projects/project-euler/Problem18
+c-projects/project-euler/a.out
+c-projects/huff-tree/main
+c-projects/num2chinese/num2chinese
+c-projects/httpd/tags
 playground/unix/dlhello/libfoo.so
 playground/unix/dlhello/main
 playground/unix/ipc-unix-domain-sock
