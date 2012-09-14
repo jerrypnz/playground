@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response success="false">
+	<errors>
+		<field>
+			<id>name</id>
+			<msg>
+				<![CDATA[
+            Name should not be empty.
+         ]]>
+			</msg>
+		</field>
+		<field>
+			<id>email</id>
+			<msg>
+				<![CDATA[
+            不合法的邮件地址. <br /> <i>检查邮件输入格式是否有误 </i>
+         ]]>
+			</msg>
+		</field>
+	</errors>
+</response>

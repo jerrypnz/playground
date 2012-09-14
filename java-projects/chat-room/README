@@ -1,0 +1,20 @@
+项目：Swing聊天室
+作者：彭睿（管理系04701班）
+日期：2007年5月31日
+说明：Swing聊天室是使用Swing作为界面的一个小小的聊天室程序。它采用本人自己封装的一套NIO框架来实现底层的通讯协议。
+
+编译运行：
+1.请首先正确安装JDK和Ant，确保它们都能正确工作(JDK要求5或以上)。
+2.在命令行下进入此目录，输入ant开始构建项目，此时会生成两个新目录，一个是build，一个是lib。build下面存放的是编译生成的class文件，lib下面是一个ChatRoom.jar文件，是项目的jar压缩包。输入ant clean可以清理build文件夹里的中间文件
+3.运行runserver.bat运行聊天室服务器，运行runclient.bat运行客户端。
+
+源文件包结构：
+jerry.nifo   本人的NIOF框架所在的包，下面有3个子包。
+jerry.niof.server  NIOF服务器框架
+jerry.niof.client  NIOF客户端框架
+jerry.niof.util    NIOF通用常量
+
+jerry.chatroom   Swing聊天室所在的包
+jerry.chatroom.server   Swing聊天室的服务器
+jerry.chatroom.client   Swing聊天室的客户端
+jerry.chatroom.protocol Swing聊天室的协议，这里定义了一个类用来存放与协议有关的常量

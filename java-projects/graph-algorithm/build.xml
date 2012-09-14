@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="GraphAlgorithm" basedir="." default="dist">
+	<property name="src" location="src" />
+	<property name="build" location="build" />
+	<property name="dist" location="lib" />
+
+	<target name="init">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${dist}"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="${src}" destdir="${build}" encoding="UTF-8"/>
+	</target>
+
+	<target name="dist" depends="compile">
+		<jar jarfile="${dist}/graph.jar" basedir="${build}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build}"></delete>
+	</target>
+	
+</project>

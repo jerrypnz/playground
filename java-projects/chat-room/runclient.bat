@@ -1,0 +1,1 @@
+java -cp lib/ChatRoom.jar jerry.chatroom.client.ChatClient %1

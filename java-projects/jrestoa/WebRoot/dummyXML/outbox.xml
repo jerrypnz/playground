@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<out-box>
+	<mail>
+		<receiver>Jerry</receiver>
+		<title>Here is what you want</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+	<mail>
+		<receiver>Jerry</receiver>
+		<title>Here is what you want</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+	<mail>
+		<receiver>Jerry</receiver>
+		<title>Here is what you want</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+	<mail>
+		<receiver>Jerry</receiver>
+		<title>Here is what you want</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+</out-box>

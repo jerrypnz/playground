@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd" >
+<beans>
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"
+			value="org.hsqldb.jdbcDriver">
+		</property>
+		<property name="url"
+			value="jdbc:hsqldb:file:./db/c2c">
+		</property>
+		<property name="username" value="sa"></property>
+		<property name="password" value=""></property>
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="mappingResources">
+			<list>
+				<value>jerry/c2c/domain/User.hbm.xml</value>
+				<value>jerry/c2c/domain/Item.hbm.xml</value>
+				<value>jerry/c2c/domain/Trade.hbm.xml</value>
+				<value>jerry/c2c/domain/Bid.hbm.xml</value>
+				<value>jerry/c2c/domain/Shop.hbm.xml</value>
+				<value>jerry/c2c/domain/ShopComment.hbm.xml</value>
+				<value>jerry/c2c/domain/ItemComment.hbm.xml</value>
+				<value>jerry/c2c/domain/Message.hbm.xml</value>
+				<value>jerry/c2c/domain/Category.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.HSQLDialect
+				</prop>
+				<prop key="hibernate.cache.provider_class">
+					org.hibernate.cache.HashtableCacheProvider
+				</prop>
+				<prop key="hibernate.hbm2ddl.auto">
+					update
+				</prop>
+			</props>
+		</property>
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+			<ref local="dataSource" />
+		</property>
+	</bean>
+
+	<!-- UserService -->
+
+	<bean id="userServiceTarget"
+		class="jerry.c2c.service.impl.UserServiceImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<bean id="userService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref local="transactionManager" />
+		</property>
+
+		<property name="target">
+			<ref local="userServiceTarget" />
+		</property>
+
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save">PROPAGATION_REQUIRED</prop>
+				<prop key="delete">PROPAGATION_REQUIRED</prop>
+				<prop key="update">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="login">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- MessageService -->
+
+	<bean id="messageServiceTarget"
+		class="jerry.c2c.service.impl.MessageServiceImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<bean id="messageService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref local="transactionManager" />
+		</property>
+
+		<property name="target">
+			<ref local="messageServiceTarget" />
+		</property>
+
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save">PROPAGATION_REQUIRED</prop>
+				<prop key="delete">PROPAGATION_REQUIRED</prop>
+				<prop key="update">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="receive">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- CategoryService -->
+
+	<bean id="categoryServiceTarget"
+		class="jerry.c2c.service.impl.CategoryServiceImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<bean id="categoryService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref local="transactionManager" />
+		</property>
+
+		<property name="target">
+			<ref local="categoryServiceTarget" />
+		</property>
+
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save">PROPAGATION_REQUIRED</prop>
+				<prop key="delete">PROPAGATION_REQUIRED</prop>
+				<prop key="update">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- ShopService -->
+
+	<bean id="shopServiceTarget"
+		class="jerry.c2c.service.impl.ShopServiceImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<bean id="shopService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref local="transactionManager" />
+		</property>
+
+		<property name="target">
+			<ref local="shopServiceTarget" />
+		</property>
+
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- ItemService -->
+
+	<bean id="itemServiceTarget"
+		class="jerry.c2c.service.impl.ItemServiceImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<bean id="itemService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref local="transactionManager" />
+		</property>
+
+		<property name="target">
+			<ref local="itemServiceTarget" />
+		</property>
+
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- BidService -->
+
+	<bean id="bidServiceTarget"
+		class="jerry.c2c.service.impl.BidServiceImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+		<property name="messageService" ref="messageService"></property>
+		<property name="itemService" ref="itemService"></property>
+		<property name="winMessageTitle" value="竞拍成功"></property>
+		<property name="winMessageContent"
+			value="您已经成功拍得{itemName}，请及时查看">
+		</property>
+	</bean>
+
+	<bean id="bidService"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref local="transactionManager" />
+		</property>
+
+		<property name="target">
+			<ref local="bidServiceTarget" />
+		</property>
+
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

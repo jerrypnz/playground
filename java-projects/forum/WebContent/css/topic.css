@@ -1,0 +1,37 @@
+﻿/* 版面列表页面相关样式 */
+.topicTable {
+	border: 2px solid ;
+	border-color: #FF9900;
+	font-size: 12px;
+	font-family: sans-serif;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.topicTable .title {
+	font-size: 13px;
+	color: #553E1C;
+	background-color: #FF9900;
+	padding-top: 3px;
+	padding-bottom: 3px; 
+}
+
+.topicTable .topic {
+	background-color: #FFE6BF;
+	padding: 10px 10px 10px 10px;
+	text-align: left;
+}
+
+.topicTable .topic a {
+	color: #553E1C;
+	font-size: 12px;
+	display: block;
+}
+
+.topicTable .topic a:hover {
+	color: #FF9900;
+}
+
+.topicTable .otherCol {
+	background-color: #FFCC80; 
+}

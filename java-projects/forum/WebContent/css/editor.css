@@ -1,0 +1,48 @@
+/* 版面列表页面相关样式 */
+.editorTable {
+	border: 2px solid;
+	border-color: #FF9900;
+	font-size: 12px;
+	font-family: sans;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.editorTable .title {
+	font-size: 13px;
+	color: #553E1C;
+	background-color: #FF9900;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.editorTable .label {
+	background-color: #FFE6BF;
+	padding: 6px 0px 6px 20px;
+	text-align: left;
+}
+
+.editorTable .control {
+	background-color: #FFCC80;
+	text-align: left;
+	padding: 6px 10px 6px 10px;
+}
+
+.editorTable .textfield {
+	border: 1px solid #BDBDBD;
+	height: 18px;
+	width: 500px;
+}
+
+.editorTable .editor {
+	background-color: #FFCC80;
+	padding: 20px 5px 20px 50px;
+	text-align: left;
+}
+
+.editorTable .button {
+	border: 2px solid #FF9900;
+	background-color: #FFCC80;
+	font-weight: bold;
+	height: 30px;
+}

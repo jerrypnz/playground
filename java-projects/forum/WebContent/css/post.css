@@ -1,0 +1,76 @@
+﻿/* 版面列表页面相关样式 */
+.postTable {
+	border: 2px solid #FF9900;
+}
+
+.postTable .title {
+	background-color: #FFCC80; 
+	font-size: 14px;
+	padding: 4px 0px 4px 0px;
+}
+
+.postTable .header {
+	background-color: #FF9900; 
+	padding: 3px 0px 3px 0px;
+}
+
+.postTable .user_profile {
+	background-color: #FFCC80; 
+	vertical-align: top;
+}
+
+.postTable .user_profile  .user_name{
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.postTable .separator {
+	background-color: #FFCC8F;
+	height: 8px;
+}
+
+.postTable .user_profile ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.postTable .user_profile ul  li {
+	padding: 4px 0px 4px 10px;
+}
+
+.postTable .post_body {
+	background-color: #FFE6BF;
+	padding: 5px auto;
+	vertical-align: top;
+}
+
+.post_time {
+	border-bottom: 1px solid #553E1C;
+	margin: 5px 10px 5px 10px;
+	padding: 0px 10px 10px 10px;
+	color: #FF9900;
+}
+
+.post_text {
+	margin: 15px 10px 5px 10px;
+	padding: 0px 5px 0px 5px;
+}
+
+.post_text p {
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+
+.button {
+	border: 2px solid #FF9900;
+	background-color: #FFCC80;
+	font-weight: bold;
+	height: 30px;
+}
+
+#quickreply {
+	text-align: right;
+	padding: 10px 10px 10px 10px;
+}
+

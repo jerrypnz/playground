@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="jerry.c2c.domain">
+  <class name="Category">
+  
+  	<id name="id" type="long" column="id">
+  		<generator class="native"></generator>
+  	</id>
+  	
+  	<property name="name" 
+  			type="string" 
+  			column="name"
+  			unique="true"
+  			/>
+  	
+  	<property name="description"
+  			type="string"
+  			column="description"
+  			/>
+  			
+  	<many-to-one name="parent"
+  			class="Category"
+  			column="parent_id"
+  			cascade="none"
+  			lazy="false"
+  			/>
+  </class>
+</hibernate-mapping>

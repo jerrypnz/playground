@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="jerry.c2c.domain">
+	<class name="Bid">
+		<id name="id" type="long" column="id">
+			<generator class="native"></generator>
+		</id>
+
+		<many-to-one name="maker" class="User" column="maker_id"
+			lazy="false" cascade="none" outer-join="true">
+		</many-to-one>
+
+		<many-to-one name="item" class="Item" column="item_id"
+			lazy="false" cascade="none" outer-join="true">
+		</many-to-one>
+		
+		<property name="time" type="timestamp" 
+			column="time">
+		</property>
+		
+		<property name="description" type="string"
+			column="description">
+		</property>
+		
+		<property name="currentPrice" type="integer"
+			column="current_price">
+		</property>
+	</class>
+</hibernate-mapping>

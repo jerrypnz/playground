@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="jerry.c2c.domain">
+  <class name="Message">
+  
+  	<id name="id" type="long" column="id">
+  		<generator class="native"></generator>
+  	</id>
+  	
+  	<property name="title" 
+  			type="string"
+  			column="title">
+  	</property>
+  	
+  	<property name="content" 
+  			type="string" 
+  			column="content">
+  	</property>
+  		
+  	<property name="sendTime" 
+  			type="timestamp" 
+  			column="send_time">
+  	</property>
+  	
+  	<many-to-one name="from"
+  				class="User" 
+  				column="from_user_id" 
+  				cascade="none"
+  				lazy="false">
+  	</many-to-one>
+  	
+  	<many-to-one name="to"
+  				class="User"
+  				column="to_user_id"
+  				cascade="all"
+  				lazy="false">
+  	</many-to-one>
+  	
+  </class>
+</hibernate-mapping>

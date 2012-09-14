@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd" >
+<beans>
+	<import resource="serviceBean.xml" />
+	<!-- Struts Actions -->
+	<bean name="/index" class="jerry.c2c.action.LoadCategoryAction">
+		<property name="categoryService" ref="categoryService"></property>
+	</bean>
+	<bean name="/registerAction"
+		class="jerry.c2c.action.RegisterAction">
+		<property name="userService" ref="userService"></property>
+	</bean>
+	<bean name="/loginAction" class="jerry.c2c.action.LoginAction">
+		<property name="userService" ref="userService"></property>
+	</bean>
+	<bean name="/shopRegAction"
+		class="jerry.c2c.action.ShopRegAction">
+		<property name="userService" ref="userService"></property>
+		<property name="shopService" ref="shopService"></property>
+		<property name="categoryService" ref="categoryService"></property>
+	</bean>
+	<bean name="/sysInitAction"
+		class="jerry.c2c.action.SysInitAction">
+		<property name="categoryService" ref="categoryService"></property>
+		<property name="initDir" value="init_data"></property>
+		<property name="categoryFileName" value="categories.txt"></property>
+	</bean>
+	<bean name="/sendMsgAction"
+		class="jerry.c2c.action.SendMsgAction">
+		<property name="userService" ref="userService"></property>
+		<property name="messageService" ref="messageService"></property>
+	</bean>
+	<bean name="/receiveMsgAction"
+		class="jerry.c2c.action.ReceiveMsgAction">
+		<property name="userService" ref="userService"></property>
+		<property name="messageService" ref="messageService"></property>
+	</bean>
+	<bean name="/uploadProductAction"
+		class="jerry.c2c.action.UploadProductAction">
+		<property name="shopService" ref="shopService"></property>
+		<property name="itemService" ref="itemService"></property>
+		<property name="categoryService" ref="categoryService"></property>
+		<property name="imagePath" value="upload/itemImages"></property>
+		<!-- file size is measured by BYTEs -->
+		<property name="maxFileSize" value="512000"></property>
+		<property name="baseName" value="item_image_"></property>
+	</bean>
+	<bean name="/listUnsoldItemAction"
+		class="jerry.c2c.action.ListUnsoldItemAction">
+		<property name="itemService" ref="itemService"></property>
+		<property name="imagePath" value="upload/itemImages"></property>
+	</bean>
+	<bean name="/searchItemAction"
+		class="jerry.c2c.action.SearchItemAction">
+		<property name="itemService" ref="itemService"></property>
+		<property name="imagePath" value="upload/itemImages"></property>
+	</bean>
+	<bean name="/viewCategoryAction"
+		class="jerry.c2c.action.ViewCategoryAction">
+		<property name="itemService" ref="itemService"></property>
+		<property name="categoryService" ref="categoryService"></property>
+		<property name="imagePath" value="upload/itemImages"></property>
+	</bean>
+	<bean name="/showItemAction"
+		class="jerry.c2c.action.ShowItemAction">
+		<property name="itemService" ref="itemService"></property>
+		<property name="imagePath" value="upload/itemImages"></property>
+	</bean>
+	<bean name="/itemCommentAction"
+		class="jerry.c2c.action.ItemCommentAction">
+		<property name="itemService" ref="itemService"></property>
+	</bean>
+	<bean name="/listShopsAction"
+		class="jerry.c2c.action.ListShopsAction">
+		<property name="shopService" ref="shopService"></property>
+	</bean>
+	<bean name="/searchShopAction"
+		class="jerry.c2c.action.SearchShopAction">
+		<property name="shopService" ref="shopService"></property>
+	</bean>
+	<bean name="/viewShopCategoryAction"
+		class="jerry.c2c.action.ViewShopCategoryAction">
+		<property name="categoryService" ref="categoryService"></property>
+		<property name="shopService" ref="shopService"></property>
+	</bean>
+	<bean name="/buyItemAction" class="jerry.c2c.action.BuyItemAction">
+		<property name="itemService" ref="itemService"></property>
+		<property name="msgService" ref="messageService"></property>
+	</bean>
+</beans>

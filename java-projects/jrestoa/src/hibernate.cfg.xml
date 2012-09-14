@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd" >
+<hibernate-configuration>
+	<session-factory>
+		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/jrestoa</property>
+		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.connection.username">root</property>
+		<property name="hibernate.connection.password">manman520</property>
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+		<property name="hibernate.show_sql">true</property>
+		<mapping class="com.jstudio.jrestoa.domain.AddressbookItem" />
+		<mapping class="com.jstudio.jrestoa.domain.Appointment" />
+		<mapping class="com.jstudio.jrestoa.domain.AskOffRecord" />
+		<mapping class="com.jstudio.jrestoa.domain.Department" />
+		<mapping class="com.jstudio.jrestoa.domain.Employee" />
+		<mapping class="com.jstudio.jrestoa.domain.Supervisor" />
+		<mapping class="com.jstudio.jrestoa.domain.News" />
+		<mapping class="com.jstudio.jrestoa.domain.Note" />
+		<mapping class="com.jstudio.jrestoa.domain.PersonalFile" />
+		<mapping class="com.jstudio.jrestoa.domain.SharedFile" />
+		<mapping class="com.jstudio.jrestoa.domain.ReceivedMail" />
+		<mapping class="com.jstudio.jrestoa.domain.SentMail" />
+		<mapping class="com.jstudio.jrestoa.domain.ToDo" />
+	</session-factory>
+</hibernate-configuration>

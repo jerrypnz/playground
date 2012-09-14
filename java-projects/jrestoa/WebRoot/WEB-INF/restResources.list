@@ -1,0 +1,8 @@
+com.jstudio.jrestoa.rest.AddressbookService
+com.jstudio.jrestoa.rest.LoginService
+com.jstudio.jrestoa.rest.PersonalFileService
+com.jstudio.jrestoa.rest.SendMailService
+com.jstudio.jrestoa.rest.InboxService
+com.jstudio.jrestoa.rest.OutboxService
+com.jstudio.jrestoa.rest.AppointmentService
+com.jstudio.jrestoa.rest.RSSFeedService

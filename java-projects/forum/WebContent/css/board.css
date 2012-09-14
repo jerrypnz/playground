@@ -1,0 +1,40 @@
+﻿/* 版面列表页面相关样式 */
+.boardTable {
+	border: 2px solid ;
+	border-color: #FF9900;
+	font-size: 12px;
+	font-family: sans-serif;
+	text-align: center;
+	margin-bottom: 20px;
+}
+
+.boardTable .title {
+	font-size: 13px;
+	color: #553E1C;
+	background-color: #FF9900;
+	padding-top: 3px;
+	padding-bottom: 3px; 
+}
+
+.boardTable .board {
+	background-color: #FFE6BF;
+	padding: 10px 10px 10px 10px;
+	text-align: left;
+}
+
+.boardTable .board a {
+	color: #FF9900;
+	font-size: 14px;
+	font-weight: bold;
+	display: block;
+}
+
+.boardTable .board a:hover {
+	color: #553E1C;
+}
+
+.boardTable .otherCol {
+	background-color: #FFCC80; 
+}
+
+

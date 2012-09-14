@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="jerry.c2c.domain">
+	<class name="Shop">
+		<id name="id" type="long" column="id">
+			<generator class="native"></generator>
+		</id>
+
+		<property name="name" type="string" column="name" unique="true"
+			not-null="true">
+		</property>
+
+		<property name="description" type="string"
+			column="describption">
+		</property>
+
+		<property name="createTime" type="timestamp"
+			column="create_time">
+		</property>
+
+		<property name="credit" type="integer" column="credit">
+		</property>
+
+		<property name="visitTimes" type="integer"
+			column="visit_times">
+		</property>
+
+		<set name="items" table="Item" cascade="all">
+			<key column="shop_id"></key>
+			<one-to-many class="Item" />
+		</set>
+
+		<set name="comments" table="ShopComment" inverse="true"
+			cascade="all">
+			<key column="shop_id"></key>
+			<one-to-many class="ShopComment" />
+		</set>
+
+		<many-to-one name="owner" class="User" column="owner_id"
+			cascade="none" lazy="false">
+		</many-to-one>
+		
+		<many-to-one name="category" cascade="none" class="Category"
+			column="category_id" lazy="false">
+		</many-to-one>
+
+
+	</class>
+</hibernate-mapping>

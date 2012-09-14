@@ -1,0 +1,116 @@
+Compiled from "Foo.java"
+public class Foo extends java.lang.Object
+  SourceFile: "Foo.java"
+  minor version: 0
+  major version: 50
+  Constant pool:
+const #1 = Method	#16.#30;	//  java/lang/Object."<init>":()V
+const #2 = Field	#12.#31;	//  Foo.fooStr:Ljava/lang/String;
+const #3 = Field	#32.#33;	//  java/lang/System.out:Ljava/io/PrintStream;
+const #4 = class	#34;	//  java/lang/StringBuilder
+const #5 = Method	#4.#30;	//  java/lang/StringBuilder."<init>":()V
+const #6 = String	#35;	//  Hello, 
+const #7 = Method	#4.#36;	//  java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+const #8 = Method	#4.#37;	//  java/lang/StringBuilder.toString:()Ljava/lang/String;
+const #9 = Method	#38.#39;	//  java/io/PrintStream.println:(Ljava/lang/String;)V
+const #10 = String	#40;	//  doing something...
+const #11 = Method	#12.#41;	//  Foo.innerDoSth:()V
+const #12 = class	#42;	//  Foo
+const #13 = String	#43;	//  hey
+const #14 = Method	#12.#44;	//  Foo."<init>":(Ljava/lang/String;)V
+const #15 = Method	#12.#45;	//  Foo.doSomething:()V
+const #16 = class	#46;	//  java/lang/Object
+const #17 = Asciz	fooStr;
+const #18 = Asciz	Ljava/lang/String;;
+const #19 = Asciz	<init>;
+const #20 = Asciz	(Ljava/lang/String;)V;
+const #21 = Asciz	Code;
+const #22 = Asciz	LineNumberTable;
+const #23 = Asciz	innerDoSth;
+const #24 = Asciz	()V;
+const #25 = Asciz	doSomething;
+const #26 = Asciz	main;
+const #27 = Asciz	([Ljava/lang/String;)V;
+const #28 = Asciz	SourceFile;
+const #29 = Asciz	Foo.java;
+const #30 = NameAndType	#19:#24;//  "<init>":()V
+const #31 = NameAndType	#17:#18;//  fooStr:Ljava/lang/String;
+const #32 = class	#47;	//  java/lang/System
+const #33 = NameAndType	#48:#49;//  out:Ljava/io/PrintStream;
+const #34 = Asciz	java/lang/StringBuilder;
+const #35 = Asciz	Hello, ;
+const #36 = NameAndType	#50:#51;//  append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+const #37 = NameAndType	#52:#53;//  toString:()Ljava/lang/String;
+const #38 = class	#54;	//  java/io/PrintStream
+const #39 = NameAndType	#55:#20;//  println:(Ljava/lang/String;)V
+const #40 = Asciz	doing something...;
+const #41 = NameAndType	#23:#24;//  innerDoSth:()V
+const #42 = Asciz	Foo;
+const #43 = Asciz	hey;
+const #44 = NameAndType	#19:#20;//  "<init>":(Ljava/lang/String;)V
+const #45 = NameAndType	#25:#24;//  doSomething:()V
+const #46 = Asciz	java/lang/Object;
+const #47 = Asciz	java/lang/System;
+const #48 = Asciz	out;
+const #49 = Asciz	Ljava/io/PrintStream;;
+const #50 = Asciz	append;
+const #51 = Asciz	(Ljava/lang/String;)Ljava/lang/StringBuilder;;
+const #52 = Asciz	toString;
+const #53 = Asciz	()Ljava/lang/String;;
+const #54 = Asciz	java/io/PrintStream;
+const #55 = Asciz	println;
+
+{
+protected java.lang.String fooStr;
+  Signature: Ljava/lang/String;
+
+
+public Foo(java.lang.String);
+  Signature: (Ljava/lang/String;)V
+  Code:
+   Stack=2, Locals=2, Args_size=2
+   0:	aload_0
+   1:	invokespecial	#1; //Method java/lang/Object."<init>":()V
+   4:	aload_0
+   5:	aload_1
+   6:	putfield	#2; //Field fooStr:Ljava/lang/String;
+   9:	return
+  LineNumberTable: 
+   line 6: 0
+   line 7: 4
+   line 8: 9
+
+
+public void doSomething();
+  Signature: ()V
+  Code:
+   Stack=2, Locals=1, Args_size=1
+   0:	getstatic	#3; //Field java/lang/System.out:Ljava/io/PrintStream;
+   3:	ldc	#10; //String doing something...
+   5:	invokevirtual	#9; //Method java/io/PrintStream.println:(Ljava/lang/String;)V
+   8:	aload_0
+   9:	invokespecial	#11; //Method innerDoSth:()V
+   12:	return
+  LineNumberTable: 
+   line 15: 0
+   line 16: 8
+   line 17: 12
+
+
+public static void main(java.lang.String[]);
+  Signature: ([Ljava/lang/String;)V
+  Code:
+   Stack=3, Locals=1, Args_size=1
+   0:	new	#12; //class Foo
+   3:	dup
+   4:	ldc	#13; //String hey
+   6:	invokespecial	#14; //Method "<init>":(Ljava/lang/String;)V
+   9:	invokevirtual	#15; //Method doSomething:()V
+   12:	return
+  LineNumberTable: 
+   line 20: 0
+   line 21: 12
+
+
+}
+

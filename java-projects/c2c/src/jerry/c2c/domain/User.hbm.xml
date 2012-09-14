@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="jerry.c2c.domain">
+	<class name="User">
+
+		<id name="id" type="long" column="id">
+			<generator class="native"></generator>
+		</id>
+
+		<property name="name" type="string" column="name" unique="true"></property>
+
+		<property name="password" type="string" column="password">
+		</property>
+
+		<property name="nickName" type="string" column="nick_name">
+		</property>
+
+		<property name="sex" type="string" column="sex"></property>
+
+		<property name="email" type="string" column="email"></property>
+
+		<property name="address" type="string" column="address">
+		</property>
+
+		<set name="ownedShops" cascade="all" inverse="true">
+			<key column="owner_id"></key>
+			<one-to-many class="Shop" />
+		</set>
+
+		
+	</class>
+	
+	<query name="getUserByName">
+			<![CDATA[
+				from User u where u.name=:name
+			]]>
+	</query>
+	
+</hibernate-mapping>

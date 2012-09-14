@@ -1,0 +1,15 @@
+.msg_title {
+	font-size: 20px;
+	color: #FF9900;
+	font-weight: bold;
+	margin: 5px 5px 5px 20px;
+}
+
+.msg_body {
+	font-size: 14px;
+	margin-left: 10px;
+}
+
+.msg_image {
+	float: right;
+}

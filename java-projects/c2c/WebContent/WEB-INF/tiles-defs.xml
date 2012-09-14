@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+       "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+
+<tiles-definitions>
+	<!-- Base tiles -->
+	<definition name="base" path="/main-layout.jsp">
+		<put name="header" value="/header.jsp"></put>
+		<put name="footer" value="/footer.jsp"></put>
+		<put name="title" value=""></put>
+		<put name="left" value=""></put>
+		<put name="right" value=""></put>
+	</definition>
+	
+	<definition name="default-page" extends="base">
+		<put name="left" value="/default-left.jsp"></put>
+		<put name="title" value=""></put>
+		<put name="right" value=""></put>
+	</definition>
+	
+	<definition name="checkuser-base"
+		path="/checkuser-main-layout.jsp">
+		<put name="title" value=""></put>
+		<put name="header" value="/header.jsp"></put>
+		<put name="footer" value="/footer.jsp"></put>
+		<put name="left" value=""></put>
+		<put name="right" value=""></put>
+		<put name="not-login" value=""></put>
+	</definition>
+	
+	<definition name="checkuser-default-page" extends="checkuser-base">
+		<put name="left" value="/default-left.jsp"></put>
+		<put name="title" value=""></put>
+		<put name="right" value=""></put>
+		<put name="not-login" value="/not-login.jsp"></put>
+	</definition>
+	
+	<definition name="three-part-page" path="/threepart-layout.jsp">
+		<put name="title" value=""></put>
+		<put name="header" value="/header.jsp"></put>
+		<put name="footer" value="/footer.jsp"></put>
+		<put name="middle" value=""></put>
+	</definition>
+	
+	<definition name="checkuser-three-part-page" path="/checkuser-threepart-layout.jsp">
+		<put name="title" value=""></put>
+		<put name="header" value="/header.jsp"></put>
+		<put name="footer" value="/footer.jsp"></put>
+		<put name="middle" value=""></put>
+		<put name="not-login" value="/not-login.jsp"></put>
+	</definition>
+	
+	<!-- index tile -->
+	
+	<definition name="index" extends="default-page">
+		<put name="title" value="首页"></put>
+		<put name="right" value="/index-right.jsp"></put>
+	</definition>
+
+	<!-- register tile -->
+
+	<definition name="register" extends="three-part-page">
+		<put name="title" value="注册"></put>
+		<put name="middle" value="/reg-right.jsp"></put>
+	</definition>
+
+	<!-- shop register tile -->
+	<definition name="shop-reg" extends="checkuser-three-part-page">
+		<put name="title" value="店铺注册"></put>
+		<put name="middle" value="/shopreg-right.jsp"></put>
+	</definition>
+	
+	<!-- Message sending and receiving tiles -->
+	
+	<definition name="list-message" extends="checkuser-default-page">
+		<put name="title" value="收消息"></put>
+		<put name="left" value="/user-left.jsp"></put>
+		<put name="right" value="/inbox.jsp"></put>
+	</definition>
+	
+	<definition name="write-message" extends="checkuser-default-page">
+		<put name="title" value="发消息"></put>
+		<put name="left" value="/user-left.jsp"></put>
+		<put name="right" value="/write-msg.jsp"></put>
+	</definition>
+	
+	<!-- Shop management tiles -->
+	<definition name="shop-manage" extends="checkuser-default-page">
+		<put name="title" value="店铺管理"></put>
+		<put name="left" value="/shop-left.jsp"></put>
+		<put name="right" value="/shopmanage-right.jsp"></put>
+	</definition>
+	
+	<definition name="new-product" extends="checkuser-default-page">
+		<put name="title" value="上传新商品"></put>
+		<put name="left" value="/shop-left.jsp"></put>
+		<put name="right" value="/upload-product.jsp"></put>
+	</definition>
+	
+	<definition name="view-unsold-product" extends="checkuser-default-page">
+		<put name="title" value="查看在售宝贝"></put>
+		<put name="left" value="/shop-left.jsp"></put>
+		<put name="right" value="/item-list.jsp"></put>
+	</definition>
+	
+	<!-- Search tiles -->
+	<definition name="search-result" extends="default-page">
+		<put name="title" value="搜索结果"></put>
+		<put name="left" value="/search-left.jsp"></put>
+		<put name="right" value="/item-list.jsp"></put>
+	</definition>
+	
+	<!-- Product detail tile -->
+	<definition name="product-detail" extends="default-page">
+		<put name="title" value="宝贝详情"></put>
+		<put name="left" value="/search-left.jsp"></put>
+		<put name="right" value="/item-detail.jsp"></put>
+	</definition>
+	
+	<definition name="view-shops" extends="default-page">
+		<put name="title" value="浏览店铺"></put>
+		<put name="left" value="/search-shop-left.jsp"></put>
+		<put name="right" value="/shop-list.jsp"></put>
+	</definition>
+	
+
+</tiles-definitions>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<todos>
+	<todoItem>
+		<id>1</id>
+		<content>参加怪物猎人2G聚会</content>
+		<alarmTime>2008-5-6 12:30</alarmTime>
+		<finished>true</finished>
+	</todoItem>
+	<todoItem>
+		<id>2</id>
+		<content>Review SubscriberManager code</content>
+		<alarmTime>2008-5-8 09:10</alarmTime>
+		<finished>false</finished>
+	</todoItem>
+	<todoItem>
+		<id>3</id>
+		<content>Review SubscriberManager code</content>
+		<alarmTime>2008-5-8 09:10</alarmTime>
+		<finished>false</finished>
+	</todoItem>
+	<todoItem>
+		<id>4</id>
+		<content>Review SubscriberManager code</content>
+		<alarmTime>2008-5-8 09:10</alarmTime>
+		<finished>true</finished>
+	</todoItem>
+	<todoItem>
+		<id>5</id>
+		<content>Review SubscriberManager code</content>
+		<alarmTime>2008-5-8 09:10</alarmTime>
+		<finished>true</finished>
+	</todoItem>
+	<todoItem>
+		<id>6</id>
+		<content>Review SubscriberManager code</content>
+		<alarmTime>2008-5-8 09:10</alarmTime>
+		<finished>true</finished>
+	</todoItem>
+	<todoItem>
+		<id>7</id>
+		<content>Review SubscriberManager code</content>
+		<alarmTime>2008-5-8 09:10</alarmTime>
+		<finished>true</finished>
+	</todoItem>
+</todos>

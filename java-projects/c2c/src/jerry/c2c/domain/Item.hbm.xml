@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="jerry.c2c.domain">
+	<class name="Item">
+		<id name="id" type="long" column="id">
+			<generator class="native"></generator>
+		</id>
+
+		<property name="name" type="string" column="name"></property>
+
+		<property name="description" type="string"
+			column="description">
+		</property>
+
+		<property name="viewTimes" type="integer" column="view_times">
+		</property>
+
+		<property name="createTime" type="timestamp"
+			column="create_time">
+		</property>
+
+		<property name="endTime" type="timestamp" column="end_time">
+		</property>
+
+		<property name="basePrice" type="integer" column="base_price">
+		</property>
+
+		<property name="tradePrice" type="integer"
+			column="trade_price">
+		</property>
+
+		<property name="soldOut" type="boolean"
+			column="is_sold_out">
+		</property>
+
+
+		<bag name="bids" table="bid" lazy="true" cascade="all">
+			<key column="item_id"></key>
+			<one-to-many class="Bid" />
+		</bag>
+
+		<bag name="comments" table="ItemComment" lazy="true"
+			cascade="all">
+			<key column="item_id"></key>
+			<one-to-many class="ItemComment" />
+		</bag>
+
+		<many-to-one name="belongTo" cascade="none" class="Shop"
+			column="shop_id" lazy="false">
+		</many-to-one>
+
+		<many-to-one name="category" cascade="none" class="Category"
+			column="category_id" lazy="false">
+		</many-to-one>
+
+		<one-to-one name="trade" class="Trade" outer-join="true"
+			cascade="all">
+		</one-to-one>
+
+	</class>
+
+	<query name="getItemByName">
+		<![CDATA[
+				from Item i where i.name=:name
+			]]>
+	</query>
+</hibernate-mapping>

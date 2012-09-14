@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<in-box>
+	<mail>
+		<sender>Jerry</sender>
+		<title>你好</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+	<mail>
+		<sender>Jerry</sender>
+		<title>欢迎新员工</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+	<mail>
+		<sender>Jerry</sender>
+		<title>新的一天</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+	<mail>
+		<sender>Jerry</sender>
+		<title>Here is what you want</title>
+		<content>
+			<![CDATA[
+			Here is the content of your mail.
+			]]>
+		</content>
+		<sendTime>2008-4-20 19:45</sendTime>
+	</mail>
+</in-box>

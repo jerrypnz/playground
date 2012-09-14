@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files>
+	<file>
+		<fileId>100001</fileId>
+		<name>Test.pdf</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100002</fileId>
+		<name>Damn.doc</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100003</fileId>
+		<name>PSP日常保养手册.xls</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100004</fileId>
+		<name>怪物猎人P2G中文版.zip</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100005</fileId>
+		<name>Final Fantasy Potion.mp3</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100006</fileId>
+		<name>WKS-OneMS-doc.avi</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100007</fileId>
+		<name>WKS-OneMS-test-result.xls</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100008</fileId>
+		<name>WKS-OneMS-review.jpg</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100008</fileId>
+		<name>PSP存档管理器.exe</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+	<file>
+		<fileId>100008</fileId>
+		<name>unknown.cpp</name>
+		<description>Test test test</description>
+		<uploadDate>2008-4-19 15:32</uploadDate>
+	</file>
+</files>

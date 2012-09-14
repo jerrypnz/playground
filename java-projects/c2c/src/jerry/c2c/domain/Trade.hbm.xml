@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+	"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+	"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="jerry.c2c.domain">
+	<class name="Trade">
+
+		<id name="id" column="id" type="long">
+			<generator class="foreign">
+				<param name="property">item</param>
+			</generator>
+		</id>
+
+		<many-to-one name="buyer" lazy="false" class="User" column="user_id">
+		</many-to-one>
+
+		<property name="description" column="description"
+			type="string">
+		</property>
+
+		<property name="createTime" column="create_time"
+			type="timestamp">
+		</property>
+		
+		<property name="endTime" column="end_time"
+			type="timestamp">
+		</property>
+		
+		<property name="price" column="price" type="integer">
+		</property>
+
+		<one-to-one name="item" class="Item" cascade="none"
+			constrained="true">
+		</one-to-one>
+		
+	</class>
+	
+	<query name="getTradeByItem">
+			<![CDATA[
+				from Trade t where t.item=:item
+			]]>
+	</query>
+</hibernate-mapping>

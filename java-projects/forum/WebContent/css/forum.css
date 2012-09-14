@@ -1,0 +1,136 @@
+/* 页面布局相关样式 */
+body {
+	font-size: 12px;
+	background-color: #FFE6DF;
+}
+
+a {
+	text-decoration:none;
+	color: #553E1C;
+}
+
+a:hover {
+	color: #FF9900;
+}
+
+.highlight {
+	color: #FF0000;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+#container {
+	width: 900px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#loginLinks {
+	width: 900px;
+	height: 20px;
+}
+
+#header {
+	width: 900px;
+	height: 90px;
+	margin:0px 0px 10px 0px;
+	padding: 10px 0px 0px 30px;
+	text-align: left;
+	background: url("../image/logo.jpg") no-repeat;
+}
+
+#header h1 {
+	display:block;
+	margin:0px 0px 5px 0px;
+	font-size:180%;
+	color: #553E1C;
+}
+
+#header h2 {
+	font-family: arial, sans-serif;
+	font-size:140%;
+	margin:5px 0px 0px 0px;
+	color: #FFE6BF;
+}
+
+#footer {
+	height: 30px;
+	border-top: 1px solid #553E1C;
+	margin-top: 30px;
+	padding-top: 20px;
+	text-align: center;
+}
+
+#copyright {
+	width: 900px;
+	height: 20px;
+	text-align: center;
+}
+
+
+#content {
+	margin-top: 10px;
+	width: 900px;
+	overflow: hidden;
+}
+
+#content .navigate {
+	color: #553E1C;
+	text-align: left;
+	padding: 5px 0px 5px 0px;
+}
+
+
+/* 顶部链接样式 */
+#loginLinks ul {
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+#loginLinks ul li {
+	float: left;
+	padding: 0px 5px 0px 5px;
+	font-size: 12px;
+	border-right: 1px solid #553E1C;
+}
+
+#loginLinks ul li a:hover {
+	background-color: #553E1C;
+}
+
+#loginLinks ul .last {
+	border-right: none;
+}
+
+#loginLinks ul .highlight {
+	color: #FF9900;
+	font-weight: bold;
+}
+
+/* 底部链接 */
+#footer ul {
+	list-style: none;
+	height: 20px;
+	margin: 0px 290px 0px 300px;
+}
+
+#footer ul li {
+	float: left;
+	padding: 0px 5px 0px 5px;
+	font-size: 12px;
+	border-right: 1px solid #553E1C;
+}
+
+#footer ul li a {
+	text-decoration: none;
+	color: #553E1C;
+}
+
+#footer ul li a:hover {
+	color: #FF9900;
+}
+
+#footer ul .last {
+	border-right: none;
+}
