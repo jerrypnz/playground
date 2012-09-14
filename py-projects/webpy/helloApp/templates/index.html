@@ -1,0 +1,14 @@
+$def with (form)
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hello web.py</title>
+</head>
+<body>
+    <form method="post" name="main"> 
+        $if not form.valid: <p class="error">Some fields are invalid</p>
+        $:form.render()
+    </form>
+</body>
+</html>
