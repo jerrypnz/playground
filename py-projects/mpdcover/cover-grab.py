@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: UTF-8 -*-
 
 from multiprocessing import Process, Queue
 from mpd import MPDClient, MPDError
