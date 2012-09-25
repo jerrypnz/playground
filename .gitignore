@@ -7,5 +7,5 @@ playground/unix/dlhello/libfoo.so
 playground/unix/dlhello/main
 playground/unix/ipc-unix-domain-sock
 playground/unix/syslog-test
-**/tags
 */**/tags
+*/**/.ropeproject
