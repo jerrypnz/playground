@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+typedef long long __int64;
+
 __int64 calcChainLength(__int64 target) {
     // There is at least two numbers in the chain, 1 and itself
     __int64 chainLength = 2L;
