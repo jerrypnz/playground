@@ -14,7 +14,7 @@ static void echo_handler(ioloop_t *loop, int fd, unsigned int events, void *args
 static void send_welcome_message(ioloop_t *loop, void* args);
 
 static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, void *args) {
-    size_t      addr_len;
+    socklen_t   addr_len;
     int         conn_fd;
     struct sockaddr_in  remo_addr;
 

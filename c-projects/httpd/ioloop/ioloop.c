@@ -89,7 +89,11 @@ int ioloop_destroy(ioloop_t *loop) {
     return 0;
 }
 
-int ioloop_add_handler(ioloop_t *loop, int fd, unsigned int events, io_handler handler, void *args) {
+int ioloop_add_handler(ioloop_t *loop,
+                       int fd,
+                       unsigned int events,
+                       io_handler handler,
+                       void *args) {
     struct epoll_event     ev;
 
     if (handler == NULL) {

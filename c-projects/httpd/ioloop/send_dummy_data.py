@@ -26,9 +26,14 @@ if s is None:
     sys.exit(1)
 
 filename = sys.argv[1]
-try:
-    with open(filename) as f:
-        for l in f:
-            s.send(l)
-finally:
-    s.close()
+if filename == '-':
+    for l in sys.stdin:
+        s.send(l)
+else:
+    try:
+        with open(filename) as f:
+            for l in f:
+                s.send(l)
+    finally:
+        s.close()
+

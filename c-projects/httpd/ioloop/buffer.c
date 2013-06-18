@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/uio.h>
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
@@ -54,6 +55,16 @@ int buffer_destroy(buffer_t *buf) {
 }
 
 
+int buffer_is_full(buffer_t *buf) {
+    return buf->size == buf->capacity;
+}
+
+
+int buffer_is_empty(buffer_t *buf) {
+    return buf->size == 0;
+}
+
+
 int buffer_write(buffer_t *buf, void *data, size_t len) {
     size_t  cap;
     size_t  write_len;
@@ -77,31 +88,33 @@ int buffer_write(buffer_t *buf, void *data, size_t len) {
 
 
 ssize_t buffer_write_from_fd(buffer_t *buf, int fd, size_t len) {
-    ssize_t  write_len, n, total = 0;
+    ssize_t  n, iovcnt;
+    struct iovec iov[2];
+    
+    iov[0].iov_base = buf->data + buf->tail;
+    if (buf->head > buf->tail) {
+        iov[0].iov_len = buf->head - buf->tail;
+        iovcnt = 1;
+    } else {
+        iov[0].iov_len = buf->capacity - buf->tail;
+        iov[1].iov_base = buf->data;
+        iov[1].iov_len = buf->head;
+        iovcnt = 2;
+    }
 
-    len = MIN(len, buf->capacity - buf->size);
-    write_len = MIN(len, buf->capacity - buf->tail);
-    n = _do_write_from_fd(buf, fd, write_len);
-
+    n = readv(fd, iov, iovcnt);
     if (n < 0) {
-        return -1;
-    }
-
-    // No more to read, just return
-    if (n < write_len) {
-        return n;
-    }
-
-    write_len = len - write_len;
-    total += n;
-    if (write_len > 0) {
-        n = _do_write_from_fd(buf, fd, write_len);
-        if (n < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            return 0;
+        } else {
             return -1;
         }
-        total += n;
+    } else if (n == 0) {
+        return -2;
     }
-    return total;
+    buf->size += n;
+    buf->tail = (buf->tail + n) % buf->capacity;   
+    return n;
 }
 
 
@@ -266,6 +279,8 @@ __inline__ static ssize_t _do_read_to_fd(buffer_t *buf, int to_fd, size_t len) {
             } else {
                 return -1;
             }
+        } else if (n == 0) {
+            break;
         }
         len -= n;
         total += n;
@@ -286,8 +301,9 @@ __inline__ static ssize_t _do_write_from_fd(buffer_t *buf, int from_fd, size_t l
             } else {
                 return -1;
             }
-        } else if (n == 0) {
-            return -1;
+        }
+        if (n == 0) {
+            return -2;
         }
         total += n;
         buf->size += n;

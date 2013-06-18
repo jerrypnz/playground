@@ -30,7 +30,7 @@ int set_nonblocking(int sockfd);
 static int mode = 0;
 
 static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int events, void *args) {
-    size_t      addr_len;
+    socklen_t   addr_len;
     int         conn_fd;
     struct sockaddr_in  remo_addr;
     iostream_t *stream;
@@ -68,8 +68,8 @@ static void connection_handler(ioloop_t *loop, int listen_fd, unsigned int event
             break;
 
         default:
-            fprintf(stderr, "Unknown mode: read_until two blank lines(\\n\\n)\n");
-            iostream_read_until(stream, "\n\n", read_headers);
+            fprintf(stderr, "Unknown mode: read_until two blank lines(\\n)\n");
+            iostream_read_until(stream, "\n", read_headers);
             break;
     }
 }
@@ -81,7 +81,7 @@ static void read_bytes(iostream_t *stream, void* data, size_t len) {
 
 static void read_headers(iostream_t *stream, void *data, size_t len) {
     dump_data(data, len);
-    iostream_read_until(stream, "\n\n", read_headers);
+    iostream_read_until(stream, "\n", read_headers);
 }
 
 static void write_texts(iostream_t *stream) {
@@ -107,8 +107,7 @@ static void dump_data(void *data, size_t len) {
 
 
 static void connection_close_handler(iostream_t *stream) {
-    printf("Connection closed\n");
-    iostream_destroy(stream);
+    printf("Closing connection.\n");
 }
 
 int main(int argc, char *argv[]) {

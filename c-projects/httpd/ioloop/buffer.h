@@ -12,6 +12,8 @@ typedef void (*consumer_func)(void *data, size_t len, void *args);
 
 buffer_t    *buffer_create(size_t size);
 int          buffer_destroy(buffer_t *buf);
+int          buffer_is_full(buffer_t *buf);
+int          buffer_is_empty(buffer_t *buf);
 int          buffer_write(buffer_t *buf, void *data, size_t len);
 ssize_t      buffer_write_from_fd(buffer_t *buf, int fd, size_t len);
 size_t       buffer_read_to(buffer_t *buf, size_t len, void *target, size_t capacity);

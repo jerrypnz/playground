@@ -63,8 +63,8 @@ struct _iostream {
 
 static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void *args);
 static void _handle_error(iostream_t *stream, unsigned int events);
-static void _handle_read(iostream_t *stream);
-static void _handle_write(iostream_t *stream);
+static int  _handle_read(iostream_t *stream);
+static int  _handle_write(iostream_t *stream);
 static int _add_event(iostream_t *stream, unsigned int events);
 
 static ssize_t _read_from_socket(iostream_t *stream);
@@ -76,10 +76,15 @@ static ssize_t _write_to_socket_direct(iostream_t *stream, void *data, size_t le
 static void _finish_stream_callback(ioloop_t *loop, void *args);
 static void _finish_read_callback(ioloop_t *loop, void *args);
 static void _finish_write_callback(ioloop_t *loop, void *args);
+static void _close_callback(ioloop_t *loop, void *args);
+static void _destroy_callback(ioloop_t *loop, void *args);
 
 static void _stream_consumer_func(void *data, size_t len, void *args);
 
-iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_capacity, size_t write_buf_capacity) {
+iostream_t *iostream_create(ioloop_t *loop,
+                            int sockfd,
+                            size_t read_buf_capacity,
+                            size_t write_buf_capacity) {
     iostream_t  *stream;
     buffer_t    *in_buf, *out_buf;
 
@@ -101,7 +106,7 @@ iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_capacity
         goto error;
     }
 
-    stream->events = 0;
+    stream->events = EPOLLERR;
     stream->write_buf = out_buf;
     stream->write_buf_cap = write_buf_capacity;
     stream->read_buf = in_buf;
@@ -115,7 +120,11 @@ iostream_t *iostream_create(ioloop_t *loop, int sockfd, size_t read_buf_capacity
     stream->error_callback = NULL;
     stream->sendfile_fd = -1;
 
-    if (ioloop_add_handler(stream->ioloop, stream->fd, EPOLLERR, _handle_io_events, stream) < 0) {
+    if (ioloop_add_handler(stream->ioloop,
+                           stream->fd,
+                           stream->events,
+                           _handle_io_events,
+                           stream) < 0) {
         perror("Error add EPOLLERR event");
         goto error;
     }
@@ -133,14 +142,29 @@ int iostream_close(iostream_t *stream) {
     if (is_closed(stream)) {
         return -1;
     }
-    ioloop_remove_handler(stream->ioloop, stream->fd);
-    close(stream->fd);
-    stream->close_callback(stream);
     stream->state = CLOSED;
+    // Defer the close action to next loop, because there may be
+    // pending read/write operations.
+    ioloop_add_callback(stream->ioloop, _close_callback, stream);
     return 0;
 }
 
+static void _close_callback(ioloop_t *loop, void *args) {
+    iostream_t  *stream = (iostream_t*) args;
+    ioloop_remove_handler(stream->ioloop, stream->fd);
+    stream->close_callback(stream);
+    close(stream->fd);
+    // Defer the destroy action to next loop, in case there are
+    // pending callbacks of this stream.
+    ioloop_add_callback(stream->ioloop, _destroy_callback, stream);
+}
 
+static void _destroy_callback(ioloop_t *loop, void *args) {
+    iostream_t *stream = (iostream_t*) args;
+    printf("IO stream(fd:%d) destroyed.\n", stream->fd);
+    iostream_destroy(stream);
+}
+    
 int iostream_destroy(iostream_t *stream) {
     buffer_destroy(stream->read_buf);
     buffer_destroy(stream->write_buf);
@@ -148,8 +172,10 @@ int iostream_destroy(iostream_t *stream) {
     return 0;
 }
 
-
-int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, read_handler stream_callback) {
+int iostream_read_bytes(iostream_t *stream,
+                        size_t sz,
+                        read_handler callback,
+                        read_handler stream_callback) {
     check_reading(stream);
     if (sz == 0) {
         return -1;
@@ -173,7 +199,6 @@ int iostream_read_bytes(iostream_t *stream, size_t sz, read_handler callback, re
     return 0;
 }
 
-
 int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callback) {
     check_reading(stream);
     assert(*delimiter != '\0');
@@ -195,7 +220,6 @@ int iostream_read_until(iostream_t *stream, char *delimiter, read_handler callba
     _add_event(stream, EPOLLIN);
     return 0;
 }
-
 
 int iostream_write(iostream_t *stream, void *data, size_t len, write_handler callback) {
     ssize_t     n;
@@ -227,14 +251,14 @@ int iostream_write(iostream_t *stream, void *data, size_t len, write_handler cal
 }
 
 int iostream_sendfile(iostream_t *stream, int in_fd, size_t len, write_handler callback) {
-
+    // TODO Implement sendfile
+    return 0;
 }
 
 int iostream_set_error_handler(iostream_t *stream, error_handler callback) {
     stream->error_callback = callback;
     return 0;
 }
-
 
 int iostream_set_close_handler(iostream_t *stream, close_handler callback) {
     stream->close_callback = callback;
@@ -248,17 +272,23 @@ static void _handle_error(iostream_t *stream, unsigned int events) {
     iostream_close(stream);
 }
 
-static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void *args) {
+static void _handle_io_events(ioloop_t *loop,
+                              int fd,
+                              unsigned int events,
+                              void *args) {
     iostream_t      *stream = (iostream_t*) args;
-    unsigned int    event;
 
     if (events & EPOLLIN) {
         printf("Handling read on socket fd %d\n", stream->fd);
-        _handle_read(stream);
+        if (_handle_read(stream)) {
+            stream->events &= ~EPOLLIN;
+        }
     }
     if (events & EPOLLOUT) {
         printf("Handling write on socket fd %d\n", stream->fd);
-        _handle_write(stream);
+        if (_handle_write(stream)) {
+            stream->events &= ~EPOLLOUT;
+        }
     }
     if (events & EPOLLERR) {
         printf("Handling error on socket fd %d\n", stream->fd);
@@ -276,25 +306,21 @@ static void _handle_io_events(ioloop_t *loop, int fd, unsigned int events, void 
         return;
     }
 
-    event = EPOLLERR;
-    if (is_reading(stream)) {
-        event |= EPOLLIN;
-    }
-    if (is_writing(stream)) {
-        event |= EPOLLOUT;
-    }
-    stream->events = event;
-    printf("Updating epoll events for socket fd %d, event %d\n", stream->fd, event);
-    ioloop_update_handler(stream->ioloop, fd, stream->events);
+    printf("Updating epoll events for socket fd %d, event %d\n",
+           stream->fd, stream->events);
+    ioloop_update_handler(stream->ioloop, stream->fd, stream->events);    
 }
 
-static void _handle_read(iostream_t *stream) {
+static int _handle_read(iostream_t *stream) {
+    if (!is_reading(stream)) {
+        return 0;
+    }
     _read_from_socket(stream);
-    _read_from_buffer(stream);
+    return _read_from_buffer(stream);
 }
 
-static void _handle_write(iostream_t *stream) {
-    _write_to_socket(stream);
+static int _handle_write(iostream_t *stream) {
+    return _write_to_socket(stream);
 }
 
 static int _add_event(iostream_t *stream, unsigned int event) {
@@ -333,7 +359,9 @@ static int _read_from_buffer(iostream_t *stream) {
                 } else {
                     ioloop_add_callback(stream->ioloop, _finish_stream_callback, stream);
                 }
-            } else if (stream->read_buf_size >= stream->read_bytes) {
+            } else if (stream->read_buf_size >= stream->read_bytes
+                       || buffer_is_full(stream->read_buf)
+                       || (stream->state == CLOSED && stream->read_buf_size > 0)) {
                 ioloop_add_callback(stream->ioloop, _finish_read_callback, stream);
                 res = 1;
             }
@@ -341,8 +369,12 @@ static int _read_from_buffer(iostream_t *stream) {
 
         case READ_UNTIL:
             idx = buffer_locate(stream->read_buf, stream->read_delimiter);
-            if (idx > 0) {
-                stream->read_bytes = idx + strlen(stream->read_delimiter);
+            if (idx > 0
+                || buffer_is_full(stream->read_buf)
+                || (stream->state == CLOSED && stream->read_buf_size > 0)) {
+                stream->read_bytes = idx > 0
+                    ? (idx + strlen(stream->read_delimiter))
+                    : stream->read_buf_size;
                 ioloop_add_callback(stream->ioloop, _finish_read_callback, stream);
                 res = 1;
             }
@@ -374,7 +406,7 @@ static void _finish_read_callback(ioloop_t *loop, void *args) {
 
     // Normal mode, call read callback
     n = buffer_read_to(stream->read_buf, stream->read_bytes, local_buf, LOCAL_BUFSIZE);
-    assert(n == stream->read_bytes);
+    // assert(n == stream->read_bytes);
     callback = stream->read_callback;
     stream->read_callback = NULL;
     stream->read_bytes = 0;

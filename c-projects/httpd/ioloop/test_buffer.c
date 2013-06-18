@@ -30,6 +30,7 @@ void test_basic_case() {
     assert(buffer_write(buf, data, strlen(data)) == 0);
     assert(buffer_read_to(buf, 10, result, 12) == 10);
     assert_equals(data, result, 10);
+    assert(buffer_destroy(buf) == 0);
 }
 
 void test_overflow() {
@@ -37,6 +38,7 @@ void test_overflow() {
     buffer_t    *buf = create_buffer(5);
 
     assert(buffer_write(buf, data, strlen(data)) < 0);
+    assert(buffer_destroy(buf) == 0);
 }
 
 void test_multiple_readwrite() {
@@ -59,6 +61,7 @@ void test_multiple_readwrite() {
     assert(buffer_write(buf, data4, strlen(data4)) == 0);
     assert(buffer_read_to(buf, 10, result, 12) == 9);
     assert_equals(data4, result, 9);
+    assert(buffer_destroy(buf) == 0);
 }
 
 
@@ -72,6 +75,7 @@ void test_read_to_fd() {
     assert(buffer_read_to_fd(buf, 50, fd) == strlen(data));
     fsync(fd);
     close(fd);
+    assert(buffer_destroy(buf) == 0);
 }
 
 void test_write_from_fd() {
@@ -102,8 +106,10 @@ void test_write_from_fd_overflow() {
     write(fd, data, data_len);
     lseek(fd, 0, SEEK_SET);
     assert(buffer_write_from_fd(buf, fd, 100) == 10);
+    assert(buffer_is_full(buf));
     assert(buffer_read_to(buf, 10, result, 100) == 10);
     assert_equals(data, result, 10);
+    assert(buffer_destroy(buf) == 0);
 }
 
 #define SECRET_ARG "foobar"
@@ -135,6 +141,7 @@ void test_consume() {
     assert(buffer_write(buf, data, strlen(data)) == 0);
     assert(buffer_consume(buf, 2, _print_consumer, SECRET_ARG) == 2);
     assert(buffer_consume(buf, 3, _print_consumer, SECRET_ARG) == 3);
+    assert(buffer_destroy(buf) == 0);
 }
 
 void test_locate() {
@@ -153,6 +160,7 @@ void test_locate() {
     assert(buffer_locate(buf, "3456") == 3);
     assert(buffer_locate(buf, "89") == 8);
     assert(buffer_locate(buf, "kkk") < 0);
+    assert(buffer_destroy(buf) == 0);
 }
 
 int main(int argc, char *argv[]) {

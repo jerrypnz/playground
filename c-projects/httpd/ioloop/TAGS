@@ -1,0 +1,170 @@
+
+buffer.h,113
+#define __BUFFER_H3,20
+typedef struct _buffer buffer_t;9,78
+typedef void (*consumer_func)consumer_func11,112
+
+ioloop.h,192
+#define __IOLOOP_H3,20
+#define MAX_TIMEOUTS 6,41
+typedef struct _ioloop ioloop_t;11,88
+typedef void (*io_handler)io_handler13,122
+typedef void (*callback_handler)callback_handler14,207
+
+iostream.h,272
+#define __IOSTREAM_H3,22
+typedef struct _iostream iostream_t;10,104
+typedef void (*read_handler)read_handler12,142
+typedef void (*write_handler)write_handler13,216
+typedef void (*error_handler)error_handler14,267
+typedef void (*close_handler)close_handler15,339
+
+buffer.c,826
+#define MIN(8,119
+typedef unsigned char byte_t;10,162
+struct _buffer 12,193
+    byte_t     *data;data13,210
+    size_t      size;14,232
+    size_t      capacity;15,254
+    int         head;16,280
+    int         tail;17,302
+buffer_t *buffer_create(buffer_create27,744
+int buffer_destroy(49,1197
+int buffer_is_full(57,1306
+int buffer_is_empty(62,1385
+int buffer_write(67,1453
+ssize_t buffer_write_from_fd(89,1913
+size_t buffer_read_to(118,2522
+size_t buffer_consume(141,3098
+ssize_t buffer_read_to_fd(160,3524
+#define MAX_DELIM_LEN 194,4215
+int buffer_locate(196,4241
+__inline__ static void _do_write(250,5879
+__inline__ static void _do_read_to(256,6077
+__inline__ static void _do_consume(262,6281
+__inline__ static ssize_t _do_read_to_fd(269,6520
+__inline__ static ssize_t _do_write_from_fd(291,7073
+
+ioloop.c,1068
+#define MAX_CALLBACKS 16,275
+struct _callback 18,302
+    callback_handler    callback;19,321
+    void          *args;args20,355
+struct _io_callback 23,384
+    io_handler      callback;24,406
+    void      *args;args25,436
+struct _callback_chain 28,461
+    struct _callback    callbacks[callbacks29,486
+    int                 callback_num;30,536
+struct _ioloop 33,578
+    int                 epoll_fd;34,595
+    int                 state;35,629
+    struct _io_callback *handlers;handlers36,660
+    struct _callback_chain  callback_chains[callback_chains37,695
+    int                     callback_chain_idx;38,743
+enum IOLOOP_STATES 41,795
+    INITIALIZED 42,816
+    RUNNING 43,837
+    STOPPED 44,854
+ioloop_t *ioloop_create(ioloop_create48,875
+int ioloop_destroy(86,1892
+int ioloop_add_handler(92,1988
+int ioloop_update_handler(116,2611
+io_handler  ioloop_remove_handler(130,2930
+#define MAX_EVENTS 145,3362
+#define EPOLL_DEFAULT_TIMEOUT 146,3387
+int ioloop_start(148,3422
+int ioloop_stop(204,5348
+int ioloop_add_callback(210,5427
+
+iostream.c,2087
+enum READ_OP_TYPES 12,204
+    READ_BYTES 13,225
+    READ_UNTIL 14,245
+enum STREAM_STATE 17,268
+    NORMAL 18,288
+    CLOSED 19,304
+struct _iostream 22,323
+    int         fd;23,342
+    int         state;24,362
+    ioloop_t    *ioloop;ioloop25,385
+    read_handler    read_callback;27,411
+    read_handler    stream_callback;28,446
+    write_handler   write_callback;29,483
+    error_handler   error_callback;30,519
+    close_handler   close_callback;31,555
+    int         read_type;33,592
+    size_t      read_bytes;34,619
+    char        *read_delimiter;read_delimiter35,647
+    unsigned int    events;37,681
+    buffer_t    *read_buf;read_buf39,710
+    size_t      read_buf_size;40,737
+    size_t      read_buf_cap;41,768
+    buffer_t    *write_buf;write_buf42,798
+    size_t      write_buf_size;43,826
+    size_t      write_buf_cap;44,858
+    int         sendfile_fd;46,890
+#define is_reading(50,924
+#define is_writing(51,985
+#define is_closed(52,1047
+#define check_reading(54,1103
+#define check_writing(59,1209
+iostream_t *iostream_create(iostream_create83,2276
+int iostream_close(136,3759
+int iostream_destroy(148,4014
+int iostream_read_bytes(156,4170
+int iostream_read_until(184,4859
+int iostream_write(207,5440
+int iostream_sendfile(236,6127
+int iostream_set_error_handler(241,6266
+int iostream_set_close_handler(247,6400
+static void _handle_error(252,6533
+static void _handle_io_events(259,6756
+static void _update_io_events(293,7785
+static void _handle_read(309,8261
+static void _handle_write(314,8373
+static int _add_event(318,8454
+#define READ_SIZE 326,8698
+static ssize_t _read_from_socket(328,8722
+#define LOCAL_BUFSIZE 340,8988
+static int _read_from_buffer(342,9016
+static void _finish_stream_callback(378,10343
+static void _finish_read_callback(391,10837
+static void _finish_write_callback(407,11413
+static void _stream_consumer_func(417,11682
+static ssize_t _write_to_buffer(424,11916
+#define WRITE_CHUNK_SIZE 435,12218
+static int _write_to_socket(437,12249
+static ssize_t _write_to_socket_direct(459,12789
+
+test_buffer.c,412
+void assert_equals(10,164
+buffer_t *create_buffer(create_buffer17,319
+void test_basic_case(25,459
+void test_overflow(36,783
+void test_multiple_readwrite(44,983
+void test_read_to_fd(68,1790
+void test_write_from_fd(81,2178
+void test_write_from_fd_overflow(97,2700
+#define SECRET_ARG 115,3277
+static void _print_consumer(117,3306
+void test_consume(130,3579
+void test_locate(147,4236
+int main(166,4874
+
+test_ioloop.c,133
+static void connection_handler(16,429
+static void send_welcome_message(35,1127
+static void echo_handler(42,1318
+int main(62,1969
+
+test_iostream.c,289
+static int mode 30,752
+static void connection_handler(32,774
+static void read_bytes(77,2270
+static void read_headers(82,2423
+static void write_texts(87,2578
+static void dump_data(97,2881
+static void connection_close_handler(109,3133
+int main(114,3260
+int set_nonblocking(156,4361
