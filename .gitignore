@@ -1,5 +1,5 @@
-c-projects/project-euler/Problem18
-c-projects/project-euler/a.out
+c-projects/project-euler/*
+!c-projects/project-euler/*.c
 c-projects/huff-tree/main
 c-projects/num2chinese/num2chinese
 c-projects/httpd/tags
@@ -8,4 +8,6 @@ unix/dlhello/main
 unix/ipc-unix-domain-sock
 unix/syslog-test
 **/tags
+*/**/TAGS
 **/.ropeproject
+clojure/target
