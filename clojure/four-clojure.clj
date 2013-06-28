@@ -199,3 +199,9 @@
      (cons (f (first col))
            (my-map f (rest col))))))
 
+;; problem 78
+(defn my-trampoline [f & args]
+  (loop [f (apply f args)]
+    (if (fn? f)
+      (recur (f))
+      f)))
