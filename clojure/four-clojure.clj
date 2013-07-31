@@ -1,3 +1,16 @@
+(def ^:dynamic *enable-debug* false)
+
+(defmacro dbg [label expr]
+  `(if *enable-debug*
+     (let [v# ~expr]
+       (println (str "[" ~label "] DEBUG:") v#)
+       v#)
+     ~expr))
+
+(defmacro with-debug [& body]
+  `(binding [*enable-debug* true]
+     ~@body))
+
 ;http://www.4clojure.com/problem/30
 (defn remove-dup [col]
   (reduce (fn [res cur]
@@ -205,3 +218,18 @@
     (if (fn? f)
       (recur (f))
       f)))
+
+;; problem 128
+(defn read-card [[s r]]
+  {:suit ({\D :diamond \H :heart \C :club \S :spade} s)
+   :rank (.indexOf "23456789TJQKA" (int r))})
+
+;; problem 100
+(defn lcm [& args]
+  (loop [seqs (apply sorted-set-by
+                     #(< (first %) (first %2))
+                     (map #(iterate (partial + %) %) args))]
+    (let [lowest (first seqs)]
+      (if (apply = (dbg "Values" (map first seqs)))
+        (first lowest)
+        (recur (conj (disj seqs lowest) (next lowest)))))))
