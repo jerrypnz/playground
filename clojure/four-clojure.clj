@@ -56,7 +56,8 @@
       (is-vector col) :vector)))
 
 ;http://www.4clojure.com/problem/58
-(defn my-comp [func & rest-funcs])
+(defn my-comp [& fs]
+  #(first(reduce (fn [v f] [(apply f v)]) %& (reverse fs))))
 
 ;; 73 tic-tac-toe
 
@@ -225,11 +226,73 @@
    :rank (.indexOf "23456789TJQKA" (int r))})
 
 ;; problem 100
+(comment (defn lcm [& args]
+           "Not working...."
+           (loop [seqs (apply sorted-set-by
+                              #(< (first %) (first %2))
+                              (map #(iterate (partial + %) %) args))]
+             (let [lowest (first seqs)]
+               (if (apply = (dbg "Values" (map first seqs)))
+                 (first lowest)
+                 (recur (conj (disj seqs lowest) (next lowest))))))))
+
 (defn lcm [& args]
-  (loop [seqs (apply sorted-set-by
-                     #(< (first %) (first %2))
-                     (map #(iterate (partial + %) %) args))]
-    (let [lowest (first seqs)]
-      (if (apply = (dbg "Values" (map first seqs)))
-        (first lowest)
-        (recur (conj (disj seqs lowest) (next lowest)))))))
+  (letfn [(gcd [x y]
+            (loop [[a b] (if (> x y) [x y] [y x])]
+              (if (= b 0) a (recur [b (mod a b)]))))]
+    (/ (apply * args)
+       (reduce gcd args))))
+
+;; problem 96
+(defn is-symmetry [[_ l r]]
+  (letfn [(trav [t l?]
+            (if (not (coll? t))
+              [t]
+              (let [[e & es] t]
+                (cons e (mapcat #(trav % l?) (if l? es (reverse es)))))))]
+    (= (trav l true)
+       (trav r false))))
+
+;; problem 147
+;; Should use +' (note the single quote) to avoid overflow error
+(defn lazy-trape [col]
+  (lazy-seq
+   (let [nxt (map #(apply +' %)
+                  (partition 2 1 (concat [0] col [0])))]
+     (cons col (lazy-trape nxt)))))
+
+(defn lazy-trape-2 [col]
+  (iterate
+   (fn [col]
+     (map #(apply +' %) (partition 2 1 (concat [0] col [0]))))
+   col))
+
+;; problem 146
+;; Should use nested for
+(defn into-table [m]
+  (into {} (mapcat (fn [[k v]] (for [[k1 v1] v] [[k k1] v1])) m)))
+
+;; problem 153
+(defn pairwise-sets [s]
+  (= (apply + (map count s))
+     (count (set (mapcat identity s)))))
+
+;; problem 50
+(defn split-by-type [c]
+  (map second (group-by type c)))
+
+;; problem 55
+(defn count-occur [c]
+  (into {} (for [[k v] (group-by identity c)] [k (count v)])))
+
+;; problem 56
+(defn my-distinct [c]
+  (let [s (atom #{})]
+    (remove #(if (@s %)
+               true
+               (do (swap! s conj %) false))
+            c)))
+
+;; problem 59
+(defn my-juxt [& fns]
+  #(map (fn [f] (apply f %&)) fns))
