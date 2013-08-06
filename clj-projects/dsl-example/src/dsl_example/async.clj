@@ -16,7 +16,7 @@
 
 (defn run-consumer [n cs]
   (go
-   (dotimes [i n]
+   (while true
      (let [[v c] (alts! cs)]
        (println "comsuming " v)
        (>! c (str "response " v))))))

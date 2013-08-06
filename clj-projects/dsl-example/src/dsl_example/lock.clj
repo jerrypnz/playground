@@ -26,6 +26,6 @@
        (finally (.unlock lock#)))))
 
 (defn test-lock-ex [key sleep-time]
-  (with-lock key
+  (with-lock (str key "-123")
     (Thread/sleep sleep-time)
     (println "Hello world")))
