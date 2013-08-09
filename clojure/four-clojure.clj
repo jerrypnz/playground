@@ -296,3 +296,14 @@
 ;; problem 59
 (defn my-juxt [& fns]
   #(map (fn [f] (apply f %&)) fns))
+
+;; problem 60
+(defn red
+  ([f n c]
+     (map first
+          (take-while identity
+                      (iterate
+                       (fn [[n c]] (when c [(f n (first c)) (next c)])) [n c]))))
+  ([f c] (red f (first c) (rest c))))
+
+
