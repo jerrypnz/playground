@@ -307,3 +307,25 @@
   ([f c] (red f (first c) (rest c))))
 
 
+;; problem 80
+;; feeling kinda like cheating
+(defn perfect? [n]
+  (contains? #{6 28 496 8128} n))
+
+;; problem 77
+(defn anagram [words]
+  (->> words
+       (group-by sort)
+       (map (comp set second))
+       (remove #(< (count %) 2))
+       set))
+
+;; problem 102
+(defn camel [w]
+  (let [ws (seq (.split w "-"))]
+    (apply str (first ws)
+           (->> (rest ws)
+                (map #(str (.toUpperCase (.substring % 0 1))
+                           (.substring % 1)))))))
+
+
