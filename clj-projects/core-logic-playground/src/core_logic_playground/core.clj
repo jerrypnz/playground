@@ -2,20 +2,27 @@
   (:refer-clojure :exclude [==])
   (:require [clojure.core.logic :refer :all]))
 
-(def flights-database {"MU123" [["PEK" "CAN"]
-                                ["PEK" "WUH"]
-                                ["WUH" "CAN"]]
-                       "MU234" [["CAN" "BKK"]
-                                ["CAN" "SIN"]
-                                ["BKK" "SIN"]]
-                       "CA888" [["SIN" "LHR"]]})
+(def flights-database {"CZ323" [["PEK" "PNH"]
+                                ["PEK" "CAN"]
+                                ["CAN" "PNH"]]
+                       "CZ305" [["CAN" "AKL"]
+                                ["AKL" "MEL"]
+                                ["CAN" "MEL"]]
+                       "QF123" [["MEL" "PAR"]
+                                ["MEL" "LON"]
+                                ["PAR" "LON"]]})
 
-(defn flighto [vars flights]
-  (if (seq vars)
-    (all 
-     (membero (first vars) (flights-database (first flights)))
-     (flighto (rest vars) (rest flights)))
-    succeed))
+(comment (defn init [vars flights]
+           (if (seq vars)
+             (all 
+              (membero (first vars) (flights-database (first flights)))
+              (init (rest vars) (rest flights)))
+             succeed))
+         every)
+
+(defn init [vars flights]
+  (everyg (fn [[var flight]](membero var (flights-database flight)))
+          (map vector vars flights)))
 
 (defn connectedo [[var1 var2]]
   (fresh [x y conn]
@@ -27,5 +34,9 @@
         connections (partition 2 1 vars)]
     (run* [q]
       (== q vars)
-      (flighto vars flights)
+      (init vars flights)
       (everyg connectedo connections))))
+
+; Test
+;(infer-orig-dest ["MU123" "MU234" "CA888"])
+

@@ -1,6 +1,10 @@
 (ns dsl-example.core)
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn oom []
+  (let [[t d] (split-with #(< % 12) (range 1e8))]
+        [(count d) (count t)]))
+
+(defn no-oom []
+  (let [[t d] (split-with #(< % 12) (range 1e8))]
+        [(count t) (count d)]))
+
