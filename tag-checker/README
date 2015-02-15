@@ -1,0 +1,5 @@
+Run the following command to test the Node.js version of the program:
+
+   node tag_checker.js test-data.txt
+
+For the Clojure version, please start a REPL and load the file to run the program.
