@@ -75,7 +75,7 @@ trait URLShortenService extends HttpService {
   }
 
   def allocateId(url: String): Option[String] = {
-    redisClient.get(url) orElse {
+    redisClient.get[String](url) orElse {
       for {
         id <- redisClient.incr(LastIdKey)
         encodedId <- {
