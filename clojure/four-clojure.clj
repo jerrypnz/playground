@@ -159,7 +159,7 @@
       col)))
 
 ;; problem 122
-;; #(Integer/parseInt % 2) 
+;; #(Integer/parseInt % 2)
 (defn read-bin [s]
   (reduce #(+ (* 2 %1) (- (int %2) (int \0))) 0 s))
 
@@ -329,3 +329,56 @@
                            (.substring % 1)))))))
 
 
+;; problem 164
+(defn run-dfa [{:keys [start accepts transitions]}]
+  (letfn [(next-states [[s o]]
+            (->> (transitions s)
+                 ;; Try accepted states first
+                 (sort-by #(not (accepts (second %))))
+                 (map (fn [[c s1]] [s1 (conj o c)]))))]
+    (->> (tree-seq seq next-states [start []])
+         (filter (fn [[s _]] (accepts s)))
+         (map #(apply str (second %))))))
+
+(comment
+  (let [res (take 2000 (run-dfa '{:states #{q0 q1}
+                                  :alphabet #{0 1}
+                                  :start q0
+                                  :accepts #{q0}
+                                  :transitions {q0 {0 q0, 1 q1}
+                                                q1 {0 q1, 1 q0}}}))]
+    (and (every? (partial re-matches #"0*(?:10*10*)*") res)
+         (= res (distinct res))))
+
+
+  (let [res (take 2000 (run-dfa '{:states #{q0 q1}
+                                  :alphabet #{n m}
+                                  :start q0
+                                  :accepts #{q1}
+                                  :transitions {q0 {n q0, m q1}}}))]
+    (and (every? (partial re-matches #"n*m") res)
+         (= res (distinct res))))
+
+
+  (let [res (take 2000 (run-dfa '{:states #{q0 q1 q2 q3 q4 q5 q6 q7 q8 q9}
+                                  :alphabet #{i l o m p t}
+                                  :start q0
+                                  :accepts #{q5 q8}
+                                  :transitions {q0 {l q1}
+                                                q1 {i q2, o q6}
+                                                q2 {m q3}
+                                                q3 {i q4}
+                                                q4 {t q5}
+                                                q6 {o q7}
+                                                q7 {p q8}
+                                                q8 {l q9}
+                                                q9 {o q6}}}))]
+    (and (every? (partial re-matches #"limit|(?:loop)+") res)
+         (= res (distinct res)))))
+
+;; Problem 108
+#(loop [coll %&]
+  (let [[[x & xs] & xss] (sort-by first coll)]
+    (if (= x (or (first (last xss)) x))
+      x
+      (recur (cons xs xss)))))
