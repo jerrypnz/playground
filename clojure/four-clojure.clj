@@ -329,6 +329,7 @@
                            (.substring % 1)))))))
 
 
+<<<<<<< Updated upstream
 ;; problem 164
 (defn run-dfa [{:keys [start accepts transitions]}]
   (letfn [(next-states [[s o]]
@@ -413,4 +414,19 @@
 
 ;; Problem 178
 (defn recognize-cards [cards]
-  )
+  nil)
+
+;; problem 105
+(defn keys-vals
+  [col]
+  (->> (interpose nil col)
+       (partition-by keyword?)
+       (partition 2)
+       (map (fn [[k v]] [(first k) (filter identity v)]))
+       (into {})))
+
+;; problem 112
+(defn sequs-horris
+  [n col sum]
+  nil)
+
