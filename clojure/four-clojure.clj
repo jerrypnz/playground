@@ -376,9 +376,41 @@
     (and (every? (partial re-matches #"limit|(?:loop)+") res)
          (= res (distinct res)))))
 
+
 ;; Problem 108
 #(loop [coll %&]
   (let [[[x & xs] & xss] (sort-by first coll)]
     (if (= x (or (first (last xss)) x))
       x
       (recur (cons xs xss)))))
+
+
+;; Problem 117
+(defn for-science [m]
+  (let [m (mapv vec m)]
+    (loop [[[x y :as p] & ps :as s]
+           (->> m
+                (map-indexed (fn [x i] [x (.indexOf i \M)]))
+                (filter (fn [[_ y]] (>= y 0))))
+
+           v #{}]
+      (cond
+        (empty? s)
+        false
+
+        (= \C (get-in m p))
+        true
+
+        :else
+        (recur (concat
+                (->> [[1 0] [-1 0] [0 -1] [0 1]]
+                     (map (fn [[x1 y1]] [(+ x x1) (+ y y1)]))
+                     (remove v)
+                     (filter #(#{\C \space} (get-in m %))))
+                ps)
+               (conj v p))))))
+
+
+;; Problem 178
+(defn recognize-cards [cards]
+  )
