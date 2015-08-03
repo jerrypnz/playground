@@ -329,7 +329,6 @@
                            (.substring % 1)))))))
 
 
-<<<<<<< Updated upstream
 ;; problem 164
 (defn run-dfa [{:keys [start accepts transitions]}]
   (letfn [(next-states [[s o]]
@@ -430,3 +429,32 @@
   [n col sum]
   nil)
 
+;; problem 121
+(defn compute-engine [e]
+  (fn [m]
+    (eval
+     `(let [~@(flatten (seq m))]
+        ~e)))) ; apparently `eval` is evil :-(
+
+;; problem 79
+(defn minimal-path [t]
+  (let [t (vec t)
+        f (fn [w p] [(+ w (get-in t p)) p])]
+    (loop [q (sorted-set-by (fn [[w1 _] [w2 _]] (< w1 w2)) (f 0 [0 0]))]
+      (let [[w [x y] :as p1] (first q)]
+        (if (= x (dec (count t)))
+          w
+          (recur (into (disj q p1) (map (partial f w)
+                                        [[(inc x) y]
+                                         [(inc x) (inc y)]]))))))))
+
+;; problem 84
+(defn transitive-closure [c]
+  (loop [c1 c
+         res c]
+    (if (empty c1)
+      res
+      (let [c] (for [[x1 x2] c
+                    [y1 y2] c1
+                    :when (= x2 y1)]
+                [x1 y2]))))) ; Wrong !
