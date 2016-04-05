@@ -40,4 +40,13 @@ class Dao {
     )
   }
 
+  val findAllComments: DbOp[Seq[Comment]] = { session ⇒
+    println(s"find all comments using session [$session]")
+    Seq(
+      Comment(1, "A comment", "John Doe", 1),
+      Comment(2, "Oh yeah", "Someone", 1),
+      Comment(3, "Another comment", "Unknown", 2)
+    )
+  }
+
 }

@@ -9,7 +9,8 @@ object Main extends App {
   val session = Session("db1")
 
   val blogs = Dao.runDbOps(session) {
-    service.getAllBlogsWithComments()
+    //service.getAllBlogsWithComments()
+    service.getAllBlogsWithCommentsAlt()
   }
 
   println("All blogs with comments from DB: ")

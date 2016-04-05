@@ -2,6 +2,7 @@ package reader
 
 import cats._
 import cats.std.all._
+import cats.syntax.cartesian._
 import cats.syntax.functor._
 import cats.syntax.flatMap._
 import cats.syntax.traverse._
@@ -19,4 +20,14 @@ class Service(dao: Dao) {
     } yield blogs
   }
 
+  def joinBlogsAndComments(blogs: Seq[Blog], comments: Seq[Comment]) = {
+    val commentMap = comments.groupBy(_.blogId)
+    blogs.map { b ⇒
+      commentMap.get(b.id).map(xs ⇒ b.copy(comments = xs)).getOrElse(b)
+    }
+  }
+
+  def getAllBlogsWithCommentsAlt(): DbOp[Seq[Blog]] = transactional {
+    (dao.findAllBlogs |@| dao.findAllComments) map joinBlogsAndComments
+  }
 }
