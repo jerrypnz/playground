@@ -1,9 +1,5 @@
 package reader
 
-import cats._
-import cats.std.all._
-import cats.syntax.flatMap._
-
 case class Session(db: String)
 
 object Dao {
