@@ -3,11 +3,19 @@ package reader
 case class Session(db: String)
 
 object Dao {
+
   type DbOp[T] = Session ⇒ T
 
   def runDbOps[T](session: Session)(dbOp: DbOp[T]): T = {
     println(s"Running db operation with session [$session]")
     dbOp(session)
+  }
+
+  def transactional[T](dbOp: DbOp[T]): DbOp[T] = { session ⇒
+    println(s"Begining transaction with session [$session]")
+    val res = dbOp(session)
+    println(s"Committing transaction with session [$session]")
+    res
   }
 }
 

@@ -10,12 +10,13 @@ import Dao._
 
 class Service(dao: Dao) {
 
-  def getAllBlogsWithComments(): DbOp[Seq[Blog]] =
+  def getAllBlogsWithComments(): DbOp[Seq[Blog]] = transactional {
     for {
-      blogs ← dao.findAllBlogs
-      blogsWithComments ← blogs.toList.traverse { blog ⇒
+      rawBlogs ← dao.findAllBlogs
+      blogs    ← rawBlogs.toList.traverse { blog ⇒
         dao.findComments(blog.id).map { xs ⇒ blog.copy(comments = xs) }
       }
-    } yield blogsWithComments
+    } yield blogs
+  }
 
 }
