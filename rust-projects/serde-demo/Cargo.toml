@@ -1,0 +1,10 @@
+[package]
+name = "serde-demo"
+version = "0.1.0"
+authors = ["Jerry Peng <pr2jerry@gmail.com>"]
+
+[dependencies]
+serde = "0.8"
+serde_json = "0.8"
+serde_macros = "0.8"
+chrono = { version = "0.2", features = ["serde"] }
