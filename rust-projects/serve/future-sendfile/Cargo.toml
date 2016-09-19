@@ -1,0 +1,9 @@
+[package]
+name = "future-sendfile"
+version = "0.1.0"
+authors = ["Jerry Peng <pr2jerry@gmail.com>"]
+
+[dependencies]
+libc = "0.2"
+futures = { git = "https://github.com/alexcrichton/futures-rs" }
+futures-io = { git = "https://github.com/alexcrichton/futures-rs" }

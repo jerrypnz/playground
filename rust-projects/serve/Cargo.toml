@@ -1,0 +1,7 @@
+[package]
+name = "serve"
+version = "0.1.0"
+authors = ["Jerry Peng <pr2jerry@gmail.com>"]
+
+[dependencies]
+future-sendfile = { path = "./future-sendfile" }
